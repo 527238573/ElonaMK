@@ -1,0 +1,11 @@
+目前已有的flag：
+
+
+ter：
+
+
+block：
+STAIRS_DOWN 相应的上下楼梯，可以使用楼梯功能
+STAIRS_UP 
+LOCKED  锁住。可以开锁，通过turnto变化成解锁状态
+CONTAINER:掩盖物品。内部物品只能通过交互取得。
