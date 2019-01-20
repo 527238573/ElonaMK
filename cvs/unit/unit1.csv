@@ -1,0 +1,3 @@
+﻿id,name,sex,race,class,attrFactor,level,weapon_skills,profession_skills,traits,animMale,animFemale
+null,空置单位,,null,null,,1,,,,,
+nilo,尼洛,male,eulderna,null,,1,,,,,

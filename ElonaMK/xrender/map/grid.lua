@@ -17,7 +17,7 @@ end
 
 function render.drawMapDebugMesh(camera,map)--绘制网格
   
-  local edge = map.edge
+  local edge = map.edge or 0
   local startx = -edge
   local starty = -edge
   local endx = map.w+edge

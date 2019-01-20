@@ -8,15 +8,21 @@ local win_width = love.graphics.getWidth()
 local win_height = love.graphics.getHeight()
 
 local panel_opt = {id={}}
-local newfile_opt = {id={},[1] = love.graphics.newQuad(0,0,32,32,32,128),img = filebtn_img}
-local open_opt = {id={},[1] = love.graphics.newQuad(0,32,32,32,32,128),img = filebtn_img}
-local save_opt = {id={},[1] = love.graphics.newQuad(0,64,32,32,32,128),img = filebtn_img}
-local saveas_opt = {id={},[1] = love.graphics.newQuad(0,96,32,32,32,128),img = filebtn_img}
+local label_opt = {color={33/255,33/255,33/255},align ="left"}
+
+local newOvermapfile_opt = {id={},[1] = love.graphics.newQuad(0,0,32,32,32,160),img = filebtn_img}
+local newfile_opt = {id={},[1] = love.graphics.newQuad(0,32,32,32,32,160),img = filebtn_img}
+local open_opt = {id={},[1] = love.graphics.newQuad(0,64,32,32,32,160),img = filebtn_img}
+local save_opt = {id={},[1] = love.graphics.newQuad(0,96,32,32,32,160),img = filebtn_img}
+local saveas_opt = {id={},[1] = love.graphics.newQuad(0,128,32,32,32,160),img = filebtn_img}
 local changeSize_btn_opt = {id={},font = c.btn_font,quads = c.pic["editor_btn_quads"]}
+
+local copyOv_btn_opt = {id=newid(),font = c.btn_font,quads = c.pic["editor_btn_quads"]}
 local test_opt = {id={},quads = c.pic["editor_btn_quads"]}
 
 local showSetting_btn = {id={},font = c.btn_font,quads = c.pic["editor_btn_quads"]}
 local changesize_dlg = require"ui/editor/changeSizeDlg"
+local copyOvermap_dlg = require"ui/editor/copyOvDlg"
 --local floor_setter = require"eui/component/floorSetter"
 --local mapfile = require"file/mapfile"
 
@@ -54,17 +60,19 @@ return function()
   local x,y,w,h = 0,0,win_width,30
   suit:Image(back_s9t,panel_opt,x,y,w,h)
   
-  local s_newfile  = IconButton(newfile_opt,newfile_opt,4,0,false)
-  local s_open  = IconButton(open_opt,open_opt,49,0,false)
-  local s_save  = IconButton(save_opt,save_opt,94,0,false)
-  local s_saveas  = IconButton(saveas_opt,saveas_opt,139,0,false)
+  local s_newOvermapfile  = IconButton(newOvermapfile_opt,newOvermapfile_opt,4,0,false)
+  local s_newfile  = IconButton(newfile_opt,newfile_opt,49,0,false)
+  local s_open  = IconButton(open_opt,open_opt,94,0,false)
+  local s_save  = IconButton(save_opt,save_opt,139,0,false)
+  local s_saveas  = IconButton(saveas_opt,saveas_opt,184,0,false)
   
   --local showgrid_state = suit.Checkbox(showMesh, 410,2,90,26)
   
   local showSetting_state = suit:S9Button("show menu",showSetting_btn,410,2,90,26)
   
-  local s_sizebtn = suit:S9Button(editor.size_str,changeSize_btn_opt,500,2,170,26)
-  
+  local s_sizebtn = suit:S9Button(editor.size_str,changeSize_btn_opt,500,2,270,26)
+  local s_copyOvbtn
+  if editor.overmapMode then  s_copyOvbtn = suit:S9Button("copyOvermap",copyOv_btn_opt,800,2,100,26) end
   --floor_setter(680,4)
   
   
@@ -72,6 +80,14 @@ return function()
   
   local tests = suit:S9Button("test",test_opt,1200,2,60,26)
   
+  local  mx,my = love.mouse.getX(),love.mouse.getY()
+  mx,my = editor.camera:screenToModel(mx,my)
+  mx = math.floor(  mx/64)
+  my = math.floor(  my/64)
+  suit:Label("XY:"..mx..","..my,label_opt,1300,2,200,22)
+  
+  
+  if(s_newOvermapfile.hit) then editor.newOvermapFile() end
   if(s_newfile.hit) then editor.newFile() end
   if(s_open.hit) then editor.popwindow = editor.openFileDialog end
   if(s_save.hit) then editor.saveOld() end
@@ -80,7 +96,7 @@ return function()
   
   if(showSetting_state.hit) then editor.popwindow = showSetting end
   if(s_sizebtn.hit) then editor.popwindow = changesize_dlg end
-  
+  if s_copyOvbtn and s_copyOvbtn.hit then editor.popwindow = copyOvermap_dlg end 
   
   if tests.hit then
     print(love.math.random(0,-17.43))

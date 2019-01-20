@@ -37,6 +37,8 @@ function Map.new(x,y,edge)
   o.unit = {} --单位，所站地格之上的。
   o.items = {} -- itemlist.一个list，包含多个物品。
   
+  o.activeUnits = {} --活跃中的单位列表。
+  --其他npc列表
   
   for i=1,o.realw*o.realh do --无效区域内只有ter 和block，做装饰用。
     o.ter[i] = 1 --默认为index为1 的类型 ，是泥土实地，最基本的ter类型
@@ -48,9 +50,7 @@ function Map.new(x,y,edge)
     o.items[i] = empty --items是物品的列表。
   end
   
-  o.activeUnits = {} --活跃中的单位列表。
   
-  --其他npc列表
   
   setmetatable(o,Map)
   return o

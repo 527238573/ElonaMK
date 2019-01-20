@@ -8,7 +8,7 @@ function editor.uiInit()
   editor.popwindow = nil--弹出窗口
   editor.terrainList_init()
   editor.blockList_init()
-
+  editor.oterList_init()
 end
 
 

@@ -25,7 +25,7 @@ function love.load()
   
  
   --love.graphics.setFont(c.font_c14)
-  love.graphics.setBackgroundColor(150/255,150/255,150/255) 
+  love.graphics.setBackgroundColor(70/255,70/255,70/255) 
   
   
   g.runScene(require"Scenes/mainMenu")

@@ -14,6 +14,11 @@ data.blockImgs["wall"] = love.graphics.newImage("data/terrain/walls.png")
 data.blockImgs["block"] = love.graphics.newImage("data/terrain/block.png")
 data.block ={} --index的数组
 
+data.overmapImg = love.graphics.newImage("data/terrain/overmap.png")
+--data.overmapImg:setFilter( "nearest", "nearest" )
+data.oter = {} --index 的数组
+
+
 
 local function strToBoolean(str,default)
   if str =="" then
@@ -26,6 +31,17 @@ local function strToBoolean(str,default)
     error("invalid booleanStr")
   end
 end
+
+local function flagsTable(flagstr)
+  if flagstr =="" then return {} end
+  local t1 = string.split(flagstr,"|")
+  local ret = {}
+  for i=1,#t1 do
+    ret[t1[i]] = true
+  end
+  return ret
+end
+
 
 
 local function loadTer()
@@ -66,8 +82,8 @@ local function loadTer()
     --move_cost
     dataT.move_cost = tonumber(strDH[10]) or 100
 
-    --flag
-    dataT.flag = strDH[11] --还未改好
+    --flags
+    dataT.flags = flagsTable(strDH[11])
 
     --读取quad
     local function loadQuad(x,y,size,tt)
@@ -156,7 +172,7 @@ local function loadBlock()
     --move_cost
     dataT.move_cost = tonumber(strDH[16]) or 0
     --flags
-    dataT.flags = strDH[17] --还未改好
+    dataT.flags = flagsTable(strDH[17])
     --ground
     dataT.ground = strToBoolean(strDH[18],false)
     --frameNum
@@ -205,6 +221,102 @@ local function loadBlock()
 
 end
 
+
+local function loadOvermapTer()
+  
+  local file = assert(io.open("data/terrain/overmap1.csv","r"))
+  debugmsg("load: overmapTer data")
+  local imgw = data.overmapImg:getWidth()
+  local imgh = data.overmapImg:getHeight()
+
+
+  local dataOter= data.oter
+  local index = 1
+  local line = file:read()
+  line = file:read()
+  while(line) do
+    local strDH = string.split(line,",") 
+    local dataT = {}
+    --序号
+    dataT.index = tonumber(strDH[1])
+    assert(dataT.index == index)
+    --id
+    dataT.id = strDH[2]
+    --name
+    dataT.name = strDH[3]
+    --type --默认single
+    dataT.type = strDH[4]
+    if dataT.type=="" then dataT.type =  "single" end
+    --layer
+    dataT.layer = assert(tonumber(strDH[5]))
+    --quadX
+    dataT.quadX = assert(tonumber(strDH[6]))
+    --quadY
+    dataT.quadY = assert(tonumber(strDH[7]))
+    --w
+    dataT.w = tonumber(strDH[8]) or 64
+    --h
+    dataT.h = tonumber(strDH[9]) or 64
+    --anchorX
+    dataT.anchorX = tonumber(strDH[10]) or math.floor(dataT.w/2)
+    --anchorY
+    dataT.anchorY = tonumber(strDH[11]) or math.floor(dataT.h/2)
+    --pass
+    dataT.pass = strToBoolean(strDH[12],true)
+    --move_cost
+    dataT.move_cost = tonumber(strDH[13])
+    if dataT.move_cost==nil then
+      if dataT.layer==1 then
+        dataT.move_cost = 100
+      else
+        dataT.move_cost = 0
+      end
+    end
+    --flags
+    dataT.flags = flagsTable(strDH[14])
+    --targetMap
+    dataT.targetMap = strDH[15]
+    if  dataT.targetMap =="" then  dataT.targetMap =nil end --需要检查
+    --priority
+    dataT.priority = tonumber(strDH[16]) or 1
+
+    --读取quad
+    local function loadQuad(x,y,w,h,tt)
+      table.insert(tt,love.graphics.newQuad(x*32,y*32,w,h,imgw,imgh))
+    end
+    if dataT.type =="hierarchy" then
+      loadQuad(dataT.quadX,dataT.quadY,64,64,dataT)
+      loadQuad(dataT.quadX+2,dataT.quadY,64,64,dataT)
+      loadQuad(dataT.quadX+4,dataT.quadY,64,64,dataT)
+      loadQuad(dataT.quadX+6,dataT.quadY,64,64,dataT)
+      loadQuad(dataT.quadX+8,dataT.quadY,64,64,dataT)
+      loadQuad(dataT.quadX+10,dataT.quadY,64,64,dataT)
+    elseif dataT.type =="road" then
+      loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
+      loadQuad(dataT.quadX+2,dataT.quadY,dataT.w,dataT.h,dataT)
+      loadQuad(dataT.quadX+4,dataT.quadY,dataT.w,dataT.h,dataT)
+      loadQuad(dataT.quadX+6,dataT.quadY,dataT.w,dataT.h,dataT)
+      loadQuad(dataT.quadX+8,dataT.quadY,dataT.w,dataT.h,dataT)
+      loadQuad(dataT.quadX+10,dataT.quadY,dataT.w,dataT.h,dataT)
+    else--single
+      loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
+    end
+
+
+    dataOter[dataT.index] = dataT
+    index = index+1
+    line = file:read()
+  end
+
+  debugmsg("load oterNubmer:"..(index-1))
+  file:close()
+  
+  
+end
+
+
+
+
 local function linkId()
   data.terIndex={}
   for i=1,#data.ter do
@@ -236,5 +348,6 @@ end
 return function()
   loadTer()
   loadBlock()
+  loadOvermapTer()
   linkId()
 end

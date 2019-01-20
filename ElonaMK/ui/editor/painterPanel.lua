@@ -7,6 +7,7 @@ local squre_layer = {data={"terrain","block","field","item"},select= 1,opt= {id=
 
 local terrain_list = require "ui/editor/painter/terList"
 local block_list = require "ui/editor/painter/blockList"
+local oter_list = require "ui/editor/painter/oterList"
 
 local eraseImg = love.graphics.newImage("assets/ui/erase.png")
 local IconButton = require"ui/component/editor/iconButton"
@@ -30,25 +31,26 @@ return function()
   
   y=y+300
 
+  if editor.overmapMode then 
+    oter_list(x+10,y+60,266,500)
+  else
   if squre_layer.select == 1 then
     terrain_list(x+10,y+60,266,500)
   elseif squre_layer.select == 2 then
     block_list(x+10,y+60,266,500)
   end
   suit:ComboBox(squre_layer,squre_layer.opt,x+10,y+30,140,24)
+  end
+  
   
   if editor.erase then
-    if squre_layer.select ==1  and editor.default_ter then
+    if squre_layer.select ==1 and  editor.overmapMode==false and editor.default_ter then
       IconButton(editor.default_ter,x+180,y+10,false,data.terImg)
     end
-    
-    
-    local er = suit:Image(eraseImg,x+200,y+10,64,64)
-    
-    if er.hit  and squre_layer.select ==1 then
+    local s_erase = suit:Image(eraseImg,x+200,y+10,64,64)
+    if s_erase.hit  and squre_layer.select ==1 and  editor.overmapMode==false then
       editor.default_ter = editor.selctTileInfo
     end
-    
   end
   
   

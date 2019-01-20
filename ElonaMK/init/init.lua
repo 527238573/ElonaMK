@@ -8,13 +8,14 @@ require"file/saveTAdv"
 --数据
 data = {}
 local loadTerdata = require"elona/map/terdata"
-
+local loadUnitdata = require"elona/unit/unitdata"
 
 
 --game部分
 require"elona/game"
 require"elona/map/map"
-
+require"elona/unit/unit"
+require"elona/unit/attr"
 --ui部分
 require"Scenes/Scene"
 require"Scenes/mainMenu"
@@ -25,5 +26,6 @@ require"xrender/render"
 
 function data.init()
   loadTerdata()
+  loadUnitdata()
   render.init()
 end
