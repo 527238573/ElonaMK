@@ -149,6 +149,36 @@ local function brushOter(x,y)
 end
 
 
+
+local function brushItem(x,y)
+  if editor.erase then
+    if(editor.map:inbounds(x,y)) then
+      editor.map:clearSquareItem(x,y)
+    end
+    return
+  end
+  if editor.selctItemInfo ==nil then return end
+  if(editor.map:inbounds(x,y)) then
+    local item = Item.create(editor.selctItemInfo.id)
+    editor.map:spawnItem(item,x,y)
+  end
+end
+
+local function brushField(x,y)
+  if editor.erase then
+    if(editor.map:inbounds(x,y)) then
+      editor.map:clearSquareField(x,y)
+    end
+    return
+  end
+  if editor.selctFieldInfo ==nil then return end
+  if(editor.map:inbounds(x,y)) then
+    local field = Field.new(editor.selctFieldInfo.id)
+    editor.map:spawnField(field,x,y)
+  end
+end
+
+
 function editor.brushSquare(x,y)
   if editor.overmapMode  then
     brushOter(x,y)
@@ -157,6 +187,10 @@ function editor.brushSquare(x,y)
       brushTerrain(x,y)
     elseif editor.curPainterSelct ==2 then
       brushBlock(x,y)
+    elseif editor.curPainterSelct ==3 then
+      brushItem(x,y)
+    elseif editor.curPainterSelct ==4 then
+      brushField(x,y)
     end
   end
 end

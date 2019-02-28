@@ -9,6 +9,7 @@ local kuang = c.pic.titleKuang
 
 local btnLoad_opt = {id = newid(),font = c.font_c20}
 local btnNewStart_opt = {id = newid(),font = c.font_c20}
+local btnFastStart_opt = {id = newid(),font = c.font_c20}
 local btnConfig_opt = {id = newid(),font = c.font_c20}
 local btnMapEditor_opt = {id = newid(),font = c.font_c20}
 local btnQuit_opt = {id = newid(),font = c.font_c20}
@@ -50,14 +51,26 @@ end
 
 function mainMenu.update(dt)
   particle:update(dt)
-  local loadgame = suit:S9Button("继续冒险之旅",btnLoad_opt,win_menu.x+80,win_menu.y+80,200,40)
-  local newgame = suit:S9Button("新的冒险之旅",btnNewStart_opt,win_menu.x+80,win_menu.y+140,200,40)
-  local gameconfig= suit:S9Button("设定",btnConfig_opt,win_menu.x+80,win_menu.y+200,200,40)
-  local mapeditor = suit:S9Button("地图编辑",btnMapEditor_opt,win_menu.x+80,win_menu.y+260,200,40)
-  local quit = suit:S9Button("退出",btnQuit_opt,win_menu.x+80,win_menu.y+320,200,40)
+  local fastStart = suit:S9Button("快速开始",btnFastStart_opt,win_menu.x+80,win_menu.y+80,200,40)
+  local loadgame = suit:S9Button("继续冒险之旅",btnLoad_opt,win_menu.x+80,win_menu.y+140,200,40)
+  local newgame = suit:S9Button("新的冒险之旅",btnNewStart_opt,win_menu.x+80,win_menu.y+200,200,40)
+  local gameconfig= suit:S9Button("设定",btnConfig_opt,win_menu.x+80,win_menu.y+260,200,40)
+  local mapeditor = suit:S9Button("地图编辑",btnMapEditor_opt,win_menu.x+80,win_menu.y+320,200,40)
+  local quit = suit:S9Button("退出",btnQuit_opt,win_menu.x+80,win_menu.y+380,200,40)
+  
+  
+  if fastStart.hit then
+    g.fastStart()
+    debugmsg("fastDataSet")
+    g.runScene(require"Scenes/mainGame")
+  end
   
   if mapeditor.hit then
     g.runScene(require"Scenes/mapEditor")
+  end
+  
+  if quit.hit then
+    love.event.push("quit")
   end
   
 end

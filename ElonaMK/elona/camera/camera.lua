@@ -83,5 +83,25 @@ function Camera:screenToModel(x,y)
   return (x-self.workx)/self.workZoom+self.seen_minX,self.seen_maxY-(y-self.worky)/self.workZoom
 end
 
+function Camera:clampXY()
+  local x,y = self.centerX,self.centerY
+  if self.workZoom ==1 then
+    x = math.floor(x+0.5)
+    y = math.floor(y+0.5)
+  elseif self.workZoom ==0.5 then 
+    x = x +1
+    y = y +1
+    
+    x = x -x%2
+    y = y -y%2
+  elseif self.workZoom ==0.75 then 
+    x = x +2/3
+    y = y +2/3
+    x = x -x%(4/3)
+    y = y -y%(4/3)
+  end
+  self:setCenter(x,y)
+end
+
 
 return Camera

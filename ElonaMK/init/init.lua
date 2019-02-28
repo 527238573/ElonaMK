@@ -6,26 +6,58 @@ require"ui/suit"
 require"file/saveTAdv"
 
 --数据
-data = {}
+require"init/datainit"
 local loadTerdata = require"elona/map/terdata"
+local loadAnimdata = require"elona/anim/animdata"
 local loadUnitdata = require"elona/unit/unitdata"
-
-
+local loadAnimClip = require"elona/unit/animClip/animMethod"
+local loadItemdata = require"elona/item/itemdata"
+local loadFielddata = require"elona/field/fielddata"
 --game部分
 require"elona/game"
-require"elona/map/map"
+Map = require"elona/map/map"
+require"elona/map/map_terrain"
+require"elona/map/map_items"
+require"elona/map/map_field"
+require"elona/map/map_unit"
+require"elona/map/mapFactory"
 require"elona/unit/unit"
-require"elona/unit/attr"
+require"elona/unit/unit_attr"
+require"elona/unit/unit_action"
+require"elona/unit/unit_anim"
+require"elona/unit/unitfactory"
+require"elona/unit/animClip/animClip"
+require"elona/item/item"
+require"elona/item/itemfactory"
+require"elona/item/inventory"
+require"elona/field/field"
+require"elona/field/fieldList"
+require"elona/player/player"
+require"elona/player/calendar"
+
+require"elona/newgame/fastStart"
 --ui部分
 require"Scenes/Scene"
 require"Scenes/mainMenu"
-
-
+require"Scenes/mainGame"
+ui = {}
+require"ui/control/key"
+require"ui/mainGame/ui"
 --绘制部分
 require"xrender/render"
 
 function data.init()
   loadTerdata()
+  loadAnimdata()
   loadUnitdata()
+  loadAnimClip()
+  loadItemdata()
+  loadFielddata()
+  
+  
+  
   render.init()
+  Item.initItemFactory()
+  
+  ui.uiInit()--虽然还未进入主游戏，但需要一次载入。
 end

@@ -3,22 +3,9 @@
 data.class ={}
 data.race ={}
 data.unit ={}
-data.unitIndex = {}
 
 
-local function flagsTable(flagstr)
-  if flagstr =="" then return {} end
-  local t1 = string.split(flagstr,"|")
-  local ret = {}
-  for i=1,#t1 do
-    ret[t1[i]] = true
-  end
-  return ret
-end
-
-
-
-
+local flagsTable =data.flagsTable
 
 local function loadClass()
   local file = assert(io.open("data/unit/class1.csv","r"))
@@ -57,6 +44,7 @@ local function loadClass()
     if dataclass[dataT.id]~=nil then
       error("repetitive class id :"..dataT.id)
     end
+    setmetatable(dataT,data.dataMeta)
     dataclass[dataT.id] = dataT
     line = file:read()
     index = index+1
@@ -120,6 +108,7 @@ local function loadRace()
     if datarace[dataT.id]~=nil then
       error("repetitive race id :"..dataT.id)
     end
+    setmetatable(dataT,data.dataMeta)
     datarace[dataT.id] = dataT
     line = file:read()
     index = index+1
@@ -176,9 +165,16 @@ local function loadUnitType()
       elseif key == "traits" then
         dataT.traits = flagsTable(val)
       elseif key == "animMale" then
-        --待添加  寻找anim
+        if val =="" then val = dataT.id end --与单位id一致
+        dataT.animMale = data.unitAnim[val]
+        if dataT.animMale ==nil then debugmsg("emptyUnitAnim id:"..val)  end
       elseif key == "animFemale" then
-        --待添加
+        if val =="" then 
+          dataT.animFemale = dataT.animMale 
+        else
+          dataT.animFemale = data.unitAnim[val]
+        end 
+        if dataT.animFemale ==nil then debugmsg("emptyUnitAnim id:"..dataT.id)  end
       else
         error("error unit key:"..key)
       end
@@ -195,11 +191,11 @@ local function loadUnitType()
     dataT.skill = skill
     --checktrait,待以后
     
-    if data.unitIndex[dataT.id]~=nil then
+    if data.unit[dataT.id]~=nil then
       error("repetitive unit id :"..dataT.id)
     end
-    data.unitIndex[dataT.id] = index
-    data.unit[index] = dataT
+    setmetatable(dataT,data.dataMeta)
+    data.unit[dataT.id] = dataT
     line = file:read()
     index = index+1
   end

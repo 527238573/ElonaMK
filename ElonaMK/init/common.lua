@@ -3,6 +3,8 @@
 
 c= {}
 
+c.empty = 0
+
 c.win_W = love.graphics.getWidth()
 c.win_H = love.graphics.getHeight()
 c.WIN_W = love.graphics.getWidth()
@@ -25,7 +27,7 @@ c.font_x14 = love.graphics.newFont("assets/fzfs.ttf",14);
 c.null_t = {}
 c.timeSpeed = 2.25 --行动点数，速度 和实际时间的换算  （行动点数/速度/tiemspeed = 实际时间）（回合数 = 实际时间秒*timeSpeed）1回合 = 0.444
 c.one_turn = 1/c.timeSpeed
-c.face_table = {7,6,5,8,1,4,1,2,3}
+c.face_table = {7,6,5,8,8,4,1,2,3}
 
 function c.face(dx,dy)
   return c.face_table[(dy+1)*3 +dx+2]

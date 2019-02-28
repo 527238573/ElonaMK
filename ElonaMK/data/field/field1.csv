@@ -1,0 +1,8 @@
+﻿id,name,type,img,frameNum,frameInterval,autoWH,w,h,anchorX,anchorY,scalefactor,drawType,priority,flags
+fire,火焰,anim,,3,0.25,,,,,3,,solid,5,
+blood,血迹,density,,4,,,,,,,,ground,1,
+liquid,液体,anim,,3,0.2,,,,,2,,ground,4,
+water,水,edge,,,,,,,,,,ground,2,
+acid,酸液,edge,,,,,,,,,,ground,3,
+smoke,烟雾,anim,,2,0.5,FALSE,38,38,,3,,air,6,
+powder,粉尘,anim,,3,0.25,,,,,8,,air,7,

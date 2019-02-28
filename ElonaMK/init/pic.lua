@@ -23,3 +23,10 @@ c.pic["close_quads"] =
   active =  love.graphics.newQuad(0,48,30,24,30,72),
   img = closeImg,
 }
+
+
+local msg_panel_img = love.graphics.newImage("assets/ui/messageWin.png")
+c.pic["msg_panel_quads"] =  suit.createS9Table(msg_panel_img,0,0,32,32,6,6,6,6)
+
+local msg_img = love.graphics.newImage("assets/ui/message2.png")
+c.pic["msg_quads"] =  suit.createS9Table(msg_img,0,0,msg_img:getWidth(),msg_img:getHeight(),4,4,4,4)

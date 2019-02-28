@@ -19,35 +19,14 @@ data.overmapImg = love.graphics.newImage("data/terrain/overmap.png")
 data.oter = {} --index 的数组
 
 
-
-local function strToBoolean(str,default)
-  if str =="" then
-    return default
-  elseif str =="FALSE" then
-    return false
-  elseif str =="TRUE" then
-    return true
-  else
-    error("invalid booleanStr")
-  end
-end
-
-local function flagsTable(flagstr)
-  if flagstr =="" then return {} end
-  local t1 = string.split(flagstr,"|")
-  local ret = {}
-  for i=1,#t1 do
-    ret[t1[i]] = true
-  end
-  return ret
-end
+local strToBoolean =data.strToBoolean
+local flagsTable =data.flagsTable
 
 
 
 local function loadTer()
 
   local file = assert(io.open("data/terrain/ter1.csv","r"))
-  debugmsg("load: ter data")
 
 
   local datater= data.ter
@@ -110,7 +89,7 @@ local function loadTer()
       loadQuad(dataT.quadX,dataT.quadY,64,dataT)
     end
 
-
+    setmetatable(dataT,data.dataMeta)
     datater[dataT.index] = dataT
     index = index+1
     line = file:read()
@@ -124,7 +103,6 @@ end
 
 local function loadBlock()
   local file = assert(io.open("data/terrain/block1.csv","r"))
-  debugmsg("load: block data")
 
 
   local datablock= data.block
@@ -209,7 +187,7 @@ local function loadBlock()
       loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
     end
 
-
+    setmetatable(dataT,data.dataMeta)
     datablock[dataT.index] = dataT
     index = index+1
     line = file:read()
@@ -225,7 +203,6 @@ end
 local function loadOvermapTer()
   
   local file = assert(io.open("data/terrain/overmap1.csv","r"))
-  debugmsg("load: overmapTer data")
   local imgw = data.overmapImg:getWidth()
   local imgh = data.overmapImg:getHeight()
 
@@ -302,7 +279,7 @@ local function loadOvermapTer()
       loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
     end
 
-
+    setmetatable(dataT,data.dataMeta)
     dataOter[dataT.index] = dataT
     index = index+1
     line = file:read()

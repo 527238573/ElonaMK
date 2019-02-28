@@ -25,19 +25,22 @@ function love.load()
   
  
   --love.graphics.setFont(c.font_c14)
-  love.graphics.setBackgroundColor(70/255,70/255,70/255) 
-  
+  --love.graphics.setBackgroundColor(70/255,70/255,70/255) 
+  love.graphics.setBackgroundColor(0,0,0) 
   
   g.runScene(require"Scenes/mainMenu")
 end
 
 
 function love.update(dt)
+  g.checkNextScene()--在一帧开始时检查切换scene
   g.current_Scene.update(dt)
 end
 
 function love.draw()
   g.current_Scene.draw()
+  
+  
 end
 
 

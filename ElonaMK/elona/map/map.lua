@@ -7,11 +7,15 @@ local Map = {
     saveType = "Map",--注册保存类型
     refreshMiniMap = false --刷新小地图
   }
-  saveClass["Map"] = Map --注册保存类型
+saveClass["Map"] = Map --注册保存类型
   
 Map.__index = Map
 Map.__newindex = function(o,k,v)
   if Map[k]==nil then error("使用了Map的意料之外的值。") else rawset(o,k,v) end
+end
+
+function Map:loadfinish()
+  --如果新版增加字段，则需要补充。
 end
 
 local empty = 0--{saveType = 0}
@@ -37,7 +41,8 @@ function Map.new(x,y,edge)
   o.unit = {} --单位，所站地格之上的。
   o.items = {} -- itemlist.一个list，包含多个物品。
   
-  o.activeUnits = {} --活跃中的单位列表。
+  o.activeUnits = {} --活跃中的单位列表。以key为值。无先后顺序。
+  o.activeFields = {} --所有地图上的field。以key为值。无先后顺序。
   --其他npc列表
   
   for i=1,o.realw*o.realh do --无效区域内只有ter 和block，做装饰用。
@@ -50,81 +55,51 @@ function Map.new(x,y,edge)
     o.items[i] = empty --items是物品的列表。
   end
   
-  
-  
   setmetatable(o,Map)
   return o
 end
 
 
-function Map:inbounds(x,y)
-  return x>=0 and x<=self.w-1 and y>=0 and y<=self.h-1
-end
-
-function Map:inbounds_edge(x,y)
-  return x>=-self.edge and x<=self.w+self.edge-1 and y>=-self.edge and y<=self.h+self.edge-1
-end
 
 
-
-function Map:copyFrom(omap)
-  if getmetatable(omap) ~= Map then
-    error("copy map error")
+function Map:updateRL(dt)
+  for _,unit in ipairs(self.activeUnits) do
+    unit:updateRL(dt)
+  end
+  for _,field in ipairs(self.activeFields) do
+    field:updateRL(dt)
   end
   
-  self.id =omap.id
-  for x = -self.edge,self.w+self.edge-1 do
-    for y = -self.edge,self.h+self.edge-1 do
-      if omap:inbounds_edge(x,y) then
-        self:setTer(omap:getTer(x,y),x,y)
-        self:setBlock(omap:getBlock(x,y),x,y)
-      end
+  
+  --清理死去或离开地图的unit。 activeUnits的unit只能由这里清理。
+  local index = 1
+  while(index<=#self.activeUnits) do
+    local unit = self.activeUnits[index]
+    if unit:is_dead() or not self:inbounds(unit.x,unit.y) or unit.map~=self  then 
+      table.remove(self.activeUnits,index)
+    else
+      index=index+1
     end
   end
-  --[[
-  for x = 0,self.w-1 do
-    for y = 0,self.h-1 do
-      if omap:inbounds(x,y) then
-        
-      end
+  index = 1
+  
+  while(index<=#self.activeFields) do
+    local field = self.activeFields[index]
+    if field:is_end() or field.map~=self then 
+      table.remove(self.activeFields,index)
+    else
+      index=index+1
     end
   end
-  --]]
+  
   
 end
 
-
---坐标，0，0为左下角。向上是Y正，向右是X正
-function Map:getTer(x,y)
-  assert(x>=-self.edge and x<=self.w+self.edge-1 and y>=-self.edge and y<=self.h+self.edge-1)
-  x = x+self.edge
-  y= y+self.edge
-  return self.ter[y*self.realw+x+1]
+function Map:updateAnim(dt)
+  for _,unit in ipairs(self.activeUnits) do
+    unit:updateAnim(dt)
+  end
 end
-
-function Map:setTer(index,x,y)
-  assert(x>=-self.edge and x<=self.w+self.edge-1 and y>=-self.edge and y<=self.h+self.edge-1)
-  x = x+self.edge
-  y= y+self.edge
-  self.ter[y*self.realw+x+1] = index
-end
-
-
-
-function Map:getBlock(x,y)
-  assert(x>=-self.edge and x<=self.w+self.edge-1 and y>=-self.edge and y<=self.h+self.edge-1)
-  x = x+self.edge
-  y= y+self.edge
-  return self.block[y*self.realw+x+1]
-end
-
-function Map:setBlock(index,x,y)
-  assert(x>=-self.edge and x<=self.w+self.edge-1 and y>=-self.edge and y<=self.h+self.edge-1)
-  x = x+self.edge
-  y= y+self.edge
-  self.block[y*self.realw+x+1] = index
-end
-
 
 
 

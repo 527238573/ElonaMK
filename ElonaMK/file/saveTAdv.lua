@@ -7,6 +7,20 @@ saveClass= {}--各种class类型
 local tableLookup--防止循环引用,查找table
 local subtables
 
+
+local function saveSub(filehandle,obj)
+  local index =tableLookup[obj]
+  if index==nil then
+    index = #subtables+1
+    subtables[#subtables+1] = obj
+    tableLookup[obj] = index --保存至subtables
+  elseif index ==true then
+    error("saveSub error:find index==true ")
+  end
+  filehandle:write("{saveIndex = "..tostring(index).." }")
+end
+
+
 --simp
 local function serialize(o,blank,filehandle,savesub)
   if(blank == nil) then
@@ -19,6 +33,7 @@ local function serialize(o,blank,filehandle,savesub)
   elseif type(o) == "boolean" then
     filehandle:write(tostring(o))
   elseif type(o) == "table" then
+    
     local function savenormal()
       filehandle:write("{\n")
       filehandle:write(blank)
@@ -27,6 +42,14 @@ local function serialize(o,blank,filehandle,savesub)
           filehandle:write("\t[");filehandle:write(k);filehandle:write("] = ")
         elseif type(k) == "string" then
           filehandle:write("\t",k," = ")
+        elseif type(k) == "table" then --以table做key。
+          if k.saveType then 
+            filehandle:write("\t[")
+            saveSub(filehandle,k)
+            filehandle:write("] = ")
+          else
+            error("cannot serialize table key: table")
+          end
         else
           error("cannot serialize table key:"..type(k))
         end
@@ -36,29 +59,25 @@ local function serialize(o,blank,filehandle,savesub)
       end
       filehandle:write("}")
     end
-    local function saveSub()
-      local index =tableLookup[o]
-      if index==nil then
-        index = #subtables+1
-        subtables[#subtables+1] = o
-        tableLookup[o] = index --保存至subtables
-      end
-      filehandle:write("{saveIndex = "..tostring(index).." }")
-    end
     
     if o.saveType then --能够circle的类型。
       if savesub == tableLookup[o] and savesub~=nil then --savesub正在存储此table
         savenormal()
       else
         --存储引用
-        saveSub()
+        saveSub(filehandle,o)
       end
     else --普通表
-      if tableLookup[o]~=nil then --有引用
+      if o.noSave then
+        --跳过。通常是固定类型数据等。
+        filehandle:write("nil")
+      else
+        if tableLookup[o]~=nil then --有引用
           error("circle reference") 
+        end
+        tableLookup[o] = true --防止循环引用
+        savenormal()
       end
-      tableLookup[o] = true --防止循环引用
-      savenormal()
     end
   else error("cannot serialize a "..type(o))
   end
@@ -67,8 +86,10 @@ end
 local function serialize_subtables(filehandle)
   local index =1
   while index<=#subtables do
-    subtables[index].saveType = subtables[index].saveType 
+    subtables[index].saveType = subtables[index].saveType --将metatable的数据取出
+    if subtables[index].preSave then subtables[index]:preSave() end
     serialize(subtables[index],"",filehandle,index)
+    if subtables[index].postSave then subtables[index]:postSave() end
     filehandle:write(",\n")
     index = index+1
   end
@@ -123,7 +144,20 @@ end
 
 
 local function linkOneTable(t,tables)
+  
+  local tolinkKey  = nil
   for k,v in pairs(t) do
+    if type(k) =="table" then
+      if k.saveIndex then
+        if tolinkKey ==nil then tolinkKey = {} end
+        table.insert(tolinkKey,{k,tables[k.saveIndex]}) --装入
+      else
+        --for k1,v1 in pairs(k) do
+        --  debugmsg(tostring(k1).." = "..tostring(v1))
+        --end
+        error("table as key")--不能执行到这一步,普通table不能用作key
+      end
+    end
     if type(v) == "table" then
       if v.saveIndex then
         t[k] = tables[v.saveIndex]
@@ -132,12 +166,17 @@ local function linkOneTable(t,tables)
       end
     end
   end
-  
+  --link key
+  if tolinkKey then
+    for _,v in ipairs( tolinkKey ) do
+			t[v[2]],t[v[1]] =  t[v[1]],nil
+		end
+  end
   if t.saveType then
     local metat = saveClass[t.saveType]
     setmetatable(t,metat)
     if t.loadfinish then
-      t:loadfinsh()
+      t:loadfinish()
     end
   end
   

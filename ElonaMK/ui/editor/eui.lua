@@ -9,6 +9,8 @@ function editor.uiInit()
   editor.terrainList_init()
   editor.blockList_init()
   editor.oterList_init()
+  editor.itemList_init()
+  editor.fieldList_init()
 end
 
 

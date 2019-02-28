@@ -83,41 +83,20 @@ local function drawOneSolidBlock(camera,x,y,map)
 end
 
 
-function render.drawGroundBlock(camera,map)
+
+function render.drawLineGroundBlock(startx,endx,y,camera,map)
   love.graphics.setColor(1,1,1)
-  local squareL = 64
-  local startx = math.floor(camera.seen_minX/squareL)-1
-  local starty = math.floor(camera.seen_minY/squareL)-1
-  local endx = math.floor(camera.seen_maxX/squareL)+1
-  local endy = math.floor(camera.seen_maxY/squareL)+1 --多看一格，有溢出的部分。
-  
-  --从后向前，从左向右，
-  
-  for y = endy,starty,-1 do
-    for x = startx,endx do
-      drawOneGroundBlock(camera,x,y,map)
-    end
+  for x = startx,endx do
+    drawOneGroundBlock(camera,x,y,map)
   end
-  
 end
 
-
-function render.drawAllSolidBlock(camera,map)
+function render.drawLineSolidBlock(startx,endx,y,camera,map)
   love.graphics.setColor(1,1,1)
-  local squareL = 64
-  local startx = math.floor(camera.seen_minX/squareL)-1
-  local starty = math.floor(camera.seen_minY/squareL)-2 --多看2格，有的物体非常高
-  local endx = math.floor(camera.seen_maxX/squareL)+1
-  local endy = math.floor(camera.seen_maxY/squareL)+1 
-  
-  --从后向前，从左向右，
-  
-  for y = endy,starty,-1 do
-    for x = startx,endx do
-      drawOneSolidBlock(camera,x,y,map)
-    end
+  for x = startx,endx do
+    drawOneSolidBlock(camera,x,y,map)
   end
-  
 end
+
 
 

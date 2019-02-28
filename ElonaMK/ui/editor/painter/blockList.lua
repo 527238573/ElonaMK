@@ -53,10 +53,6 @@ return function (x,y,w,h)
     end
     y=y+v.height
   end
-  
-  
   suit:endScissor()
   suit:wheelRoll(itemstates,tiles_info)
-  
-  
 end
