@@ -1,9 +1,9 @@
 
-
+local lovefs = require("file/lovefs")
 data.class ={}
 data.race ={}
 data.unit ={}
-
+data.face ={}
 
 local flagsTable =data.flagsTable
 
@@ -203,11 +203,22 @@ local function loadUnitType()
   file:close()
 end
 
-
+local function loadUnitFace()
+  --debugmsg("source:"..love.filesystem.getSource())
+  local fs = lovefs(love.filesystem.getSource().."/data/pic/face")
+  for _, v in ipairs(fs.files) do --
+    if string.match(v,".%.png") then
+      local fname = string.sub(v,1,-5)
+      --debugmsg("load face:"..fname)
+      data.face[fname]= love.graphics.newImage("/data/pic/face/"..v) 
+    end
+  end
+end
 
 return function ()
   loadClass()
   loadRace()
   loadUnitType()
+  loadUnitFace()
   
 end

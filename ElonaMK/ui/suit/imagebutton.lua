@@ -24,8 +24,14 @@ local function defaultS9Draw(opt,quads,x,y,w,h,theme)
     todraw = quads.active
   elseif opt.state == "hovered" then
     todraw = quads.hovered
+  elseif opt.state == "disable" then
+    todraw = quads.disable
   end
-  love.graphics.setColor(1,1,1)
+  if opt.color then
+    love.graphics.setColor(opt.color)
+  else
+    love.graphics.setColor(1,1,1)
+  end
   theme.drawScale9Quad(todraw,x,y,w,h)
   if opt.text then
     if opt.textcolor then love.graphics.setColor(opt.textcolor[1],opt.textcolor[2],opt.textcolor[3]) else love.graphics.setColor(66/255,66/255,66/255) end

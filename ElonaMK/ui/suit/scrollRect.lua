@@ -16,7 +16,7 @@ return function(core, info, ...)
     info.h_min =0
     info.h_max =info.w -w
     info.hbar_percent = w/info.w
-    info.hscroll_opt = info.hscroll_opt or {id={},vertical = false}
+    info.hscroll_opt = info.hscroll_opt or {id={},vertical = false,hide_disable=opt.hide_disable}
     hstate = core:ScrollBar(info,info.hscroll_opt, x,y+h,w,18)
     info.x = math.floor(x-info.h_value)
   end
@@ -28,7 +28,7 @@ return function(core, info, ...)
     info.v_min =0
     info.v_max = math.max(info.h -h,0)--修正wheelroll失误
     info.vbar_percent = h/info.h
-    info.vscroll_opt = info.vscroll_opt or {id={},vertical = true}
+    info.vscroll_opt = info.vscroll_opt or {id={},vertical = true,hide_disable=opt.hide_disable}
     vstate = core:ScrollBar(info,info.vscroll_opt, x+w,y,18,vsc_h)
     info.y = math.floor(y-info.v_value)
     core:wheelRoll(vstate,info)

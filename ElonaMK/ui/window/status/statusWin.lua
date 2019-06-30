@@ -1,119 +1,139 @@
 local suit = require"ui/suit"
---先声明本体
-local statusWin = ui.new_window()
+
+local statusWin = Window.new()
 ui.statusWin = statusWin
---通用dialogue等
-local s_win = {name = tl("装备","Equipment"),x= c.win_W/2-500,y =c.win_H/2-300, w= 800,h =590,dragopt = {id= newid()}}
-local close_quads = ui.res.close_quads
+
+
+local teamButtons = require"ui/component/window/teamButtons"
+local parchment = require"ui/component/window/parchment"
+local titleFrame = require"ui/component/window/titleFrame"
+local s_win = {name = tl("人物","Character"),id=newid(),x= (c.win_W-ui.right_w)/2-400+50,y =(c.win_H-ui.bottom_h)/2-300+50, w= 800,h =600,dragopt = {id= newid()}}
+local close_quads = c.pic.close_quads2
 local close_opt = {id= newid()}
-local tab_character_opt = {text= tl("  人物","    Character"),id= newid(),font = c.font_c16 ,textcolor = {22,22,88}}
-local tab_equipment_opt = {text= tl("  装备","      Equipment"),id= newid(),font = c.font_c16,textcolor = {22,22,88}}
-local tab_skill_opt = {text= tl("  技能","    Skills"),id= newid(),font = c.font_c16 ,textcolor = {22,22,88}}
+local subWins = {}
+subWins[1] = require"ui/window/status/characterWin"
+subWins[2] = require"ui/window/status/weaponSkillsWin"
+subWins[3] = require"ui/window/status/professionSkillsWin"
+subWins[4] = require"ui/window/status/traitsWin"
+local curentActiveWin 
 
---所有状态总集，人物，装备，技能
-local characterWin = require "ui/window/status/characterWin"
-local equipmentWin = require "ui/window/status/equipmentWin"
-local skillWin = require "ui/window/status/skillWin"
+local sideTab_quads = c.pic.sideTab_quads
+local tab_character_opt = {id= newid(),font = c.font_c16 }
+local tab_weaponSkills_opt = {id= newid(),font = c.font_c16}
+local tab_professionSkills_opt = {id= newid(),font = c.font_c16 }
+local tab_traits_opt = {id= newid(),font = c.font_c16 }
 
-local curentActiveWin = nil --当前激活的窗口，属于上面几种的一个
 
 
-local function changeWin(newwin)
-  if curentActiveWin ~= newwin then
-    curentActiveWin.win_close()
-    curentActiveWin = newwin
-    curentActiveWin.win_open()
+local function pressLeft()
+  g.playSound("card1")
+  for i=1,#subWins do
+    if curentActiveWin == subWins[i] then
+      if i==1 then
+        curentActiveWin = subWins[#subWins]
+      else
+        curentActiveWin = subWins[i-1]
+      end
+      return 
+    end
   end
 end
---移动一个通用函数到这里
-function statusWin.draw_player(x,y)
-  love.graphics.oldColor(255,255,255)
-  suit.theme.drawScale9Quad(ui.res.common_backt,x+9,y+35,140,140)
-  
-  --人物图像
-  local animList = player:getAnimList()
-  local scale = 2*animList.scalefactor
-  local weapon_appearance = player:get_weapon_appearance()
-  --love.graphics.oldColor(255,255,255)
-  local drawfront = true 
-  if weapon_appearance and (weapon_appearance.always_back) then
-    drawfront = false
-    local centx = weapon_appearance.start_cord[1]
-    local centy = weapon_appearance.start_cord[2]
-    love.graphics.draw(weapon_appearance.img,x+15+64,y+41+64,0,scale*weapon_appearance.scaleFactor/2,scale*weapon_appearance.scaleFactor/2,centx,centy)--绘制中心点
+
+local function pressRight()
+  g.playSound("card1")
+  for i=1,#subWins do
+    if curentActiveWin == subWins[i] then
+      if i==#subWins then
+        curentActiveWin = subWins[1]
+      else
+        curentActiveWin = subWins[i+1]
+      end
+      return 
+    end
   end
-  if animList.use_quad then
-    love.graphics.draw(animList.img,animList[1],x+15,y+41,0,scale,scale)--绘制，根据位置（左下点）和缩放
-  else
-    love.graphics.draw(animList[1],x+15,y+41,0,scale,scale)--绘制，根据位置（左下点）和缩放
-  end
-  if weapon_appearance and drawfront then
-    local centx = weapon_appearance.start_cord[1]
-    local centy = weapon_appearance.start_cord[2]
-    love.graphics.draw(weapon_appearance.img,x+15+64,y+41+64,0,scale*weapon_appearance.scaleFactor/2,scale*weapon_appearance.scaleFactor/2,centx,centy)--绘制中心点
-  end
-  
-  
 end
 
 
+local function changeTab(index)
+  if subWins[index]== curentActiveWin then return end
+  curentActiveWin = subWins[index]
+  g.playSound("card1")
+end
 
 
-
-
-
-function statusWin.keyinput(key)
+function statusWin:keyinput(key)
+  if key=="cancel" then  statusWin:Close() ;g.playSound("book1")end
+  if key=="left" then  pressLeft() end
+  if key=="right" then  pressRight() end
+  if key=="tab" then  pressRight() end
+  if key=="f1" then  p:changeMC(1) end
+  if key=="f2" then  p:changeMC(2) end
+  if key=="f3" then  p:changeMC(3) end
+  if key=="f4" then  p:changeMC(4) end
   curentActiveWin.keyinput(key)
 end
-function statusWin.win_open(openwin)
-  if openwin == "character" then
-    curentActiveWin = characterWin
-  elseif openwin == "equipment" then
-    curentActiveWin = equipmentWin
-  elseif openwin == "skill" then
-    curentActiveWin = skillWin
-  elseif curentActiveWin==nil then
-    curentActiveWin = characterWin --没有的话默认第一个
-  end
-  curentActiveWin.win_open()
+
+function statusWin:win_open()
+  g.playSound("skill")
+  --s_win.x = (c.win_W-ui.right_w)/2-400
+  --s_win.y = (c.win_H-ui.bottom_h)/2-300
+  curentActiveWin = subWins[1]
+  
 end
 
-function statusWin.win_close()
-  curentActiveWin.win_close()
+
+
+
+
+function statusWin:win_close()
+  
 end
 
-function statusWin.window_do(dt)
+
+function statusWin:window_do(dt)
   suit:DragArea(s_win,true,s_win.dragopt)
-  
   --使用该窗口的名字
-  suit:Dialog(curentActiveWin.name,s_win.x,s_win.y,s_win.w,s_win.h)
-  suit:DragArea(s_win,false,s_win.dragopt,s_win.x,s_win.y,s_win.w,32)
-  local close_st = suit:ImageButton(close_quads,close_opt,s_win.x+s_win.w-34,s_win.y+4,30,24)
+  local startX = s_win.x-184
+  local startY = s_win.y+44
+  local lineH = 84
+  local character_st = suit:ImageButton(sideTab_quads,tab_character_opt,startX,startY,240,84)
+  if curentActiveWin == subWins[1] then tab_character_opt.state ="active"end
+  local weaponSkills_st = suit:ImageButton(sideTab_quads,tab_weaponSkills_opt,startX,startY+lineH,240,84)
+  if curentActiveWin == subWins[2] then tab_weaponSkills_opt.state ="active"end
+  local professionSkills_st = suit:ImageButton(sideTab_quads,tab_professionSkills_opt,startX,startY+lineH*2,240,84)
+  if curentActiveWin == subWins[3] then tab_professionSkills_opt.state ="active"end
+  local traits_st = suit:ImageButton(sideTab_quads,tab_traits_opt,startX,startY+lineH*3,240,84)
+  if curentActiveWin == subWins[4] then tab_traits_opt.state ="active"end
+  suit:registerDraw(function() 
+      love.graphics.setColor(1,1,1)
+      local list = c.pic.uiIcon
+      love.graphics.draw(list.img,list[subWins[1].icon_index],startX+10,startY-4+lineH*0,0,2,2)
+      love.graphics.draw(list.img,list[subWins[2].icon_index],startX+10,startY-4+lineH*1,0,2,2)
+      love.graphics.draw(list.img,list[subWins[3].icon_index],startX+10,startY-4+lineH*2,0,2,2)
+      love.graphics.draw(list.img,list[subWins[4].icon_index],startX+10,startY-4+lineH*3,0,2,2)
+      love.graphics.setColor(0.1,0.1,0.1)
+      love.graphics.setFont(c.font_c18)
+      love.graphics.printf(subWins[1].name, startX+70, startY+25+lineH*0,120,"center") 
+      love.graphics.printf(subWins[2].name, startX+70, startY+25+lineH*1,120,"center") 
+      love.graphics.printf(subWins[3].name, startX+70, startY+25+lineH*2,120,"center") 
+      love.graphics.printf(subWins[4].name, startX+70, startY+25+lineH*3,120,"center") 
+    end)
   
-  local character_st = suit:ImageButton(ui.res.tab_left_quads,tab_character_opt,s_win.x-104,s_win.y+44,110,43)
-  local equipment_st = suit:ImageButton(ui.res.tab_left_quads,tab_equipment_opt,s_win.x-104,s_win.y+90,110,43)
-  local skill_st = suit:ImageButton(ui.res.tab_left_quads,tab_skill_opt,s_win.x-104,s_win.y+136,110,43)
-  if curentActiveWin == characterWin then tab_character_opt.state ="active"
-  elseif curentActiveWin == equipmentWin then tab_equipment_opt.state ="active"
-  elseif curentActiveWin == skillWin then tab_skill_opt.state ="active" end
+  
+  parchment(s_win.id,s_win.x,s_win.y,s_win.w,s_win.h)
+  titleFrame(s_win.id,curentActiveWin.name,s_win.x+40,s_win.y-10,300,40,curentActiveWin.icon_index)
+  suit:DragArea(s_win,false,s_win.dragopt,s_win.x+40,s_win.y-10,300,40)
+  local close_st = suit:ImageButton(close_quads,close_opt,s_win.x+s_win.w-44,s_win.y+4,30,24)
+  
+  teamButtons(s_win.x+370,s_win.y)
   
   
-  curentActiveWin.window_do(dt,s_win.x,s_win.y,s_win.w,s_win.h)
   
-  if close_st.hit then statusWin:Close() end
-  if character_st.hit then changeWin(characterWin) end
-  if equipment_st.hit then  changeWin(equipmentWin) end
-  if skill_st.hit then changeWin(skillWin) end
-  
+  curentActiveWin.window_do(dt,s_win)
+  if close_st.hit then self:Close() ;g.playSound("book1")end
+  if character_st.hit then changeTab(1) end
+  if weaponSkills_st.hit then changeTab(2) end
+  if professionSkills_st.hit then changeTab(3) end
+  if traits_st.hit then changeTab(4) end
   
 end
-
-
-
-
-
-
-
-
-
-

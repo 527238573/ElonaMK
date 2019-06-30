@@ -1,7 +1,6 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
 
 local BASE = (...):match('(.-)[^%.]+$')
-local bar_res 
 
 local function defaultDraw(fraction, opt, x,y,w,h,theme)
 	local xb, yb, wb, hb -- size of the progress bar
@@ -13,7 +12,7 @@ local function defaultDraw(fraction, opt, x,y,w,h,theme)
 		y, h = y + h*.25, h*.5
 		xb, yb, wb, hb = x,y, w*fraction, h
 	end
-  bar_res = bar_res or ui.res.somebar 
+  local bar_res = c.pic["slider_bar"]
 	local c = theme.getColorForState(opt)
   love.graphics.setColor(1,1,1)
   theme.drawScale9Quad(bar_res.back,x,y,w,h)

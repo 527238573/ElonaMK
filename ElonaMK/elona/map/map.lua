@@ -5,7 +5,11 @@ local Map = {
     edge = 0,
     id = "null",
     saveType = "Map",--注册保存类型
-    refreshMiniMap = false --刷新小地图
+    refreshMiniMap = false, --刷新小地图
+    seen ={w=10,sx=1,sy=1,allseen = true,time = 0},
+    transparent = {},
+    transparent_dirty = true,
+    seen_dirty = true,
   }
 saveClass["Map"] = Map --注册保存类型
   
@@ -14,8 +18,20 @@ Map.__newindex = function(o,k,v)
   if Map[k]==nil then error("使用了Map的意料之外的值。") else rawset(o,k,v) end
 end
 
+function Map:preSave()
+  self.seen = nil
+  self.transparent = nil
+  self.transparent_dirty = true
+  self.seen_dirty = true
+end
+function Map:postSave()
+  
+end
+
 function Map:loadfinish()
   --如果新版增加字段，则需要补充。
+  self.transparent_dirty = true
+  self.seen_dirty = true
 end
 
 local empty = 0--{saveType = 0}
@@ -41,6 +57,8 @@ function Map.new(x,y,edge)
   o.unit = {} --单位，所站地格之上的。
   o.items = {} -- itemlist.一个list，包含多个物品。
   
+  o.transparent={}
+  
   o.activeUnits = {} --活跃中的单位列表。以key为值。无先后顺序。
   o.activeFields = {} --所有地图上的field。以key为值。无先后顺序。
   --其他npc列表
@@ -53,8 +71,11 @@ function Map.new(x,y,edge)
     o.field[i] = empty --field是一个list，列出了地形上的所有field。按绘制优先级顺序。empty为空占位
     o.unit[i] = empty --unit指具体的unit。 empty空占位
     o.items[i] = empty --items是物品的列表。
+    
+    o.transparent[i] = true --
   end
-  
+  o.transparent_dirty = false
+  o.seen_dirty = true
   setmetatable(o,Map)
   return o
 end
@@ -99,6 +120,7 @@ function Map:updateAnim(dt)
   for _,unit in ipairs(self.activeUnits) do
     unit:updateAnim(dt)
   end
+  self.seen.time = self.seen.time+dt
 end
 
 

@@ -38,10 +38,9 @@ function Unit:clips_update(dt)
   --刷新位置。
   local status = self.status
   status.rot = 0;
-  status.dx = 0;status.dy =0;
+  status.dx = 0;status.dy =0;status.dz = 0; --dz表示是否飞起。影子不考虑dz。dz单位和dy都是一样会上移相同像素。
   status.scaleX = 1;status.scaleY =1;
   status.camera_dx = 0;status.camera_dy = 0
-  
   local clips_list = self.clips
   local i=1
   while i<=#clips_list do

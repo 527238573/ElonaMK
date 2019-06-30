@@ -1,5 +1,89 @@
 
+local keyMapping_UI =
+{
+  up = {"up","w"},
+  down = {"down","s"},
+  right = {"right","d"},
+  left = {"left","a"},
+  
+  f1 ={"f1"}, 
+  f2 ={"f2"}, 
+  f3 ={"f3"}, 
+  f4 ={"f4"}, 
+  tab = {"tab"},
+  cancel = {"q","escape"},
+  comfirm = {"e","return"},
+  key_r = {"r"},
+  key_g = {"g"},
+}
 
+local reverseKey_UI
+
+local keyMapping_Game =
+{
+  up = {"up","w"},
+  down = {"down","s"},
+  right = {"right","d"},
+  left = {"left","a"},
+  
+  f1 ={"f1"}, 
+  f2 ={"f2"}, 
+  f3 ={"f3"}, 
+  f4 ={"f4"}, 
+  tab = {"tab"},
+  character = {"c"},
+  inventory = {"x"},
+  pickup = {"g"},
+  drop = {"q"},
+  useItem = {"e"},
+}
+
+local reverseKey_Game
+
+
+function ui.initKeyMapping()
+  reverseKey_UI = {}
+  for order,keytable in pairs(keyMapping_UI) do
+    for _,key in ipairs(keytable) do
+      reverseKey_UI[key] = order
+    end
+  end
+  reverseKey_Game = {}
+  for order,keytable in pairs(keyMapping_Game) do
+    for _,key in ipairs(keytable) do
+      reverseKey_Game[key] = order
+    end
+  end
+  
+end
+--不在mapping的只会为false
+function ui.isDown_UI(order)
+  local keytable =keyMapping_UI[order]
+  if keytable then
+    for _,key in ipairs(keytable) do
+      if love.keyboard.isDown(key) then return true end
+    end
+  end
+  return false
+end
+--陌生的key返回本身。
+function ui.convertKey_UI(key)
+  return reverseKey_UI[key] or key
+end
+
+function ui.isDown_Game(order)
+  local keytable =keyMapping_Game[order]
+  if keytable then
+    for _,key in ipairs(keytable) do
+      if love.keyboard.isDown(key) then return true end
+    end
+  end
+  return false
+end
+--陌生的key返回本身。
+function ui.convertKey_Game(key)
+  return reverseKey_Game[key] or key
+end
 
 
 --key bounding
@@ -30,6 +114,8 @@ local priority = {"up","down","right","left"}
 
 
 function ui.mainGameKeyCheck(dt)
+  if not ui.isKeyfocusMainGame() then return end
+  
   local mc= p.mc 
   
   

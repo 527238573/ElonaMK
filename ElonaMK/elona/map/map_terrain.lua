@@ -14,6 +14,7 @@ function Map:copyFrom(omap)
   if getmetatable(omap) ~= Map then
     error("copy map error")
   end
+  self.transparent_dirty = true
   
   self.id =omap.id
   for x = -self.edge,self.w+self.edge-1 do
@@ -66,6 +67,7 @@ function Map:setBlock(index,x,y)
   x = x+self.edge
   y= y+self.edge
   self.block[y*self.realw+x+1] = index
+  self.transparent_dirty = true
 end
 
 function Map:getAltitude(x,y)
@@ -99,4 +101,11 @@ function Map:move_cost(x,y)
   if not binfo.pass then return -1 end
   local cost = tinfo.move_cost + binfo.move_cost
   return cost
+end
+
+--CONTAINER
+--LOCKED --
+function Map:hasFlag(flag,x,y)
+  
+  
 end

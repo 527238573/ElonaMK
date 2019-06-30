@@ -291,6 +291,10 @@ local function calculateNewScissor(old,x,y,w,h)
   return {x = nx,y=ny,w = nw, h= nh,next = old}
 end
 
+function suit:getScissor()
+  return self.cur_scissor
+end
+
 function suit:pushScissor(x,y,w,h)
   if self.cur_scissor then 
     self.cur_scissor = calculateNewScissor(self.cur_scissor,x,y,w,h)
@@ -318,15 +322,18 @@ end
 
 --after state obtained, wheel triggerd next frame
 function suit:wheelRoll(state,info)
+  local wheel_step = info.wheel_step or 20
+  
   if state.hovered and state.wasHovered and self.mouse_wheel_dy~=0 then
-    info.v_value = math.min(info.v_max, math.max(info.v_min, info.v_value -self.mouse_wheel_dy*20))
+    info.v_value = math.min(info.v_max, math.max(info.v_min, info.v_value -self.mouse_wheel_dy*wheel_step))
     self.mouse_wheel_dy = 0
   end
 end
 --不是很好的的方法，一旦上方有其他组件就会乱了逻辑， 
 function suit:wheelRollInRect(x,y,w,h,info)
+  local wheel_step = info.wheel_step or 20
   if self:mouseInRect(x,y,w,h) and self.mouse_wheel_dy~=0 then
-    info.v_value = math.min(info.v_max, math.max(info.v_min, info.v_value -self.mouse_wheel_dy*20))
+    info.v_value = math.min(info.v_max, math.max(info.v_min, info.v_value -self.mouse_wheel_dy*wheel_step))
     --self.mouse_wheel_dy = 0  --不减去防止覆盖上层滚动。 
   end
 end

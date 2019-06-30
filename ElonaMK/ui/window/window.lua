@@ -1,30 +1,39 @@
---window组件使用面向对象，因为太复杂
-local window_mt = {}
-window_mt.__index = window_mt
+Window={
+  window_do = function(dt) end,
+  win_open = function() end,
+  win_close = function() end,
+  keyinput = function(key) end,
+}
 
-function ui.new_window()
-  local new_win = {}
-  setmetatable(new_win,window_mt)
-  return new_win
+Window.__index = Window
+Window.__newindex = function(o,k,v)
+  if Window[k]==nil and k~="child" then error("使用了Window的意料之外的值。") else rawset(o,k,v) end
+end
+function Window.new()
+  local o = {}
+  setmetatable(o,Window)
+  return o
 end
 
---4个函数需自定义
---window_do(dt) --必须，可无参数
---win_open(...)--可选,任意参数
---win_close(...)--可选,任意参数
---keyinput(key) --可选，但是必会占用键盘焦点
+
+local win_root
+
+function Window.getRoot()
+  return win_root
+end
+
 
 --根节点的 入口函数，每帧都进入
-function ui.windowRoot(dt)
-  --以ui.win_root为根指针
-  if ui.win_root then
-    ui.win_root.window_do(dt)
+function Window.windowRoot(dt)
+  --以win_root为根指针
+  if win_root then
+    win_root:window_do(dt)
   end
   --此时parent可能在执行后close了
-  local parent = ui.win_root
+  local parent = win_root
   local num=1
   while(parent and parent.child) do --层级调用
-    parent.child.window_do(dt) --此时child可能在执行后close了
+    parent.child:window_do(dt) --此时child可能在执行后close了
     parent = parent.child
     num=num+1
     if num>10 then 
@@ -37,34 +46,34 @@ end
 
 
 --从ui根节点展开
-function window_mt:Open(...)
-  if ui.win_root then ui.win_root:Close() end--关闭旧的
-  ui.win_root = self
+function Window:Open(...)
+  if win_root then win_root:Close() end--关闭旧的
+  win_root = self
   self.child = nil--防出错吧
-  if self.win_open then self.win_open(...) end --可选
+  self:win_open(...)
   
 end
 
-function window_mt:OpenChild(child,...)
+function Window:OpenChild(child,...)
   if self.child then self.child:Close() end--关闭旧的
   self.child = child
   child.child = nil--防出错吧
-  if child.win_open then child.win_open(...) end --可选函数
+  child:win_open(...)
 end
 
-function window_mt:keypressed(key)
+function Window:keypressed(key)
   if self.child then self.child:keypressed(key);return end
-  if self.keyinput then self.keyinput(key) end --可选函数
+  self:keyinput(key)
 end
 
-function window_mt:Close(...)
+function Window:Close(...)
   if self.child then self.child:Close() end--关闭子层
-  if self.win_close then self.win_close(...) end--可选
-  if ui.win_root then
-    if ui.win_root==self then
-      ui.win_root = nil
+  self:win_close(...)
+  if win_root then
+    if win_root==self then
+      win_root = nil
     else
-      local parent = ui.win_root
+      local parent = win_root
       local num=1
       while(parent.child) do 
         if parent.child ==self then

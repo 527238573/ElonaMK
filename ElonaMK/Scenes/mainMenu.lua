@@ -61,7 +61,7 @@ function mainMenu.update(dt)
   
   if fastStart.hit then
     g.fastStart()
-    debugmsg("fastDataSet")
+    debugmsg("fastStart game")
     g.runScene(require"Scenes/mainGame")
   end
   

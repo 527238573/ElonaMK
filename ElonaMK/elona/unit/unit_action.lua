@@ -19,7 +19,7 @@ function Unit:walk_to(dest_x,dest_y)
   
   local costtime  = map:move_cost(dest_x,dest_y)/self:getSpeed()
   costtime = (dx~=0 and dy~=0) and costtime*1.4 or costtime
-  costtime = costtime/c.timeSpeed *0.7
+  costtime = costtime/c.timeSpeed 
   map:unitMove(self,dest_x,dest_y) --更换地图上的位置。
   --设置动画。
   
@@ -37,3 +37,43 @@ function Unit:moveAction(dx,dy)
   self:set_face(dx,dy)
   self:walk_to(self.x+dx,self.y+dy)
 end
+
+--将item装入背包。已经经过检查，去除之前的联系。
+
+local pickupStr = tl("%s捡起%s。","%s picks up %s.")
+function Unit:pickUpItem(item,nosound)
+  local playerPick = false
+  for i=1,4 do if self ==p.team[i] then playerPick = true; break end end --是玩家控制的单位。
+  if playerPick then
+    p.inv:addItem(item)
+    addmsg(string.format(pickupStr,self:getName(),item:getDisplayName()),"info")
+  else
+    self.inv:addItem(item)
+  end
+  self:short_delay(0.4,"pickItem") --差不多一回合时间。
+  if not nosound then g.playSound("get1",self.x,self.y) end
+end
+
+local dropStr = tl("%s将%s放下。","%s puts %s down.")
+function Unit:dropItem(item)
+  local playerPick = false
+  for i=1,4 do if self ==p.team[i] then playerPick = true; break end end --是玩家控制的单位。
+  local map = self.map or cmap
+  local success =map:dropItem(item,self.x,self.y)
+  if not success then
+    if item.parent~= nil then
+      item.parent:removeItem(item) --没添加成功，也从原始包内移除。
+    end
+  end
+  self:short_delay(0.3,"dropItem")
+  g.playSound("drop1",self.x,self.y)
+  if playerPick then
+    addmsg(string.format(dropStr,self:getName(),item:getDisplayName()),"info")
+    if not success then
+      addmsg(tl("丢下的物品找不到了！","The item just dropped is lost!"),"info")
+    end
+  end
+end
+
+
+

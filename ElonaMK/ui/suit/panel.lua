@@ -21,7 +21,6 @@ end
 
 
 return function(core, id, x,y,w,h)
-	
 	core:registerHitbox(nil,id, x,y,w,h)
   if id.mg then 
     core:registerDraw(defaultDraw2,x,y,w,h,core.theme)

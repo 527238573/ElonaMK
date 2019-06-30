@@ -13,11 +13,14 @@ c.WIN_H = love.graphics.getHeight()
 c.SQUARE_L= 64  --以下常数，基本不修改，位运算
 
 
-c.font_c20 = love.graphics.newFont("assets/fzh.ttf",20);
-c.font_c18 = love.graphics.newFont("assets/fzh.ttf",18);
-c.font_c16 = love.graphics.newFont("assets/fzh.ttf",16);
-c.font_c14 = love.graphics.newFont("assets/fzh.ttf",14);
-c.font_c12 = love.graphics.newFont("assets/fzh.ttf",12);
+local testfont = "assets/fzh.ttf"
+
+c.font_c20 = love.graphics.newFont(testfont,20);
+c.font_c18 = love.graphics.newFont(testfont,18);
+c.font_c16 = love.graphics.newFont(testfont,16);
+c.font_c14 = love.graphics.newFont(testfont,14);
+c.font_c12 = love.graphics.newFont(testfont,12);
+c.font_x18 = love.graphics.newFont("assets/fzfs.ttf",18);
 c.font_x16 = love.graphics.newFont("assets/fzfs.ttf",16);
 c.font_x14 = love.graphics.newFont("assets/fzfs.ttf",14);
 --c.font_x12 = love.graphics.newFont("assets/fzfs.ttf",12);
@@ -25,7 +28,7 @@ c.font_x14 = love.graphics.newFont("assets/fzfs.ttf",14);
 
 
 c.null_t = {}
-c.timeSpeed = 2.25 --行动点数，速度 和实际时间的换算  （行动点数/速度/tiemspeed = 实际时间）（回合数 = 实际时间秒*timeSpeed）1回合 = 0.444
+c.timeSpeed = 2.25 /0.7 --行动点数，速度 和实际时间的换算  （行动点数/速度/tiemspeed = 实际时间）（回合数 = 实际时间秒*timeSpeed）1回合 = 0.444
 c.one_turn = 1/c.timeSpeed
 c.face_table = {7,6,5,8,8,4,1,2,3}
 
@@ -157,6 +160,28 @@ end
 
 
 
+function c.closest_xypoint_first(x,y,radius)
+  local mx,my = 0,0
+  local dx,dy = 0,-1
+  local rrr = radius*2+1
+  return function()
+    local rx,ry
+    if mx>=-0.5*rrr and mx<=0.5*rrr and my>=-0.5*rrr and my<=0.5*rrr then
+      rx,ry =  x+mx,y+my
+    end
+    if mx==my or (mx<0 and mx == -my) or( mx>0 and mx ==1-my) then
+      dx,dy =dy,dx
+      dx = -dx
+    end
+    mx = mx+dx
+    my = my+dy
+    return rx,ry
+  end
+end
+
+
+
+
 --全局常量
 --stringid转换数字id
 function oid(name)
@@ -202,3 +227,42 @@ function string.split(szFullString, szSeparator)
   end
   return nSplitArray
 end
+
+
+
+local function s9type(self,stype)
+  return stype == "S9Table"
+end
+
+function c.createS9Table(img,x,y,w,h,top,bottom,left,right)
+  
+  if w<left+right then w= left+right+1 end
+  if h<top+bottom then h= top+bottom+1 end
+  
+  local sw,sh = img:getDimensions()
+  local s9t = {img = img, top =top, bottom = bottom, left = left,right = right,w=w,h=h}
+  s9t.midw = w- left -right
+  s9t.midh = h- top -bottom
+  s9t[1] = love.graphics.newQuad(x,y,left,top,sw,sh)
+  s9t[2] = love.graphics.newQuad(x+left,y,w-left-right,top,sw,sh)
+  s9t[3] = love.graphics.newQuad(x+w-right,y,right,top,sw,sh)
+  
+  s9t[4] = love.graphics.newQuad(x,y+top,left,h-top-bottom,sw,sh)
+  s9t[5] = love.graphics.newQuad(x+left,y+top,w-left-right,h-top-bottom,sw,sh)
+  s9t[6] = love.graphics.newQuad(x+w-right,y+top,right,h-top-bottom,sw,sh)
+  
+  s9t[7] = love.graphics.newQuad(x,y+h-bottom,left,bottom,sw,sh)
+  s9t[8] = love.graphics.newQuad(x+left,y+h-bottom,w-left-right,bottom,sw,sh)
+  s9t[9] = love.graphics.newQuad(x+w-right,y+h-bottom,right,bottom,sw,sh)
+  s9t.typeOf = s9type -- 兼容
+  return s9t
+end
+
+
+c.shader_grey = love.graphics.newShader[[
+    vec4 effect(vec4 color, Image texture, vec2 tc, vec2 _) {
+      vec4 cp = Texel(texture, tc) * color;
+      number luminosity = 0.299 * cp.r + 0.587 * cp.g + 0.114 * cp.b;
+      return vec4(luminosity,luminosity,luminosity,cp.a);
+    }]]
+    

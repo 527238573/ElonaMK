@@ -186,6 +186,9 @@ local function loadBlock()
     else--single
       loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
     end
+    
+    --if not dataT.transparent then  debugmsg("find no trans") end
+
 
     setmetatable(dataT,data.dataMeta)
     datablock[dataT.index] = dataT

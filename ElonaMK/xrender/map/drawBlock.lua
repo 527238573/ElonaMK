@@ -50,6 +50,9 @@ local function drawOneSolidBlock(camera,x,y,map)
   local info = data.block[bid]
   if info.ground == true then return end 
   
+  render.setSolidColor(map,x,y)
+  
+  
   
   if info.type=="wall" then
     local up  = getblock(map,x,y+1)
@@ -85,7 +88,7 @@ end
 
 
 function render.drawLineGroundBlock(startx,endx,y,camera,map)
-  love.graphics.setColor(1,1,1)
+  
   for x = startx,endx do
     drawOneGroundBlock(camera,x,y,map)
   end

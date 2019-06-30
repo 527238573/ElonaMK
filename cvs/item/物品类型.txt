@@ -1,0 +1,12 @@
+generic 内部 或者杂物
+decoration 装饰物品，可能能使用。
+tool  工具能使用
+equipment 装备。能装备。可能能使用？
+material 材料
+food 食物
+potion 药水
+wand 魔杖
+magicDevice 魔导器
+scroll 卷轴
+book 书
+ammo 子弹， 投掷，爆炸等

@@ -17,7 +17,7 @@ end
 
 
 --默认ground为true
-function Inventory.new(ground)
+function Inventory.new(ground,parent)
   ground = ground or true --默认是地面的
   local o= {}
   o.list = {}
@@ -43,10 +43,20 @@ function Inventory:setMaxWeight(maxweight)
 end
 
 
---必须成功，成功后返回item，可能是堆叠后的（会改变）
-function Inventory:addItem(item)
+
+--检测物品是否在inventory中。 临时读取出的物品可能随着时间推移被移出，需要检测是否还在包内。
+function Inventory:containsItem(item)
+  return item.parent == self
+end
+
+--必须成功，成功后返回item，可能是堆叠后的（会改变）。
+function Inventory:addItem(item,useStack)
   --不考虑重量体积等，直接加入。
-  if not self.ground then --只有非地面的才会尝试堆叠
+  if item.parent == self then debugmsg("cant add item already in inv");return end
+  if item.parent~= nil then
+    item.parent:removeItem(item) --如果在另一个inventory中，先移除。如果不在任何inv中，直接添加。
+  end
+  if ((not self.ground) or useStack) and item:canStack() then --只有非地面的才会尝试堆叠. 或设useStack为true，强行堆叠。
     for i=1,#self.list do --尝试堆叠
       if self.list[i]:try_to_stack_with(item) then
         self.weight_dirty = true --不改变排序
@@ -63,6 +73,9 @@ function Inventory:addItem(item)
   return item
 end
 
+
+
+
 --整个物品移除，不考虑部分stack
 function Inventory:removeItem(item)
   if item.parent~= self then 
@@ -70,7 +83,7 @@ function Inventory:removeItem(item)
     return
   end
   if self.list[item.index] ==item then
-    table.remove(item,item.index)
+    table.remove(self.list,item.index)
     for i=item.index,#self.list do
       self.list[i].index = i
     end
@@ -110,7 +123,7 @@ end
 function Inventory:sort()
   if not self.unsorted then return end
   self:restack()
-  table.sort(self.items,itemcompare)
+  table.sort(self.list,itemcompare)
   self.unsorted = false
   for i=1,#self.list do
     self.list[i].index =i --重定位。
@@ -146,11 +159,21 @@ end
 --作为绘制的
 function Inventory:getLastThreeItem()
   local list = self.list
-  local length = #list
-  if length<=3 then
-    return list[1],list[2],list[3]
+  
+  local ret={}
+  local index=0
+  for i=#list,1,-1 do
+    local item = list[i]
+    if not item:isHidden() then
+      index =index+1
+      ret[index]= item
+    end
+    if index>=4 then break end
+  end
+  if index>=4  then
+    return Item.manyItems,ret[2],ret[1]
   else
-    return Item.manyItems,list[length-1],list[length]
+    return ret[index],ret[index-1],ret[index-2]
   end
 end
 

@@ -27,10 +27,10 @@ end
 
 local month_table = {31,28,31,30,31,30,31,31,30,31,30,31}
 
-
+local turn_per_sec = 24
 
 function Calendar:caculateTimeFromTurn()
-  local total_sec = math.floor(self.turnpast*6)
+  local total_sec = math.floor(self.turnpast*turn_per_sec)
   self.second = total_sec%60
   local total_minute = math.floor(total_sec/60)
   self.minute = total_minute%60
@@ -56,7 +56,7 @@ function Calendar:caculateTurnFromTime()
   for mon=1,(self.month-1) do
     total_day = total_day+month_table[mon]
   end
-  self.turnpast = total_day*24*60*10 +self.hour*60*10 +self.minute*10+self.second/6
+  self.turnpast = (total_day*24*60*60 +self.hour*60*60 +self.minute*60+self.second)/turn_per_sec
   debugmsg("turn set:"..self.turnpast)
 end
 
@@ -73,7 +73,8 @@ local yearname =  tl("年","")
 function Calendar:getTimeStr()
   if time_str_dirty then
     time_str_dirty = false
-    time_str = string.format("%d%s%s%d%s %02d:%02d",self.year+516,yearname,month_name[self.month],self.day,dayname,self.hour,self.minute)
+    --time_str = string.format("%d%s%s%d%s %02d:%02d",self.year+516,yearname,month_name[self.month],self.day,dayname,self.hour,self.minute)
+    time_str = string.format("%d%s%s%d%s",self.year+516,yearname,month_name[self.month],self.day,dayname)
   end
   return time_str 
 end
@@ -135,6 +136,23 @@ function Calendar:sunset_seconds()
 end
 
 
-
+local  DAYLIGHT_LEVEL =100
+local MOONLIGHT_LEVEL =10
+function Calendar:sun_light()
+  local seconds = self:seconds_past_midnight()
+  local sunrise_seconds = self:sunrise_seconds()
+  local sunset_seconds = self:sunset_seconds()
+  
+  if seconds>sunset_seconds + TWILIGHT_SECONDS or seconds<sunrise_seconds then
+    return MOONLIGHT_LEVEL
+  elseif seconds>=sunrise_seconds  and seconds<=sunrise_seconds + TWILIGHT_SECONDS then
+    local percent = (seconds - sunrise_seconds)/TWILIGHT_SECONDS
+    return MOONLIGHT_LEVEL*(1-percent) +DAYLIGHT_LEVEL *percent
+  elseif seconds>=sunset_seconds  and seconds<=sunset_seconds + TWILIGHT_SECONDS then
+    local percent = (seconds - sunset_seconds)/TWILIGHT_SECONDS
+    return DAYLIGHT_LEVEL*(1-percent) +MOONLIGHT_LEVEL *percent
+  end
+  return DAYLIGHT_LEVEL--其他时间，日光
+end
 
 

@@ -1,269 +1,225 @@
-require"ui/component/info/infoEffect"
-require"ui/component/info/infoTrait"
 local suit = require"ui/suit"
+--先声明本体
+local characterWin = {name = tl("人物","Character"),icon_index = 9}
 
-local characterWin = {name = tl("人物","Character")}
-local statusWin = ui.statusWin--父窗口。真正的当前窗口
-
-
-local function drawHpbar(hp,maxhp,x,y,w,h)
-  love.graphics.oldColor(143,59,59)
-  love.graphics.rectangle("fill",x,y,w,h)
-  if hp>0 then
-    local hplen = hp/maxhp*(w-4)
-    love.graphics.oldColor(121,213,68)
-    love.graphics.rectangle("fill",x+2,y+2,hplen,h-4)
-  end
-end
-
-local function setValColor(val,base)
-  if val==base then
-    love.graphics.oldColor(22,22,22)
-  elseif val>base then
-    love.graphics.oldColor(11,129,11)
+local function valColor(cur,base)
+  if cur<base then 
+    love.graphics.setColor(0.5,0.1,0.1)
+  elseif cur>base then
+    love.graphics.setColor(0.1,0.5,0.1)
   else
-    love.graphics.oldColor(142,22,22)
+    love.graphics.setColor(0.1,0.1,0.1)
   end
 end
 
+local potential_s = {tl("拙劣","Hopeless"),tl("平庸","Bad  "),tl("良好","Good"),tl("优秀","Great"),tl("极佳","Superb")}
+local function potenrial_str(p)
+  p = math.floor(p*100)
+  local index =1
+  if p<=50 then index =1 
+  elseif p<=100 then index =2 
+  elseif p<=150 then index =3 
+  elseif p<=200 then index =4
+  else index= 5 end
+  return string.format("%s%d%%",potential_s[index],p)
+end
+
+
+
+local function drawBar(value,style,x,y,w,h,border)
+  local pb = c.pic.progressBar
+	local xb, yb, wb, hb -- size of the progress bar
+  xb, yb, wb, hb = x+border,y+ border, (w-2*border)*value, h-2*border
+  love.graphics.setColor(1,1,1)
+  suit.theme.drawScale9Quad(pb[1],x,y,w,h)
+  suit.theme.drawScale9Quad(pb[style],xb,yb,wb,hb)
+end
+
+
+local lineH = 24
 local function drawBack(x,y,w,h)
-
-  love.graphics.oldColor(183,186,210)
-  love.graphics.rectangle("fill",x+160,y+35,625,148)
-  love.graphics.oldColor(22,22,22)
+  
+  local mc = p.mc
+  love.graphics.setFont(c.font_x18)
+  --love.graphics.setColor(82/255,82/255,82/255)
+  love.graphics.setColor(0.1,0.1,0.1)
+  love.graphics.print(tl("名字","Name"), x+50, y+60) --改成一次性的读取翻译
+  love.graphics.print(tl("别名","Aka"), x+50, y+60+lineH) --改成一次性的读取翻译
+  love.graphics.print(tl("种族","Race"), x+50, y+60+lineH*2) --改成一次性的读取翻译
+  love.graphics.print(tl("职业","Class"), x+50, y+60+lineH*3) --改成一次性的读取翻译
+  
+  love.graphics.print(tl("性别","Sex"), x+250, y+60) --改成一次性的读取翻译
+  love.graphics.print(tl("年龄","Age"), x+250, y+60+lineH) --改成一次性的读取翻译
+  love.graphics.print(tl("身高","Height"), x+250, y+60+lineH*2) --改成一次性的读取翻译
+  love.graphics.print(tl("体重","Weight"), x+250, y+60+lineH*3) --改成一次性的读取翻译
+  
+  love.graphics.print(tl("等级","Level"), x+425, y+60) --改成一次性的读取翻译
+  love.graphics.print(tl("经验","EXP"), x+425, y+60+lineH) --改成一次性的读取翻译
+  love.graphics.print(tl("必要值","NextLV"), x+425, y+60+lineH*2) --改成一次性的读取翻译
+  love.graphics.print(tl("所属","Faction"), x+425, y+60+lineH*3) --改成一次性的读取翻译
+  love.graphics.setColor(0.1,0.1,0.1)
   love.graphics.setFont(c.font_c18)
-  love.graphics.print(tl("人物姓名    性别","Character Name         Sex"), x+170, y+38) --改成一次性的读取翻译
-  love.graphics.oldColor(255,255,255)
-  love.graphics.draw(ui.res.hpstate_img,ui.res.hpquad_str,x+165,y+60,0,2,2)
-  love.graphics.draw(ui.res.hpstate_img,ui.res.hpquad_dex,x+165,y+85,0,2,2)
-  love.graphics.draw(ui.res.hpstate_img,ui.res.hpquad_int,x+165,y+110,0,2,2)
-  love.graphics.draw(ui.res.hpstate_img,ui.res.hpquad_per,x+165,y+135,0,2,2)
-  love.graphics.draw(ui.res.hpstate_img,ui.res.hpquad_speed,x+165,y+160,0,2,2)
-  love.graphics.draw(ui.res.hpstate_img,ui.res.hpquad_morale,x+395,y+60,0,2,2)
-  love.graphics.draw(ui.res.hpstate_img,ui.res.hpquad_pain,x+395,y+85,0,2,2)
-  love.graphics.oldColor(82,82,82)
+  love.graphics.print(mc:getName(), x+110, y+60) 
+  love.graphics.print(mc:getAkaName(), x+110, y+60+lineH) 
+  love.graphics.print(mc:getRaceName(), x+110, y+60+lineH*2) 
+  love.graphics.print(mc:getClassName(), x+110, y+60+lineH*3) 
+  
+  love.graphics.print(mc:getSexName(), x+310, y+60) 
+  love.graphics.print(string.format("%d",mc:getAge()), x+310, y+60+lineH) 
+  love.graphics.print(string.format("%d cm",mc:getHeight()), x+310, y+60+lineH*2) 
+  love.graphics.print(string.format("%d kg",mc:getWeight()), x+310, y+60+lineH*3) 
+  
+  love.graphics.print(string.format("%d",mc.level), x+485, y+60) 
+  love.graphics.print(string.format("%d",mc.exp), x+485, y+60+lineH) 
+  love.graphics.print(string.format("%d",1234), x+485, y+60+lineH*2) 
+  love.graphics.print("无",        x+485, y+60+lineH*3) 
+  
+  
+  love.graphics.setColor(1,1,1)
+  local head_pic = mc:getPortrait()
+  suit.theme.drawScale9Quad(c.pic.titleKuang,x+650,y+40,84,120)
+  love.graphics.draw(head_pic,x+656,y+46,0,1.5,1.5)
+  local anim = mc:get_unitAnim()
+  love.graphics.draw(anim.img,anim[anim.stillframe],x+700,y+154,0,1.5,1.5,0,anim.h)
+  
+  --attr
+  love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+50,y+164,0,1,1)
+  love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+410,y+164,0,1,1)
+  love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+50,y+460,0,1,1)
+  love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+540,y+460,0,1,1)
+  love.graphics.setColor(0.4,0.4,0.4)
   love.graphics.setFont(c.font_c16)
-  love.graphics.print(tl("力量","Strength"), x+190, y+60) --改成一次性的读取翻译
-  love.graphics.print(tl("敏捷","Dexterity"), x+190, y+85) --改成一次性的读取翻译
-  love.graphics.print(tl("智力","Intelligence"), x+190, y+110) --改成一次性的读取翻译
-  love.graphics.print(tl("感知","Perception"), x+190, y+135) --改成一次性的读取翻译
-  love.graphics.print(tl("速度","Speed"), x+190, y+160) --改成一次性的读取翻译
-
-  love.graphics.print(tl("情绪","Morale"), x+420, y+60) --改成一次性的读取翻译
-  love.graphics.print(tl("疼痛","Pain"), x+420, y+85) --改成一次性的读取翻译
-
-  love.graphics.print(tl("头部","Head"), x+610, y+40) 
-  love.graphics.print(tl("躯干","Torso"), x+610, y+65) 
-  love.graphics.print(tl("左臂","L Arm"), x+610, y+90) 
-  love.graphics.print(tl("右臂","R Arm"), x+610, y+115) 
-  love.graphics.print(tl("左腿","L Leg"), x+610, y+140) 
-  love.graphics.print(tl("右腿","R Leg"), x+610, y+165) 
-
-  --基础值
-  local base_str= player.base.str
-
-
-  love.graphics.print(string.format("(%d)",player.base.str), x+340, y+60) --改成一次性的读取翻译
-  love.graphics.print(string.format("(%d)",player.base.dex), x+340, y+85) --改成一次性的读取翻译
-  love.graphics.print(string.format("(%d)",player.base.int), x+340, y+110) --改成一次性的读取翻译
-  love.graphics.print(string.format("(%d)",player.base.per), x+340, y+135) --改成一次性的读取翻译
-  love.graphics.print(string.format("(%d)",player.base.speed), x+335, y+160) --改成一次性的读取翻译
-
-
-
-  --变化值
-  local val = player:cur_str()
-  setValColor(val,player.base.str)
-  love.graphics.print(string.format("%d",val), x+310, y+60) --改成一次性的读取翻译
-  val = player:cur_dex()
-  setValColor(val,player.base.dex)
-  love.graphics.print(string.format("%d",val), x+310, y+85) --改成一次性的读取翻译
-  val = player:cur_int()
-  setValColor(val,player.base.int)
-  love.graphics.print(string.format("%d",val), x+310, y+110) --改成一次性的读取翻译
-  val = player:cur_per()
-  setValColor(val,player.base.per)
-  love.graphics.print(string.format("%d",val), x+310, y+135) --改成一次性的读取翻译
-  val = player:get_speed()
-  setValColor(val,player.base.speed)
-  love.graphics.print(string.format("%d",val), x+305, y+160) --改成一次性的读取翻译
-
-  val = -1
-  setValColor(val,0)
-  love.graphics.print(string.format("%+d",val), x+505, y+60) --改成一次性的读取翻译
-  val = 0
-  setValColor(-val,0)
-  love.graphics.print(string.format("%d",val), x+505, y+85) --改成一次性的读取翻译
-
-
-
-  drawHpbar(player.hp_part["bp_head"],player:get_max_hp("bp_head"),x+660,y+38,120,20)
-  drawHpbar(player.hp_part["bp_torso"],player:get_max_hp("bp_torso"),x+660,y+63,120,20)
-  drawHpbar(player.hp_part["bp_arm_l"],player:get_max_hp("bp_arm_l"),x+660,y+88,120,20)
-  drawHpbar(player.hp_part["bp_arm_r"],player:get_max_hp("bp_arm_r"),x+660,y+113,120,20)
-  drawHpbar(player.hp_part["bp_leg_l"],player:get_max_hp("bp_leg_l"),x+660,y+138,120,20)
-  drawHpbar(player.hp_part["bp_leg_r"],player:get_max_hp("bp_leg_r"),x+660,y+163,120,20)
-
-  statusWin.draw_player(x,y)
-
-  --特性
-
-  love.graphics.oldColor(82,82,82)
-  love.graphics.setFont(c.font_c16)
-  love.graphics.print(tl("详细属性","Detailed attribute"), x+70, y+200) 
-  love.graphics.print(tl("特性","Traits"), x+360, y+200) 
-  love.graphics.print(tl("效果","Effects"), x+630, y+200) 
-  love.graphics.oldColor(255,255,255)
-  suit.theme.drawScale9Quad(ui.res.common_contentS9,x+10,y+220,255,360)
-
-  suit.theme.drawScale9Quad(ui.res.common_contentS9,x+290,y+220,215,360)
-  suit.theme.drawScale9Quad(ui.res.common_contentS9,x+530,y+220,240,360)
+  love.graphics.print(tl("主要属性 (本来值)","Attributes  (Org)"), x+73, y+162) --改成一次性的读取翻译
+  love.graphics.print(tl("潜力","Potential"), x+290, y+162) --改成一次性的读取翻译
+  love.graphics.print(tl("其他属性","Others"), x+433, y+162)
+  love.graphics.print(tl("攻击修正","Attack Rolls"), x+73, y+458)
+  love.graphics.print(tl("防御修正","Defense Rolls"), x+563, y+458)
+  love.graphics.line(x+73, y+180,x+363, y+180)
+  love.graphics.line(x+410, y+180,x+740, y+180)
+  love.graphics.line(x+73, y+476,x+443, y+476)
+  love.graphics.line(x+540, y+476,x+740, y+476)
+  --attrIcon
+  love.graphics.setColor(1,1,1)
+  local iconlength = 34 
+  local icons = c.pic.uiAttr
+  love.graphics.draw(icons.img,icons[1],x+40,y+185+iconlength*0,0,2,2)
+  love.graphics.draw(icons.img,icons[2],x+40,y+185+iconlength*1,0,2,2)
+  love.graphics.draw(icons.img,icons[3],x+40,y+185+iconlength*2,0,2,2)
+  love.graphics.draw(icons.img,icons[4],x+40,y+185+iconlength*3,0,2,2)
+  love.graphics.draw(icons.img,icons[5],x+40,y+185+iconlength*4,0,2,2)
+  love.graphics.draw(icons.img,icons[6],x+40,y+185+iconlength*5,0,2,2)
+  love.graphics.draw(icons.img,icons[7],x+40,y+185+iconlength*6,0,2,2)
+  love.graphics.draw(icons.img,icons[8],x+40,y+185+iconlength*7,0,2,2)
+  
+  
+  love.graphics.draw(icons.img,icons[16],x+400,y+185+iconlength*0,0,2,2)
+  love.graphics.draw(icons.img,icons[30],x+400,y+185+iconlength*1,0,2,2)
+  love.graphics.draw(icons.img,icons[9], x+400,y+185+iconlength*2,0,2,2)
+  love.graphics.draw(icons.img,icons[10],x+400,y+185+iconlength*3,0,2,2)
+  love.graphics.draw(icons.img,icons[11],x+400,y+185+iconlength*4,0,2,2)
+  love.graphics.draw(icons.img,icons[13],x+400,y+185+iconlength*5,0,2,2)
+  love.graphics.draw(icons.img,icons[12],x+400,y+185+iconlength*6,0,2,2)
+  love.graphics.draw(icons.img,icons[14],x+400,y+185+iconlength*7,0,2,2)
+  --love.graphics.draw(icons.img,icons[15],x+400,y+185+iconlength*8,0,2,2)
+  
+  love.graphics.setColor(0.4,0.4,0.4)
+  love.graphics.setFont(c.font_c18)
+  love.graphics.print(tl("力量","Strength"), x+79, y+192+iconlength*0) --改成一次性的读取翻译
+  love.graphics.print(tl("体质","Constitution"), x+79, y+192+iconlength*1) --改成一次性的读取翻译
+  love.graphics.print(tl("灵巧","Dexterity"), x+79, y+192+iconlength*2) --改成一次性的读取翻译
+  love.graphics.print(tl("感知","Perception"), x+79, y+192+iconlength*3) --改成一次性的读取翻译
+  love.graphics.print(tl("学习","Learning"), x+79, y+192+iconlength*4) --改成一次性的读取翻译
+  love.graphics.print(tl("意志","Will"), x+79, y+192+iconlength*5) --改成一次性的读取翻译
+  love.graphics.print(tl("魔力","Magic"), x+79, y+192+iconlength*6) --改成一次性的读取翻译
+  love.graphics.print(tl("魅力","Charisma"), x+79, y+192+iconlength*7) --改成一次性的读取翻译
+  
+  love.graphics.print(tl("HP","HP"), x+439, y+192+iconlength*0) --改成一次性的读取翻译
+  love.graphics.print(tl("MP","MP"), x+439, y+192+iconlength*1) --改成一次性的读取翻译
+  love.graphics.print(tl("生命力","Life"), x+439, y+192+iconlength*2) --改成一次性的读取翻译
+  love.graphics.print(tl("法力","Mana"), x+439, y+192+iconlength*3) --改成一次性的读取翻译
+  love.graphics.print(tl("速度","Speed"), x+439, y+192+iconlength*4) --改成一次性的读取翻译
+  love.graphics.print(tl("名声","Fame"), x+439, y+192+iconlength*5) --改成一次性的读取翻译
+  love.graphics.print(tl("善恶值","Karma"), x+439, y+192+iconlength*6) --改成一次性的读取翻译
+  love.graphics.print(tl("最大负重","Carry Lmt"), x+439, y+192+iconlength*7) --改成一次性的读取翻译
+  --love.graphics.print(tl("装备重量","Equip Wt"), x+439, y+192+iconlength*8) --改成一次性的读取翻译
+  
+  --value
+  local c_str,b_str = mc:cur_str(),mc:base_str()
+  local c_con,b_con = mc:cur_con(),mc:base_con()
+  local c_dex,b_dex = mc:cur_dex(),mc:base_dex()
+  local c_per,b_per = mc:cur_per(),mc:base_per()
+  local c_ler,b_ler = mc:cur_ler(),mc:base_ler()
+  local c_wil,b_wil = mc:cur_wil(),mc:base_wil()
+  local c_mag,b_mag = mc:cur_mag(),mc:base_mag()+1
+  local c_chr,b_chr = mc:cur_chr(),mc:base_chr()-1
+  
+  valColor(c_str,b_str);love.graphics.print(string.format("%d",c_str), x+175, y+192+iconlength*0) --改成一次性的读取翻译
+  valColor(c_con,b_con);love.graphics.print(string.format("%d",c_con), x+175, y+192+iconlength*1) --改成一次性的读取翻译
+  valColor(c_dex,b_dex);love.graphics.print(string.format("%d",c_dex), x+175, y+192+iconlength*2) --改成一次性的读取翻译
+  valColor(c_per,b_per);love.graphics.print(string.format("%d",c_per), x+175, y+192+iconlength*3) --改成一次性的读取翻译
+  valColor(c_ler,b_ler);love.graphics.print(string.format("%d",c_ler), x+175, y+192+iconlength*4) --改成一次性的读取翻译
+  valColor(c_wil,b_wil);love.graphics.print(string.format("%d",c_wil), x+175, y+192+iconlength*5) --改成一次性的读取翻译
+  valColor(c_mag,b_mag);love.graphics.print(string.format("%d",c_mag), x+175, y+192+iconlength*6) --改成一次性的读取翻译
+  valColor(c_chr,b_chr);love.graphics.print(string.format("%d",c_chr), x+175, y+192+iconlength*7) --改成一次性的读取翻译
+  
+  love.graphics.setColor(0.1,0.1,0.1)
+  love.graphics.print(string.format("(%d)",b_str), x+215, y+192+iconlength*0) --改成一次性的读取翻译
+  love.graphics.print(string.format("(%d)",b_con), x+215, y+192+iconlength*1) --改成一次性的读取翻译
+  love.graphics.print(string.format("(%d)",b_dex), x+215, y+192+iconlength*2) --改成一次性的读取翻译
+  love.graphics.print(string.format("(%d)",b_per), x+215, y+192+iconlength*3) --改成一次性的读取翻译
+  love.graphics.print(string.format("(%d)",b_ler), x+215, y+192+iconlength*4) --改成一次性的读取翻译
+  love.graphics.print(string.format("(%d)",b_wil), x+215, y+192+iconlength*5) --改成一次性的读取翻译
+  love.graphics.print(string.format("(%d)",b_mag), x+215, y+192+iconlength*6) --改成一次性的读取翻译
+  love.graphics.print(string.format("(%d)",b_chr), x+215, y+192+iconlength*7) --改成一次性的读取翻译
+  
+  love.graphics.setColor(0.3,0.3,0.3)
+  love.graphics.print(potenrial_str(mc:potential_str()), x+265, y+192+iconlength*0) --改成一次性的读取翻译
+  love.graphics.print(potenrial_str(mc:potential_con()), x+265, y+192+iconlength*1) --改成一次性的读取翻译
+  love.graphics.print(potenrial_str(mc:potential_dex()), x+265, y+192+iconlength*2) --改成一次性的读取翻译
+  love.graphics.print(potenrial_str(mc:potential_per()), x+265, y+192+iconlength*3) --改成一次性的读取翻译
+  love.graphics.print(potenrial_str(mc:potential_ler()), x+265, y+192+iconlength*4) --改成一次性的读取翻译
+  love.graphics.print(potenrial_str(mc:potential_wil()), x+265, y+192+iconlength*5) --改成一次性的读取翻译
+  love.graphics.print(potenrial_str(mc:potential_mag()), x+265, y+192+iconlength*6) --改成一次性的读取翻译
+  love.graphics.print(potenrial_str(mc:potential_chr()), x+265, y+192+iconlength*7) --改成一次性的读取翻译
+  
+  drawBar(1,3,x+530, y+192+iconlength*0-2,230,22,4)
+  drawBar(1,4,x+530, y+192+iconlength*1-2,230,22,4)
+  love.graphics.setColor(1,1,1)
+  love.graphics.printf(string.format("%d/%d",mc.hp,mc:getMaxHP()), x+530, y+192+iconlength*0,230,"center")
+  love.graphics.printf(string.format("%d/%d",mc.mp,mc:getMaxMP()), x+530, y+192+iconlength*1,230,"center")
+  
+  local c_life,b_life = mc:cur_life(),mc:base_life()
+  local c_mana,b_mana = mc:cur_mana(),mc:base_mana()
+  local c_speed,b_speed = mc:cur_speed(),mc:base_speed()
+  valColor(c_life,b_life);love.graphics.print(string.format("%d",c_life), x+530, y+192+iconlength*2)
+  valColor(c_mana,b_mana);love.graphics.print(string.format("%d",c_mana), x+530, y+192+iconlength*3)
+  valColor(c_speed,b_speed);love.graphics.print(string.format("%d",c_speed), x+530, y+192+iconlength*4)
+  love.graphics.setColor(0.1,0.1,0.1);
+  love.graphics.print(string.format("(%d)",b_life), x+570, y+192+iconlength*2)
+  love.graphics.print(string.format("(%d)",b_mana), x+570, y+192+iconlength*3)
+  love.graphics.print(string.format("(%d)",b_speed), x+570, y+192+iconlength*4)
+  
+  love.graphics.print(string.format("%d",mc.fame), x+540, y+192+iconlength*5)
+  love.graphics.print(string.format("%d",mc.karma), x+540, y+192+iconlength*6)
+  love.graphics.print(string.format("%.1f kg",mc:getMaxCarry()), x+540, y+192+iconlength*7)
 end
 
-local lasthover = nil
-local hovertime = 0
-local function setHover(something)
-  if lasthover~= something then lasthover =something; hovertime = 0 end
-end
-
-
-local hover_trait
-local hover_effect
-local traits_list
-
-local detail_list
-local function loadState()
-  traits_list = {}
-  for _,v in pairs(player.traits) do
-    traits_list[#traits_list +1] = v
-  end
-
-  detail_list = {}
-  --重载入基本信息
-  local numdice,sides = player:hit_roll_dice()
-  detail_list[#detail_list+1] = {left = tl("近战命中骰子:","melee hit roll:"),right = string.format("%dd%d",numdice,sides)}
-  numdice,sides = player:dodge_roll_dice()
-  detail_list[#detail_list+1] = {left = tl("闪避骰子:","dodge roll:"),right = string.format("%dd%d",numdice,sides)}
-
-end
-
-
-local function oneTrait(num,x,y,w,h)
-  local curTrait = traits_list[num]
-  if not curTrait then return end 
-  local state = suit:registerHitbox(nil,curTrait, x,y,w,h)
-  if state =="hovered" then hover_trait = curTrait;setHover(curTrait) end
-
-  local function drawOneTrait()
-    if state =="hovered" then
-      love.graphics.oldColor(111,147,210,150)
-      love.graphics.rectangle("fill",x,y,w,h)
-    end
-    if curTrait:is_good() then
-      love.graphics.oldColor(22,102,22)
-    else
-      love.graphics.oldColor(102,22,22)
-    end
-    love.graphics.setFont(c.font_c16)
-    love.graphics.print(curTrait:getName(), x+6, y+4)
-  end
-  suit:registerDraw(drawOneTrait)
-end
-
-
-
-local traitsScroll = {w= 300,h = 360,itemYNum= 15,opt ={id= newid()}}
-local function traitsWin(x,y,w,h)
-  traitsScroll.h = (360/traitsScroll.itemYNum) * #traits_list
-  suit:List(traitsScroll,oneTrait,traitsScroll.opt,x,y,w,h)
-end
-
-
-
-local function oneEffect(num,x,y,w,h)
-  local eff_list = player.effect_list 
-  local curEffect = eff_list[num]
-  if not curEffect then return end 
-  local state = suit:registerHitbox(nil,curEffect.type, x,y,w,h)--用type做id，防止和底层的effectview冲突
-  if state =="hovered" then hover_effect = curEffect;setHover(curEffect) end
-
-  local function drawOneEffect()
-    if state =="hovered" then
-      love.graphics.oldColor(111,147,210,150)
-      love.graphics.rectangle("fill",x,y,w,h)
-    end
-    local color = curEffect:get_color()
-    love.graphics.oldColor(color[1],color[2],color[3])
-    love.graphics.setFont(c.font_c16)
-    love.graphics.print(curEffect:getName(), x+6, y+4)
-  end
-  suit:registerDraw(drawOneEffect)
-end
-
-
-
-
-local effectsScroll = {w= 400,h = 360,itemYNum= 15,opt ={id= newid()}}
-local function effectWin(x,y,w,h)
-  local eff_list = player.effect_list
-  effectsScroll.h = (360/effectsScroll.itemYNum) * #eff_list
-  suit:List(effectsScroll,oneEffect,effectsScroll.opt,x,y,w,h)
-
-end
-
-local function oneDetail(num,x,y,w,h)
-  local curEntry = detail_list[num]
-  if not curEntry then return end 
-
-  local function drawOneDetail()
-    love.graphics.oldColor(22,22,22)
-    love.graphics.setFont(c.font_c16)
-    love.graphics.print(curEntry.left, x+6, y+4)
-    love.graphics.printf(curEntry.right, x+6, y+4,240,"right")
-  end
-  suit:registerDraw(drawOneDetail)
-end
-
-local detailScroll = {w= 400,h = 350,itemYNum= 15,opt ={id= newid()}}
-local function detailWin(x,y,w,h)
-  --调整高度
-  detailScroll.h = (360/detailScroll.itemYNum) * #detail_list
-  suit:List(detailScroll,oneDetail,detailScroll.opt,x,y,w,h)
-end
 
 
 function characterWin.keyinput(key)
-  if key=="escape" then  statusWin:Close() end
+  
 end
 
-
 function characterWin.win_open()
-  loadState()
 end
 
 function characterWin.win_close()
-  traits_list = nil
+  
 end
 
-function characterWin.window_do(dt,x,y,w,h)
-  suit:registerDraw(drawBack,x,y,w,h)
 
-  hover_trait = nil
-  hover_effect = nil
-  detailWin(x+12,y+222,271,356)
-  traitsWin(x+292,y+222,231,356)
-  effectWin(x+532,y+222,256,356)
-
-  hovertime = hovertime+dt
-  if hover_trait and hovertime >0.5 then
-    ui.traitInfo(hover_trait,love.mouse.getX(),love.mouse.getY())
-  end
-  if hover_effect and hovertime >0.5 then
-    ui.effectInfo(hover_effect,love.mouse.getX(),love.mouse.getY())
-  else
-    ui.clearEffectInfo()
-  end
-
+function characterWin.window_do(dt,s_win)
+  suit:registerDraw(drawBack,s_win.x,s_win.y,s_win.w,s_win.h)
 end
 
 return characterWin

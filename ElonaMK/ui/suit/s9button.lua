@@ -3,19 +3,7 @@ local BASE = (...):match('(.-)[^%.]+$')
 
 local s9util = require(BASE.."s9util")
 
-
-local btn_img = love.graphics.newImage(BASE.."/assets/button2.png")
-local quads = 
-{
-  --normal = s9util.createS9Table(btn_img,0,0,75,23,2,2,2,2),
-  --hovered= s9util.createS9Table(btn_img,0,23,75,23,2,2,2,2),
-  --active = s9util.createS9Table(btn_img,0,46,75,23,2,2,2,2)
-  
-  normal = s9util.createS9Table(btn_img,0,0,28,32,6,10,6,6),
-  hovered= s9util.createS9Table(btn_img,0,32,28,32,6,10,6,6),
-  active = s9util.createS9Table(btn_img,0,64,28,32,6,10,6,6)
-}
-
+local quads = c.pic["btn2_quads"]
 
 local function defaultDraw(text, opt, x,y,w,h,theme)
   local opstate = opt.state or "normal"

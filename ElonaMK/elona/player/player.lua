@@ -23,6 +23,7 @@ function Player.new()
   o.gold = 0
   o.team = {}
   o.calendar = Calendar.new()
+  o.inv = Inventory.new(false,o)
   setmetatable(o,Player)
   return o
 end

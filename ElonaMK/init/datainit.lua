@@ -33,3 +33,15 @@ function data.flagsTable(flagstr)
   end
   return ret
 end
+
+function data.flagsIndexTable(flagstr)
+  if flagstr =="" then return {} end
+  local t1 = string.split(flagstr,"|")
+  return t1
+end
+
+function data.colorTable(colorstr,r,g,b)
+  if colorstr =="" then return {r,g,b} end
+  local t1 = string.split(colorstr,",")
+  return t1
+end

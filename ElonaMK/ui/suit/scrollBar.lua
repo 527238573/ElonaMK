@@ -52,6 +52,7 @@ local back_quads=
 }
 
 local function h_disabled_scroll(core,info,opt,x,y,w,h)
+  if opt.hide_disable then return core:standardState(opt.id)end
   local value_changed = false
   if(w<50) then w = 50 end -- 最小
   h=18 --固定的
@@ -63,7 +64,6 @@ local function h_disabled_scroll(core,info,opt,x,y,w,h)
   
   info.sc_left_opt.img = left_img
   info.sc_right_opt.img = right_img
-  
   local s1=core:Image(back_img,info.sc_hback_opt,x+fang,y,midw,h)
   local s2=core:Image(left_quads.normal,info.sc_left_opt,x,y,fang,h)
   local s3=core:Image(right_quads.normal,info.sc_right_opt,x+fang+midw,y,fang,h)
@@ -77,6 +77,7 @@ end
 local function h_scroll(core,info,opt,x,y,w,h)
   info.hbar_percent = info.hbar_percent or 0.5
   if info.hbar_percent >=1 or info.hbar_percent<=0 or info.h_value ==nil then 
+    info.h_value = 0 --固定为0
     return h_disabled_scroll(core,info,opt,x,y,w,h) 
   end
   
@@ -172,6 +173,7 @@ local function h_scroll(core,info,opt,x,y,w,h)
 end
 
 local function v_disabled_scroll(core,info,opt,x,y,w,h)
+  if opt.hide_disable then return core:standardState(opt.id)end
   local value_changed = false
   if(h<50) then h = 50 end -- 最小
   w=18 --固定的
@@ -196,6 +198,7 @@ end
 local function v_scroll(core,info,opt,x,y,w,h)
   info.vbar_percent = info.vbar_percent or 0.5
   if info.vbar_percent >=1 or info.vbar_percent<=0 or info.v_value==nil then 
+    info.v_value = 0 --固定为0
     return v_disabled_scroll(core,info,opt,x,y,w,h) 
   end
   

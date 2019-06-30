@@ -16,7 +16,7 @@ end
 
 function mainGame.update(dt)
   g.update(dt)
-  ui.uiLayer()
+  ui.uiLayer(dt)
   
 end
 
@@ -26,7 +26,7 @@ function mainGame.draw()
 end
 
 function mainGame.keypressed(key)
-  
+  ui.keypressed(key)
 end
 
 return mainGame

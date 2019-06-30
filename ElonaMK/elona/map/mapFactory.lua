@@ -16,7 +16,6 @@ function Map.createFromTemplateId(id)
   print("load map Template:",template,err)
   io.flush()
   if template==nil then error("load map template failed:"..id)end
-  
   --基础复制。
   local newmap = Map.new(template.w,template.h,template.edge)
   newmap:copyFrom(template)
@@ -28,7 +27,7 @@ function Map.createFromTemplateId(id)
       local list = template:getItemList(x,y,false)
       if list then
         for i=1,#list.list do
-          newmap:spawnItemById(list.list[i].type.id) --创建物品。
+          newmap:spawnItemById(list.list[i].type.id,x,y) --创建物品。
         end
       end
     end

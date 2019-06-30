@@ -1,23 +1,12 @@
 local suit = require"ui/suit"
-local btn_img = love.graphics.newImage("ui/suit/assets/button.png")
-local quads = 
-{
-  --normal = s9util.createS9Table(btn_img,0,0,75,23,2,2,2,2),
-  --hovered= s9util.createS9Table(btn_img,0,23,75,23,2,2,2,2),
-  --active = s9util.createS9Table(btn_img,0,46,75,23,2,2,2,2)
-  
-  normal = suit.createS9Table(btn_img,0,0,28,32,6,10,6,6),
-  hovered= suit.createS9Table(btn_img,0,32,28,32,6,10,6,6),
-  active = suit.createS9Table(btn_img,0,64,28,32,6,10,6,6)
-}
-
-
+local quads = c.pic["btn_quads"]
+--已启用
 local function defaultDraw(picquad,picimg, opt, x,y,w,h,theme)
   local opstate = opt.state or "normal"
   local s9t = quads[opstate] or quads.normal
 
   local pic_size = opt.pic_size or 2
-  love.graphics.oldColor(255,255,255)
+  love.graphics.setColor(1,1,1)
 	theme.drawScale9Quad(s9t,x,y,w,h)
   local side = 6
   if opt.noside then side =0 end
@@ -29,7 +18,7 @@ local function drawDisable(picquad,picimg, opt, x,y,w,h,theme)
   local s9t = quads[opstate] or quads.normal
 
   local pic_size = opt.pic_size or 2
-  love.graphics.oldColor(160,160,160)
+  love.graphics.setColor(160/255,160/255,160/255)
 	theme.drawScale9Quad(s9t,x,y,w,h)
   local side = 6
   if opt.noside then side =0 end

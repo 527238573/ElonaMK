@@ -29,6 +29,7 @@ local function drawOneSquareItem(camera,x,y,map)
     return 
   end --没有，物品，不用画
   local item1,item2,item3  = list:getLastThreeItem()
+  
   if item1==nil then return end
 
   local altitude = map:getAltitude(x,y)
@@ -51,6 +52,7 @@ local function drawOneSquareItem(camera,x,y,map)
     oy = info.h
     quad = getItemQuad(info)
     screenx,screeny = camera:modelToScreen(ax,ay)
+    love.graphics.setColor(item1:getDrawColor())
     love.graphics.draw(info.img,quad,screenx,screeny,0,scale,scale,ox,oy)--绘制，根据位置（锚点默认正中底边）和缩放
   end
   if item2==nil then return end
@@ -63,6 +65,7 @@ local function drawOneSquareItem(camera,x,y,map)
   oy = info.h
   quad = getItemQuad(info)
   screenx,screeny = camera:modelToScreen(ax,ay)
+  love.graphics.setColor(item2:getDrawColor())
   love.graphics.draw(info.img,quad,screenx,screeny,0,scale,scale,ox,oy)--绘制，根据位置（锚点默认正中底边）和缩放
   if item3==nil then return end
   info = item3.type
@@ -74,6 +77,7 @@ local function drawOneSquareItem(camera,x,y,map)
   oy = info.h
   quad = getItemQuad(info)
   screenx,screeny = camera:modelToScreen(ax,ay)
+  love.graphics.setColor(item3:getDrawColor())
   love.graphics.draw(info.img,quad,screenx,screeny,0,scale,scale,ox,oy)--绘制，根据位置（锚点默认正中底边）和缩放
 
   if item1== Item.manyItems then
@@ -86,6 +90,7 @@ local function drawOneSquareItem(camera,x,y,map)
     oy = info.h
     quad = getItemQuad(info)
     screenx,screeny = camera:modelToScreen(ax,ay)
+    love.graphics.setColor(1,1,1,1)
     love.graphics.draw(info.img,quad,screenx,screeny,0,scale,scale,ox,oy)--绘制，根据位置（锚点默认正中底边）和缩放
   end
 

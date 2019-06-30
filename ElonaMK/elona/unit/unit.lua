@@ -9,15 +9,20 @@ Unit = {
     saveType = "Unit",--注册保存类型
     level = 1,--等级
     exp = 0,--经验。
+    hp = 0,--生命
+    mp = 0,--魔法
+    karma = 0,--善恶值
+    fame = 0,--名声
     attr = nil,--存储的属性。
     bnous = nil,--加成。
-    status = 0, ---动画状态 类似 {rate =0,dx = 0,dy =0,face = 1,rot = 0,scaleX = 1,scaleY =1,camera_dx = 0,camera_dy = 0}  
+    status = 0, ---动画状态 类似 {rate =0,dx = 0,dy =0,dz=0,face = 1,rot = 0,scaleX = 1,scaleY =1,camera_dx = 0,camera_dy = 0,flying =0,}  
     anim_id = "null",
     sex_male = true, --male为true， female为false
     delay = 0,--动作延迟的状态。
     delay_id ="null",
     map =nil, --父地图的状态。
-    
+    class_id = "null", --classid。因为可能更换职业，所以
+    protrait = 0,
   }
 saveClass["Unit"] = Unit --注册保存类型
 
@@ -31,6 +36,7 @@ function Unit:loadfinish()
   rawset(self,"type",assert(data.unit[self.id]))
   --如果新版增加字段，则需要补充。
   rawset(self,"anim",assert(data.unitAnim[self.anim_id]))
+  rawset(self,"class",assert(data.class[self.class_id]))
 end
 
 function Unit.new(typeid,level)
@@ -39,7 +45,9 @@ function Unit.new(typeid,level)
   o.id = typeid
   o.type = utype
   o.level = level or 1
-  o.status={rate=0,dx = 0,dy =0,face = 8,rot = 0,scaleX = 1,scaleY =1,camera_dx = 0,camera_dy = 0} --动画状态
+  o.class = utype.class
+  o.class_id = o.class.id
+  o.status={rate=0,dx = 0,dy =0,dz = 0,face = 8,rot = 0,scaleX = 1,scaleY =1,camera_dx = 0,camera_dy = 0,} --动画状态
   Unit.unitInitAttrAndBouns(o)
   
   if utype.sex =="male" then
@@ -53,7 +61,8 @@ function Unit.new(typeid,level)
   o.anim_id = o.anim.id
   --clip
   o.clips ={} 
-  
+  --inventory
+  o.inv =  Inventory.new(false,o)
   setmetatable(o,Unit)
   return o
 end
@@ -81,6 +90,16 @@ function Unit:add_delay(time,delay_id)
   self.delay = self.delay+time
   self.delay_id = delay_id
 end
+
+
+--短暂固定长度的延迟。，不暂用其他事件的时间。
+function Unit:short_delay(time,delay_id)
+  if self.delay<time then
+    self.delay = time
+    self.delay_id = delay_id
+  end
+end
+
 
 function Unit:updateRL(dt)
   self.delay = self.delay -dt
