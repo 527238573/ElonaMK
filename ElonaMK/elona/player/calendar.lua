@@ -102,6 +102,9 @@ function Calendar:updateRL(dt)
   --if last_min~= self.minute then g.map.zLevelCache.setLightDirty() end
 end
 
+function Calendar:getTurnpast()
+  return self.turnpast
+end
 
 function Calendar:seconds_past_midnight()
   return  self.second + (self.minute * 60) + (self.hour * 60 * 60);

@@ -23,6 +23,7 @@ Unit = {
     map =nil, --父地图的状态。
     class_id = "null", --classid。因为可能更换职业，所以
     protrait = 0,
+    weapon_list= {},--临时数据结构
   }
 saveClass["Unit"] = Unit --注册保存类型
 
@@ -63,6 +64,7 @@ function Unit.new(typeid,level)
   o.clips ={} 
   --inventory
   o.inv =  Inventory.new(false,o)
+  o.equipment = {} --内涵1-5位置
   setmetatable(o,Unit)
   return o
 end

@@ -21,6 +21,9 @@ Item = {
     diceFace =1,
     baseAtk =0,
     to_hit = 0,
+    --equipment
+    dv =0,
+    pv =0,
     
     diceNum_range =1,
     diceFace_range =1,

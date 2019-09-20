@@ -33,6 +33,7 @@ function Unit.createMC(id,classid)
   
   unit.hp = unit:getMaxHP()
   unit.mp = unit:getMaxMP()
+  unit:on_equip_change()--刷新装备数据
   
   return unit
 end

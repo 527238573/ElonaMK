@@ -1,5 +1,22 @@
 
 
+function Item:isEquipment()
+  return self.type.type =="equipment"
+end
+function Item:isWeapon()
+  return self.type.weapon
+end
+
+function Item:getEquipType()
+  return self.type.equipType
+end
+function Item:getPV()
+  return self.pv
+end
+
+function Item:getDV()
+  return self.dv
+end
 
 
 
@@ -13,8 +30,10 @@ end
 --根据物品等级。初始化装备的基础属性。
 function Item:initEquipment(level)
   local itype = self.type
-  if not itype.weapon then return end--必须是武器
   local dlevel = level - self.type.sLevel
+  self.dv = math.floor(itype.DV+dlevel*itype.DV_grow)
+  self.pv = math.floor(itype.PV+dlevel*itype.PV_grow)
+  if not itype.weapon then return end--必须是武器
   self.diceNum =itype.diceNum
   self.to_hit =itype.to_hit
   self.diceFace =math.floor(itype.diceFace +dlevel*itype.face_grow*itype.atkCost/100*2)
@@ -65,6 +84,8 @@ function Item:resetEquipmentName()
     name = name..dmgstr
     if self.to_hit~=0 then name = name..string.format("(%d)",self.to_hit) end
   end
+  if self.pv>0 or self.dv>0 then
+    name = name..string.format(" [%d,%d]",self.dv,self.pv)
+  end
   self.displayName = name
-  
 end

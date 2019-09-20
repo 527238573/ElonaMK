@@ -7,10 +7,15 @@ local img = list.img
 local function defaultDraw(str,x,y,w,h,icon_index)
   love.graphics.setColor(1,1,1)
   suit.theme.drawScale9Quad(kuang,x,y,w,h)
-  love.graphics.draw(img,list[icon_index],x+4,y-32,0,2,2)
+  local dx = 50
+  if icon_index>0 then
+    love.graphics.draw(img,list[icon_index],x+4,y-32,0,2,2)
+  else
+    dx = 0
+  end
   love.graphics.setColor(0.7,0.7,0.7)
 	love.graphics.setFont(c.font_c20)
-	love.graphics.printf(str,x+50,y+8, w-50, "center")
+	love.graphics.printf(str,x+dx,y+8, w-dx, "center")
 end
 
 return function(id,str, x,y,w,h ,icon_index)

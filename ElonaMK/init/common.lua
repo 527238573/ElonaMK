@@ -31,7 +31,9 @@ c.null_t = {}
 c.timeSpeed = 2.25 /0.7 --行动点数，速度 和实际时间的换算  （行动点数/速度/tiemspeed = 实际时间）（回合数 = 实际时间秒*timeSpeed）1回合 = 0.444
 c.one_turn = 1/c.timeSpeed
 c.face_table = {7,6,5,8,8,4,1,2,3}
-
+--face方向 face： 123
+  --              884
+  --              765
 function c.face(dx,dy)
   return c.face_table[(dy+1)*3 +dx+2]
 end
@@ -180,6 +182,32 @@ function c.closest_xypoint_first(x,y,radius)
 end
 
 
+function c.closest_xypoint_rnd(x,y,radius)
+  local mx,my = 0,0
+  local dx,dy = 0,-1
+  local rrr = radius*2+1
+  local fx = rnd()<0.5 and -1 or 1
+  local fy = rnd()<0.5 and -1 or 1
+  local switch = rnd()<0.5
+  
+  return function()
+    local rx,ry
+    if mx>=-0.5*rrr and mx<=0.5*rrr and my>=-0.5*rrr and my<=0.5*rrr then
+      if switch then
+        rx,ry =  x+mx*fx,y+my*fy
+      else
+        rx,ry =  x+my*fy,y+mx*fx
+      end
+    end
+    if mx==my or (mx<0 and mx == -my) or( mx>0 and mx ==1-my) then
+      dx,dy =dy,dx
+      dx = -dx
+    end
+    mx = mx+dx
+    my = my+dy
+    return rx,ry
+  end
+end
 
 
 --全局常量

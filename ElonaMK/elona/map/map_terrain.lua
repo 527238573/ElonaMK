@@ -8,6 +8,10 @@ function Map:inbounds_edge(x,y)
   return x>=-self.edge and x<=self.w+self.edge-1 and y>=-self.edge and y<=self.h+self.edge-1
 end
 
+function Map:inbounds_real(x,y)
+  return x>=0 and x<=self.realw-1 and y>=0 and y<=self.realh-1
+end
+
 
 
 function Map:copyFrom(omap)
@@ -53,6 +57,10 @@ function Map:setTer(index,x,y)
   self.ter[y*self.realw+x+1] = index
 end
 
+function Map:setTer_real(index,x,y)
+  assert(x>=0 and x<=self.realw-1 and y>=0 and y<=self.realh-1)
+  self.ter[y*self.realw+x+1] = index
+end
 
 
 function Map:getBlock(x,y)

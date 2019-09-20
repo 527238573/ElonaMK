@@ -9,6 +9,7 @@ require"xrender/map/drawItem"
 require"xrender/map/drawField"
 require"xrender/map/drawUnit"
 require"xrender/overmap/drawOvermap"
+require"xrender/overmap/drawPlayer"
 function render.init()
   render.initDrawTerrain()
   render.initDrawOvermap()
@@ -57,4 +58,14 @@ function render.drawMainGame()
   render.drawShadow(camera,map)
   render.drawSolid(camera,map)
   --camera.centerX,camera.centerY = x,y
+end
+
+
+function render.drawOverMapScene()
+  local camera = g.wcamera
+  local x,y = camera.centerX,camera.centerY
+  camera:clampXY()
+  local map = wmap
+  render.drawOvermap(camera,map)
+  render.drawPlayer(camera,p)
 end

@@ -1,21 +1,42 @@
 
 
 function g.fastStart()
+  
+  --g.runScene(g.mainGame_scene)
+  g.runScene(g.overMap_scene)
+  
   p = Player.new()
   p.calendar:setDate(1,1,1,5) --517年1月1日8点
   
-  cmap = Map.createFromTemplateId("Vernis")
+  --cmap = Map.createFromTemplateId("Vernis")
+  wmap = Map.createOverMapFromTemplateId("tyris1")
+  cmap = Map.getOrCreateIdmap("Vernis")
+  --大地图位置
+  p:setPosition(26,31)
+  
   local mc = Unit.createMC("Nilo","wizard")
   p.mc = mc
   p.team[1] = mc
-  cmap:unitEnter(mc,38,20,true)
+  cmap:unitSpawn(mc,38,20,true)
   
   p.team[2] = Unit.createMC("teenage_girl","warrior")
-  cmap:unitEnter(p.team[2],35,20,true)
+  cmap:unitSpawn(p.team[2],35,20,true)
   
   local item = Item.create("saving_pot")
   p.inv:addItem(item)
   item = Item.create("spear")
+  p.inv:addItem(item)
+  item = Item.create("noble_coat")
+  p.inv:addItem(item)
+  item = Item.create("protection_coat")
+  p.inv:addItem(item)
+  item = Item.create("shield_arm")
+  p.inv:addItem(item)
+  item = Item.create("bejeweled_necklace")
+  p.inv:addItem(item)
+  item = Item.create("magic_gloves")
+  p.inv:addItem(item)
+  item = Item.create("long_sword")
   p.inv:addItem(item)
   item = Item.create("beer_shelf")
   p.inv:addItem(item)
@@ -75,4 +96,6 @@ function g.fastStart()
   g.initCamera()
   g.camera:updateRect(cmap)
   g.camera:setCenter(38*64,20*64)
+  g.wcamera:updateRect(wmap)
+  g.wcamera:setCenter(38*64,20*64)
 end

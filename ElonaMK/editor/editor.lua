@@ -285,7 +285,9 @@ function editor.openFile(name,path)
   io.flush()
   --for k,v in pairs(result) do debugmsg("k:"..k.." v:"..tostring(v)) end
   if result and type(result)=="table" and result.w then
-
+    print("load map Template meta:",getmetatable(result))
+    io.flush()
+    
     if editor.copyOv then 
       editor.copyOvermap(result)
     else

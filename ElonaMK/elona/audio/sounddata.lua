@@ -23,4 +23,5 @@ end
 
 return function()
   loadSound()
+  data.sound["pop2"].volume = 1
 end

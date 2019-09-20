@@ -3,7 +3,7 @@ index,id,name,type,color,priority,quadX,quadY,quadSize,move_cost,flag
 2,grass,草地,hierarchy,,19,0,0,64,100,
 3,sgrass,草地,hierarchy,,12,0,2,,,
 4,rock,岩石地面,hierarchy,brown,14,0,6,,110,
-5,desert ,旱地,hierarchy,,10,0,8,,,
+5,desert,旱地,hierarchy,,8,0,8,,,
 6,water,浅水,hierarchy,,4,7,0,,150,
 7,water_deep,深水,hierarchy,,3,7,2,,200,
 8,pavement,马路,hierarchy,,23,7,4,,,
@@ -105,3 +105,4 @@ index,id,name,type,color,priority,quadX,quadY,quadSize,move_cost,flag
 104,edged_carpet7,地毯,edged,,40,21,23,,,
 105,edged_screen,大屏幕,edged,,40,23,23,,,
 106,edged_ground,水泥地,edged,,40,25,23,,,
+107,dirt_road,泥地路,hierarchy,,9,21,6,,,

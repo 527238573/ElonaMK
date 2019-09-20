@@ -66,3 +66,11 @@ function Item.getRandomMaterial(dlevel)
     return data.material_seq[2] --paper
   end
 end
+
+local testEquip
+function Item.getTestEquipment()
+  if testEquip ==nil then
+    testEquip = Item.create("spear")
+  end
+  return testEquip
+end

@@ -17,7 +17,11 @@ return function()
 
   suit:Panel(panel_opt,x,y,w,h)
   
-  miniMap(cmap,g.camera,x+25,y+25,250,250)
+  if g.inOvermapMode() then
+    miniMap(wmap,g.wcamera,x+25,y+25,250,250)
+  else
+    miniMap(cmap,g.camera,x+25,y+25,250,250)
+  end
   teamBar(x+6,y+340)
   
   local messageY = 368

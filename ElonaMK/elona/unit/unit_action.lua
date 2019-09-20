@@ -1,5 +1,24 @@
 
 
+local function walk_out_of_map_callback(leave)
+  if leave then
+    g.playSound("exitmap1")
+    local wx,wy = p.x,p.y
+    if cmap.wmap_cord then
+      wx,wy = cmap.wmap_cord[1],cmap.wmap_cord[2]
+    end
+    Map.enterWorldMap(wx,wy)
+  end
+end
+
+function Unit:walk_out_of_map(dest_x,dest_y)
+  local map = assert(self.map)
+  if self == p.mc and not map:inbounds(dest_x,dest_y) and  map.can_exit then
+    ui.ynAskWin:Open(walk_out_of_map_callback,tl("离开地图？","Do you want to leave?"))
+    return true
+  end
+  return false
+end
 
 
 --尝试走到x，y点，不行则返回false。行则返回true
@@ -35,7 +54,10 @@ end
 --操作move
 function Unit:moveAction(dx,dy)
   self:set_face(dx,dy)
-  self:walk_to(self.x+dx,self.y+dy)
+  local mdo = self:walk_out_of_map(self.x+dx,self.y+dy)
+  if mdo then return end
+  mdo = self:walk_to(self.x+dx,self.y+dy)
+  
 end
 
 --将item装入背包。已经经过检查，去除之前的联系。

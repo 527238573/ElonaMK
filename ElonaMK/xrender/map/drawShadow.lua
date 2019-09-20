@@ -10,7 +10,7 @@ local oldSeen
 local oldSX
 local oldSY
 
-local sun_light
+local sun_light = 50
 
 local batch1
 local batchshow

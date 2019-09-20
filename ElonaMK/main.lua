@@ -39,8 +39,6 @@ end
 
 function love.draw()
   g.current_Scene.draw()
-  
-  
 end
 
 

@@ -4,12 +4,16 @@ local Map = {
     h = 10, --高默认值，
     edge = 0,
     id = "null",
+    name = tl("未知之地","Unknown place"),
     saveType = "Map",--注册保存类型
     refreshMiniMap = false, --刷新小地图
     seen ={w=10,sx=1,sy=1,allseen = true,time = 0},
     transparent = {},
     transparent_dirty = true,
     seen_dirty = true,
+    lastTurn = 0,--最后次更新的游戏内时间。载入新cmap时使用
+    gen_id ="",--map生成及刷新相关函数的id。data.mapgen[gen_id] 
+    can_exit = false,--能否在边缘退出。
   }
 saveClass["Map"] = Map --注册保存类型
   
@@ -84,40 +88,40 @@ end
 
 
 function Map:updateRL(dt)
-  for _,unit in ipairs(self.activeUnits) do
+  for unit,_ in pairs(self.activeUnits) do
     unit:updateRL(dt)
   end
-  for _,field in ipairs(self.activeFields) do
+  for field,_ in pairs(self.activeFields) do
     field:updateRL(dt)
   end
   
   
   --清理死去或离开地图的unit。 activeUnits的unit只能由这里清理。
-  local index = 1
-  while(index<=#self.activeUnits) do
-    local unit = self.activeUnits[index]
+  local leaveUnits = {}
+  for unit,_ in pairs(self.activeUnits) do
     if unit:is_dead() or not self:inbounds(unit.x,unit.y) or unit.map~=self  then 
-      table.remove(self.activeUnits,index)
-    else
-      index=index+1
+      table.insert(leaveUnits,unit)
     end
   end
-  index = 1
+  for _,unit in ipairs(leaveUnits) do
+    self.activeUnits[unit]=nil
+  end
   
-  while(index<=#self.activeFields) do
-    local field = self.activeFields[index]
-    if field:is_end() or field.map~=self then 
-      table.remove(self.activeFields,index)
-    else
-      index=index+1
+  local leaveFields = {}
+  for field,_ in pairs(self.activeFields) do
+    if field:is_end() or field.map~=self  then 
+      table.insert(leaveFields,field)
     end
+  end
+  for _,field in ipairs(leaveFields) do
+    self.activeFields[field]=nil
   end
   
   
 end
 
 function Map:updateAnim(dt)
-  for _,unit in ipairs(self.activeUnits) do
+  for unit,_ in pairs(self.activeUnits) do
     unit:updateAnim(dt)
   end
   self.seen.time = self.seen.time+dt

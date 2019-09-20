@@ -202,6 +202,8 @@ local function drawBack(x,y,w,h)
   love.graphics.print(string.format("%d",mc.fame), x+540, y+192+iconlength*5)
   love.graphics.print(string.format("%d",mc.karma), x+540, y+192+iconlength*6)
   love.graphics.print(string.format("%.1f kg",mc:getMaxCarry()), x+540, y+192+iconlength*7)
+  
+  ui.drawFix(x,y,w,h)
 end
 
 

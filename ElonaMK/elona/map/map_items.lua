@@ -71,9 +71,9 @@ end
 --返回是否成功drop.不一定能成功drop
 function Map:dropItem(item,x,y)
   if not self:inbounds(x,y) then return false end
-  for nx,ny,nz in c.closest_xypoint_first(x,y,3) do--默认为3
-    if self:canDropItems(x,y,false) then
-      local list = self:getItemList(x,y,true)
+  for nx,ny in c.closest_xypoint_first(x,y,3) do--默认为3
+    if self:canDropItems(nx,ny,false) then
+      local list = self:getItemList(nx,ny,true)
       list:addItem(item,true)
       return true
     end

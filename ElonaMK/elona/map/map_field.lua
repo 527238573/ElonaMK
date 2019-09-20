@@ -18,7 +18,8 @@ end
 function Map:spawnField(field,x,y)
   local list = self:getFieldList(x,y,true)
   list:add(field)
-  table.insert(self.activeFields,field)--加入活动列表中
+  self.activeFields[field] = true--加入活动列表中
+  --table.insert(self.activeFields,field)--加入活动列表中
   
 end
 --强行清楚一个地格上的所有field。

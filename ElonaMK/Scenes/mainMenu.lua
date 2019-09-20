@@ -62,7 +62,7 @@ function mainMenu.update(dt)
   if fastStart.hit then
     g.fastStart()
     debugmsg("fastStart game")
-    g.runScene(require"Scenes/mainGame")
+    
   end
   
   if mapeditor.hit then

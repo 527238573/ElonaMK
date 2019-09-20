@@ -36,9 +36,13 @@ local keyMapping_Game =
   pickup = {"g"},
   drop = {"q"},
   useItem = {"e"},
+  space ={"space"},
 }
 
 local reverseKey_Game
+
+
+
 
 
 function ui.initKeyMapping()
@@ -158,3 +162,50 @@ function ui.mainGameKeyCheck(dt)
     end
   end
 end
+
+
+
+function ui.overmapKeyCheck(dt)
+  if not ui.isKeyfocusMainGame() then return end
+  
+  for i=1,4 do
+    if(keyD(priority[i])) then
+      if(priority[i] == "up") then
+        if(keyD("left")) then
+          p:moveAction(-1,1)
+        elseif(keyD("right")) then
+          p:moveAction(1,1)
+        else
+          p:moveAction(0,1)
+        end
+      elseif (priority[i] =="down") then
+        if(keyD("left")) then
+          p:moveAction(-1,-1)
+        elseif(keyD("right")) then
+          p:moveAction(1,-1)
+        else
+          p:moveAction(0,-1)
+        end
+      elseif (priority[i] =="right") then
+        if(keyD("up")) then
+          p:moveAction(1,1)
+        elseif(keyD("down")) then
+          p:moveAction(1,-1)
+        else
+          p:moveAction(1,0)
+        end
+      elseif (priority[i] =="left") then
+        if(keyD("up")) then
+          p:moveAction(-1,1)
+        elseif(keyD("down")) then
+          p:moveAction(-1,-1)
+        else
+          p:moveAction(-1,0)
+        end
+      end
+      return
+    end
+  end
+end
+
+

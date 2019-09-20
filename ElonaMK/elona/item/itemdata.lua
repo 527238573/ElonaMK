@@ -335,6 +335,10 @@ local function loadWeapon()
     dataT.hanging = false
     dataT.canStack = false
     dataT.initNum = 1
+    if dataT.equipType=="twohand" then
+      dataT.equipType = "mainhand" --双手武器就是主手武器带双手flag
+      dataT.flags["TWOHAND"] = true --
+    end
 
     --quad
     local function loadQuad(x,y,w,h,tt)
@@ -362,6 +366,106 @@ local function loadWeapon()
 end
 
 
+local function loadEquipment()
+  
+  local file = assert(io.open("data/item/item_equipment1.csv","r"))
+  local index = 1
+  local line = file:read()
+  local attrName = string.split(line,",") 
+  attrName[1] = "id" --utf8头，需要修正
+
+  line = file:read()
+  while(line) do
+    local strDH = string.split(line,",") 
+    local dataT = {}
+    for i=1,#strDH do
+      local val = strDH[i]
+      local key = attrName[i] 
+
+      if key=="id" then
+        dataT.id = val
+      elseif  key=="name" then
+        dataT.name = val
+      elseif  key=="type" then
+        if val =="" then val = "generic" end
+        dataT[key] = val
+      elseif  key=="img" then
+        local img = data.itemImgs[val]
+        if img ==nil then error("wrong itemImg id:"..val.." index:"..index)  end
+        dataT.img = img
+      elseif  key=="quadX" then
+        dataT.quadX = assert(tonumber(val))
+      elseif  key=="quadY" then
+        dataT.quadY = assert(tonumber(val))
+      elseif  key=="w" then
+        dataT[key] = tonumber(val) or 64
+      elseif  key=="h" then
+        dataT[key] = tonumber(val) or 64
+      elseif  key=="frameNum" then
+        dataT.frameNum = tonumber(val) or 1
+        dataT.useAnim = dataT.frameNum>1 
+      elseif  key=="frameInterval" then
+        dataT.frameInterval = tonumber(val) or 0.2
+      elseif  key=="weight" then
+        dataT[key] = tonumber(val) or 0.1
+      elseif  key=="price" then
+        dataT[key] = tonumber(val) or 100
+      elseif key =="description" then
+        dataT[key] = val
+      elseif key == "flags" then
+        dataT[key] = flagsTable(val)
+      elseif key =="equipType" then
+        dataT[key] = assert(val)
+      elseif  key=="sLevel" then
+        dataT[key] = assert(tonumber(val))
+      elseif  key=="DV" then
+        dataT[key] = tonumber(val) or 0
+      elseif  key=="PV" then
+        dataT[key] = tonumber(val) or 0
+      elseif  key=="DV_grow" then
+        dataT[key] = tonumber(val) or 0
+      elseif  key=="PV_grow" then
+        dataT[key] = tonumber(val) or 0
+      else
+        error("error equipment item key:"..key)
+      end
+    end
+    --此类型默认的值。
+    dataT.weapon = false
+    dataT.hanging = false
+    dataT.canStack = false
+    dataT.initNum = 1
+    if dataT.equipType=="twohand" then
+      dataT.equipType = "mainhand" --双手武器就是主手武器带双手flag
+      dataT.flags["TWOHAND"] = true --
+    end
+
+    --quad
+    local function loadQuad(x,y,w,h,tt)
+      table.insert(tt,love.graphics.newQuad(x*64,y*64,w,h,tt.img:getWidth(),tt.img:getHeight()))
+    end
+    if dataT.useAnim then
+      for i=1,dataT.frameNum do
+        loadQuad(dataT.quadX+(i-1)*dataT.w/64,dataT.quadY,dataT.w,dataT.h,dataT)
+      end
+    else
+      loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
+    end
+
+
+    if data.item[dataT.id]~=nil then
+      error("repetitive equipment id :"..dataT.id)
+    end
+    setmetatable(dataT,data.dataMeta)
+    data.item[dataT.id] = dataT
+    line = file:read()
+    index = index+1
+  end
+  debugmsg("load equipment Nubmer:"..(index-1))
+  file:close()
+  
+end
+
 
 
 return function ()
@@ -369,4 +473,5 @@ return function ()
   loadMaterial()
   loadItemType()
   loadWeapon()
+  loadEquipment()
 end
