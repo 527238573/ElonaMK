@@ -34,7 +34,58 @@ function data.animClip.move.updateStatus(dt,clip,status,unit)
   
 end
 
+data.animClip["moveAndBack"] = {}
+function data.animClip.moveAndBack.init(clip,midTime,target_x,target_y) 
+  clip.priority = 2
+  clip.midRate = midTime/clip.totalTime
+  --clip.playSpeed = 0.5
+  clip.target_x = target_x
+  clip.target_y = target_y
+  
+end
 
+function data.animClip.moveAndBack.updateStatus(dt,clip,status,unit)
+  local rate = clip.time/clip.totalTime
+  rate = c.clamp(rate,0,1)
+  local crate
+  if rate<clip.midRate then
+      crate = rate/clip.midRate--中间值
+  else
+      crate =1- (rate-clip.midRate)/(1 - clip.midRate)
+  end
+  
+  local dx = clip.target_x*crate
+  local dy = clip.target_y*crate
+  status.dx =status.dx+dx;
+  status.dy =status.dy+dy;
+  status.rate = rate
+end
+
+data.animClip["impact"]={}
+function data.animClip.impact.init(clip,tdx,tdy,delay,midTime,backTime) 
+  clip.priority = 4
+  clip.delay = delay or 0
+  clip.midTime = midTime or 0.05
+  clip.backTime = backTime or 0.15
+  clip.totalTime = clip.delay+clip.midTime+clip.backTime
+  clip.tdx = tdx
+  clip.tdy = tdy
+end
+
+
+function data.animClip.impact.updateStatus(dt,clip,status,unit)
+  if clip.time<clip.delay then return end
+  local ctime = clip.time - clip.delay
+  local rate
+  if ctime<clip.midTime then
+    rate = ctime/clip.midTime
+  else
+    rate = 1-(ctime-clip.midTime)/clip.backTime
+  end
+  rate = c.clamp(rate,0,1)
+  status.dx =status.dx+clip.tdx*rate;
+  status.dy =status.dy+clip.tdy*rate;
+end
 
 
 return function ()

@@ -16,6 +16,7 @@ function Map:unitEnter(unit,x,y)
   unit.y = y
   self.unit[y*self.w+x+1] = unit
   unit.map = self
+  if self.activeUnits[unit]==nil then self.activeUnit_num = self.activeUnit_num+1 end --增加数目
   self.activeUnits[unit] = true
 end
 
@@ -105,7 +106,16 @@ function Map:unitSpawn(unit,x,y,force)
 end
 
 --从地图上移除。
+--注意这个方法不能在单位自循环内使用，self.activeUnits 被改变了。
 function Map:unitDespawn(unit)
   self:unitLeave(unit)
+  if self.activeUnits[unit]==true then self.activeUnit_num = self.activeUnit_num-1 end --增加数目
   self.activeUnits[unit] = nil
+end
+
+function Map:monsterSpawn(unit,x,y,force)
+  if unit:hasFlag("NEUTRAL") then
+    unit:setFaction("neutral")
+  end
+  self:unitSpawn(unit,x,y,force)
 end

@@ -27,38 +27,10 @@ function render.drawPlayer(camera,pl)
   --屏幕坐标
   local screenx,screeny = camera:modelToScreen(sx+status.dx,sy+status.dy+status.dz)
   
-  
-  --选取正确的quad。
-  local animNum = anim.num--
-  local len = animNum
-  if(len>2 and anim.pingpong) then len = len*2 -2 end   -- 来回动画,总帧数更长
-  local onerate = 1/len
-  local userate = onerate *0.5 +status.rate--从第一帧正中分割
-  local useframe = (math.floor(userate/onerate)+anim.stillframe-1) % len +1  --计算出正确的帧。如果stillframe～=1 则向前推进对应的帧数。
-  if(anim.pingpong and useframe>animNum) then
-    useframe = animNum - (useframe - animNum) --得到对应的帧。
+  local img,quad,flip = unit:getImgQuad(status)
+  if flip then --水平翻转 
+    scaleX =scaleX*-1
   end
-  --判断face方向的影响。 face： 123
-  --                            884
-  --                            765
-  local face = status.face 
-  if anim.type == "twoside" then 
-    if face<=4 then
-      useframe = useframe + animNum
-      if face<=2 then
-        scaleX =scaleX*-1
-      end
-    elseif face<=6 then
-      scaleX =scaleX*-1
-    end
-  else --"oneside"
-    if face>=2 and face<=5 then scaleX =scaleX*-1 end
-  end
-  local quad = anim[useframe]
   
-  
-  
-  love.graphics.draw(anim.img,quad,screenx,screeny,rotation,scaleX,scaleY,ox,oy)--绘制
-  
-  
+  love.graphics.draw(img,quad,screenx,screeny,rotation,scaleX,scaleY,ox,oy)--绘制
 end

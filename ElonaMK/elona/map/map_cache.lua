@@ -25,7 +25,8 @@ end
 
 function Map:buildSeenCache()
   self:buildTransparentCache()
-  local range = p.mc.get_seen_range()
+  local rrange = p.mc.get_seen_range()
+  local range = math.floor(rrange)
   local ox = p.mc.x
   local oy = p.mc.y
   local changeTime = 100/p.mc:getSpeed()/c.timeSpeed 
@@ -56,7 +57,7 @@ function Map:buildSeenCache()
     return cansee
   end
   
-  local limit = (range+1.1)*(range+1.1)
+  local limit = (rrange)*(rrange)
   local function see(x,y)
     local dx = x -orginx
     local dy = y -orginy
@@ -129,3 +130,46 @@ function Map:isMCSeen(x,y,lastseen)
 end
 
 
+local function bresenham2d(fx,fy,tx,ty,interactFunc)
+  local dx = tx - fx
+  local dy = ty - fy
+  local ax = math.abs(dx) ;
+  local ay = math.abs(dy) ;
+  --Signs of slope values.
+  if dx>0 then dx = 1 elseif dx<0 then dx = -1 else dx = 0 end
+  if dy>0 then dy = 1 elseif dy<0 then dy = -1 else dy = 0 end
+  local maxa = math.max(ax,ay)
+  if maxa ==0 then interactFunc(fx,fy,fz);return end
+  if maxa ==ax then
+    for cx = fx,tx,dx do
+      local cy  = math.floor((cx - fx)/(tx - fx) *(ty - fy)+fy+0.5)--四舍五入
+      if not interactFunc(cx,cy,cz) then
+          break
+      end
+    end
+  else
+    for cy = fy,ty,dy do
+      local cx  = math.floor((cy - fy)/(ty - fy) *(tx - fx)+fx+0.5)--四舍五入
+      if not interactFunc(cx,cy,cz) then
+          break
+      end
+    end
+  end
+end
+
+--检测视线是否被遮。能看穿就返回true
+function Map:seeLine(fx,fy,tx,ty)
+  local visible = true;
+  self:buildTransparentCache()
+  local function seeThroghSquare(x,y)
+    if x==tx and y==ty then return false end
+    if x==fx and y==fy then return true end
+    if not self:isTranspant(x,y)then 
+      visible = false
+      return false
+    end
+    return true
+  end
+  bresenham2d(fx,fy,tx,ty,seeThroghSquare)
+  return visible
+end

@@ -52,3 +52,16 @@ function Player:useItem_action()
   if p.mc.delay>0 then return end
   ui.itemUseWin:Open()
 end
+
+--按下f键，或 持续按下f键
+function Player:fire_action()
+  if p.mc.delay>0 then return end
+  if p.mc:is_dead() then return end
+  p.mc:fastShootAction(true)
+end
+
+function Player:reload_action()
+  if p.mc.delay>0 then return end
+  if p.mc:is_dead() then return end
+  p.mc:reloadAction(true)
+end

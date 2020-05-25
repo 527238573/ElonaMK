@@ -9,11 +9,13 @@ require"file/saveTAdv"
 require"init/datainit"
 local loadTerdata = require"elona/map/terdata"
 local loadAnimdata = require"elona/anim/animdata"
+local loadFramesdata = require"elona/anim/framedata"
 local loadUnitdata = require"elona/unit/unitdata"
 local loadAnimClip = require"elona/unit/animClip/animMethod"
 local loadItemdata = require"elona/item/itemdata"
 local loadFielddata = require"elona/field/fielddata"
 local loadAudiodata = require"elona/audio/sounddata"
+
 --scene
 require"Scenes/Scene"
 require"Scenes/mainMenu"
@@ -28,6 +30,7 @@ require"elona/map/map_items"
 require"elona/map/map_field"
 require"elona/map/map_unit"
 require"elona/map/map_enter"
+require"elona/map/map_frames"
 require"elona/map/mapBuffer"
 require"elona/map/mapFactory"
 Overmap = require"elona/map/overmap"
@@ -36,13 +39,22 @@ require"elona/unit/unit"
 require"elona/unit/unit_check"
 require"elona/unit/unit_attr"
 require"elona/unit/unit_action"
+require"elona/unit/unit_fight"
+require"elona/unit/unit_fightMelee"
+require"elona/unit/unit_fightRange"
+require"elona/unit/unit_death"
 require"elona/unit/unit_anim"
 require"elona/unit/unit_equip"
+require"elona/unit/unit_faction"
 require"elona/unit/unitfactory"
 require"elona/unit/animClip/animClip"
+require"elona/unit/other/projectile"
+require"elona/anim/FrameClip"
+require"elona/anim/frameFactory"
 require"elona/item/item"
 require"elona/item/item_check"
 require"elona/item/item_equipment"
+require"elona/item/item_weapon"
 require"elona/item/itemfactory"
 require"elona/item/inventory"
 require"elona/field/field"
@@ -57,6 +69,7 @@ require"elona/player/calendar"
 require"elona/audio/audio"
 
 require"elona/newgame/fastStart"
+require"elona/test/test1"
 --ui部分
 ui = {}
 require"ui/control/key"
@@ -70,6 +83,7 @@ require"xrender/render"
 function data.init()
   loadTerdata()
   loadAnimdata()
+  loadFramesdata()
   loadUnitdata()
   loadAnimClip()
   loadItemdata()
@@ -80,6 +94,7 @@ function data.init()
   render.init()
   Item.initItemFactory()
   Map.initMapBuffer()
-  
+  Unit.initUnitFactions()
+  Unit.initUnitFactory()
   ui.uiInit()--虽然还未进入主游戏，但需要一次载入。
 end

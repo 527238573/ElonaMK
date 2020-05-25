@@ -21,6 +21,17 @@ function Unit:walk_out_of_map(dest_x,dest_y)
 end
 
 
+
+
+function Unit:attak_to(dest_x,dest_y,destunit)
+  if destunit ==nil then destunit = self.map:unit_at(dest_x,dest_y) end
+  if destunit==nil then return false end
+  if not self:isHostile(destunit) then return false end
+  self:melee_attack(destunit)
+  return true
+end
+
+
 --尝试走到x，y点，不行则返回false。行则返回true
 function Unit:walk_to(dest_x,dest_y)
   local map = assert(self.map)
@@ -54,8 +65,19 @@ end
 --操作move
 function Unit:moveAction(dx,dy)
   self:set_face(dx,dy)
-  local mdo = self:walk_out_of_map(self.x+dx,self.y+dy)
+  local dest_x,dest_y = self.x+dx,self.y+dy
+  
+  local mdo = self:walk_out_of_map(dest_x,dest_y)
   if mdo then return end
+  
+  local destunit = self.map:unit_at(dest_x,dest_y)
+  if destunit then
+    mdo = self:attak_to(dest_x,dest_y,destunit)
+    if mdo then return end
+  end
+  
+  
+  
   mdo = self:walk_to(self.x+dx,self.y+dy)
   
 end

@@ -35,3 +35,7 @@ end
 function Item:getDrawColor()
   return 1,1,1,1
 end
+
+function Item:hasFlag(flag)
+  return self.type.flags[flag]
+end

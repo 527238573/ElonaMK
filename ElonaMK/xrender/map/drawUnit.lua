@@ -1,4 +1,66 @@
 
+local function drawOneFrame(frame,acx,acy,camera)
+  local img,quad = frame:getImgQuad()
+  local screenx,screeny = camera:modelToScreen(acx+frame.dx,acy+frame.dy)
+  
+  local ftype = frame.type
+  local ox = ftype.ox
+  local oy = ftype.oy --以中心为点
+  local scaleX = ftype.scaleFactor *camera.workZoom
+  local scaleY = ftype.scaleFactor *camera.workZoom
+  if frame.flipX then scaleX = scaleX*-1 end
+  if frame.flipY then scaleY = scaleY*-1 end
+  local rot = frame.rotation
+  love.graphics.draw(img,quad,screenx,screeny,rot,scaleX,scaleY,ox,oy)--绘制
+end
+
+
+
+local function drawUnitFrames(unit,underUnit,acx,acy,camera)
+  local list = unit.frames
+  for _,frame in ipairs(list) do
+    if frame.time>=0 and frame.underUnit == underUnit then
+      drawOneFrame(frame,acx,acy,camera)
+    end
+  end
+end
+
+local lifebar_q = c.pic["lifebar_quads"]
+local function drawUnitLifebar(unit,status,camera,x,y)
+  
+  local life_rate = unit:getHPRate()
+  if life_rate==1 then return end
+  
+  local lifebarquad = lifebar_q.green
+  if unit:isInEnemyFaction() then lifebarquad =lifebar_q.red end
+  
+  
+  local sx = x*64 +2 --格子中心点
+  local sy = y*64 +30
+  local lw = camera.workZoom *unit:getHPRate()
+  local lh = camera.workZoom
+  local acx,acy = sx+status.dx,sy+status.dy+status.dz
+  local screenx,screeny = camera:modelToScreen(acx,acy)
+  love.graphics.setColor(1,1,1,1)
+  love.graphics.draw(lifebar_q.img,lifebarquad,screenx,screeny,0,lw,lh,0,0)
+end
+
+local function drawDelayBar(unit,camera,screenx,screeny)
+  if unit.delay_bar<=0 then return end
+  local zoom = camera.workZoom
+  local precent  = c.clamp(unit.delay_bar/unit.delay_barmax,0,1)
+  love.graphics.setColor(0.65,0.65,1)
+  love.graphics.rectangle("fill",screenx-32*zoom,screeny+4*zoom,64*zoom,14*zoom)
+  love.graphics.setColor(0.4,0.4,1)
+  love.graphics.rectangle("fill",screenx-30*zoom,screeny+6*zoom,60*precent*zoom,10*zoom)
+  love.graphics.setColor(1,1,1)
+  if zoom==1 and unit.delay_barname then
+    love.graphics.setFont(c.font_c14)
+    love.graphics.printf(unit.delay_barname,screenx-32,screeny+4,64,"center")
+  end
+end
+
+
 
 local shadow_img = c.pic["unit_shadow"] 
 
@@ -13,7 +75,6 @@ local function drawOneSquareUnit(camera,todraw)
   local shadow_scale = 2*anim.shadowSize
   render.setUnitShadowColor()
   love.graphics.draw(shadow_img,shadow_x,shadow_y,0,shadow_scale,shadow_scale,16,10)--绘制
-  love.graphics.setColor(1,1,1,1)
   --画人物
   
   local ox = anim.anchorX
@@ -21,45 +82,22 @@ local function drawOneSquareUnit(camera,todraw)
   local sacleFactor = anim.scalefactor
   
   local sx = x*64 +32 --格子中心点
-  local sy = y*64 +32+oy*sacleFactor --格子中心点+上移图片中心点
+  local sy = y*64 +32+(anim.h-oy)*sacleFactor --格子中心点+上移图片中心点
   local scaleX = status.scaleX * sacleFactor *camera.workZoom
   local scaleY = status.scaleY * sacleFactor *camera.workZoom
   local rotation = status.rot
   --屏幕坐标
-  local screenx,screeny = camera:modelToScreen(sx+status.dx,sy+status.dy+status.dz)
+  local acx,acy = sx+status.dx,sy+status.dy+status.dz
+  local screenx,screeny = camera:modelToScreen(acx,acy)
   
-  
-  --选取正确的quad。
-  local animNum = anim.num--
-  local len = animNum
-  if(len>2 and anim.pingpong) then len = len*2 -2 end   -- 来回动画,总帧数更长
-  local onerate = 1/len
-  local userate = onerate *0.5 +status.rate--从第一帧正中分割
-  local useframe = (math.floor(userate/onerate)+anim.stillframe-1) % len +1  --计算出正确的帧。如果stillframe～=1 则向前推进对应的帧数。
-  if(anim.pingpong and useframe>animNum) then
-    useframe = animNum - (useframe - animNum) --得到对应的帧。
-  end
-  --判断face方向的影响。 face： 123
-  --                            884
-  --                            765
-  local face = status.face 
-  if anim.type == "twoside" then 
-    if face<=4 then
-      useframe = useframe + animNum
-      if face<=2 then
-        scaleX =scaleX*-1
-      end
-    elseif face<=6 then
-      scaleX =scaleX*-1
-    end
-  else --"oneside"
-    if face>=2 and face<=5 then scaleX =scaleX*-1 end
-  end
-  local quad = anim[useframe]
-  
-  
-  
-  love.graphics.draw(anim.img,quad,screenx,screeny,rotation,scaleX,scaleY,ox,oy)--绘制
+  local img,quad,flip = unit:getImgQuad(status)
+  if flip then scaleX =scaleX*-1 end--水平翻转 
+  love.graphics.setColor(1,1,1,1)
+  drawUnitFrames(unit,true,acx,acy,camera)
+  love.graphics.draw(img,quad,screenx,screeny,rotation,scaleX,scaleY,ox,oy)--绘制
+  drawUnitFrames(unit,false,acx,acy,camera)
+  drawUnitLifebar(unit,status,camera,x,y)
+  drawDelayBar(unit,camera,screenx,screeny)
 end
 
 local function insertUnit(x,y,map,drawSequence)

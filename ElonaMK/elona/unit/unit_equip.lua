@@ -50,6 +50,16 @@ function Unit:wearEquipment(toEquip,slot,interactive)
   end
   self.inv:addItem(toEquip)
   self.equipment[slot] = toEquip
+  if toEquip:hasFlag("TWOHAND")  and slot ==1 then --双手
+    --主手穿戴双手物品，副手退下
+    self:dropEquipmentToInventory(2)--褪下副手物品
+  end
+  if slot ==2 then --装备副手物品，但主手是双手武器
+    if self.equipment[1] and self.equipment[1]:hasFlag("TWOHAND") then
+      self:dropEquipmentToInventory(1)--褪下主手物品
+    end
+  end
+  
   self:on_equip_change()
 end
 
@@ -66,49 +76,59 @@ end
 function Unit:on_equip_change()
   self:buildWeaponList()
   
-  
-  
 end
 
 
 
 function Unit:buildWeaponList()
-  local weapon_list = {}
-  --统计pv，dv，重量 武器
-  local pv =0
-  local dv = 0
+  local weapon_list = {melee={},range = {}}
+  --统计ar，mr，重量 武器
+  local ar =0
+  local mr = 0
   local totalWeight = 0
   
   for i=1,5 do
     local eq = self.equipment[i]
     if eq  then--有装备
       totalWeight = totalWeight+eq:getWeight()
-      pv = pv+eq:getPV()
-      dv = dv+eq:getDV()
+      ar = ar+eq:getAR()
+      mr = mr+eq:getMR()
       if eq:isWeapon() then
-        local weapon = {item = eq,type = "melee",}
-        weapon_list[#weapon_list+1] = weapon
+        local weapon = {item = eq,}
+        if eq:isMeleeWeapon() then
+          table.insert(weapon_list.melee,weapon)
+        end
+        if eq:isRangeWeapon() then
+          table.insert(weapon_list.range,weapon)
+        end
       end
     end
   end
-  weapon_list.pv =pv
-  weapon_list.dv = dv
+  if #(weapon_list.melee) ==0 then --当没有可用的近战武器，以徒手攻击为武器。
+    local weapon = {unarmed = true} --代表。徒手格斗。具体数据实时计算
+    table.insert(weapon_list.melee,weapon)
+  end
+  
+  weapon_list.AR =ar
+  weapon_list.MR = mr
   weapon_list.totalWeight=totalWeight
   self.weapon_list = weapon_list
 end
 
-function Unit:getWeaponBaseAtk(weapon)
+function Unit:getWeaponBaseAtk(weapon)--取决于技能等级
   return weapon.baseAtk
   
 end
-function Unit:getWeaponMeleeModifier(weapon)
+function Unit:getWeaponMeleeModifier(weapon)--取决于技能等级
   return 1
 end
 
-function Unit:getUnarmedDice()
+function Unit:getUnarmedDice()--取决于技能等级
   return 2,6,2
 end
 
-function Unit:getUnarmedModifier()
+function Unit:getUnarmedModifier()--取决于技能等级
   return 1
 end
+
+

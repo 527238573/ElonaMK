@@ -60,6 +60,7 @@ end
 
 function g.updateAnim(dt)
   cmap:updateAnim(dt)
+  g.updateDelaySound(dt)
 end
 
 --overmap模式更新入口

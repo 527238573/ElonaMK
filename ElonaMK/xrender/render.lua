@@ -8,6 +8,7 @@ require"xrender/map/drawShadow"
 require"xrender/map/drawItem"
 require"xrender/map/drawField"
 require"xrender/map/drawUnit"
+require"xrender/map/drawFrames"
 require"xrender/overmap/drawOvermap"
 require"xrender/overmap/drawPlayer"
 function render.init()
@@ -57,6 +58,8 @@ function render.drawMainGame()
   render.drawGround(camera,map)
   render.drawShadow(camera,map)
   render.drawSolid(camera,map)
+  render.drawFrames(camera,map)
+  render.drawProjectiles(camera,map)
   --camera.centerX,camera.centerY = x,y
 end
 

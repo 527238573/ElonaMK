@@ -73,7 +73,15 @@ for y =0,h do
     c.pic.uiAttr[y*w +x+1] = love.graphics.newQuad(x*16,y*16,16,16,uiAttr_img:getWidth(),uiAttr_img:getHeight())
   end
 end
-
+local bulletIcon_img = love.graphics.newImage("assets/ui/bulletIcon.png")
+c.pic["bulletIcon"] = {img = bulletIcon_img}
+w = math.floor(bulletIcon_img:getWidth()/24)
+h = math.floor(bulletIcon_img:getHeight()/24)
+for y =0,h do
+  for x=0,w do
+    c.pic.bulletIcon[y*w +x+1] = love.graphics.newQuad(x*24,y*24,24,24,bulletIcon_img:getWidth(),bulletIcon_img:getHeight())
+  end
+end
 
 
 local ui_clip_img = love.graphics.newImage("assets/ui/ui_clip.png")
@@ -120,6 +128,7 @@ c.pic["lifebar_quads"] =
 {
   green= love.graphics.newQuad(0,0,lifebar_img:getWidth(),6,lifebar_img:getWidth(),lifebar_img:getHeight()),
   blue= love.graphics.newQuad(0,6,lifebar_img:getWidth(),4,lifebar_img:getWidth(),lifebar_img:getHeight()),
+  red= love.graphics.newQuad(0,10,lifebar_img:getWidth(),6,lifebar_img:getWidth(),lifebar_img:getHeight()),
   img = lifebar_img,
 }
 c.pic["unit_shadow"] = love.graphics.newImage("assets/ui/unit_shadow.png")

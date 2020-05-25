@@ -37,6 +37,9 @@ local keyMapping_Game =
   drop = {"q"},
   useItem = {"e"},
   space ={"space"},
+  fire ={"f"},--开火
+  reload ={"r"}, --装载
+  
 }
 
 local reverseKey_Game
@@ -121,6 +124,15 @@ function ui.mainGameKeyCheck(dt)
   if not ui.isKeyfocusMainGame() then return end
   
   local mc= p.mc 
+  if ui.isDown_Game("fire") then
+    p:fire_action()
+    return
+  end
+  if ui.isDown_Game("reload") then
+    p:reload_action()
+    return
+  end
+  
   
   
   for i=1,4 do
@@ -167,6 +179,7 @@ end
 
 function ui.overmapKeyCheck(dt)
   if not ui.isKeyfocusMainGame() then return end
+  
   
   for i=1,4 do
     if(keyD(priority[i])) then

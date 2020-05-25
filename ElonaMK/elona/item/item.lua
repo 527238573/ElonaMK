@@ -22,13 +22,16 @@ Item = {
     baseAtk =0,
     to_hit = 0,
     --equipment
-    dv =0,
-    pv =0,
+    AR =0,
+    MR =0,
     
     diceNum_range =1,
     diceFace_range =1,
     baseAtk_range =0,
     to_hit_range = 0,
+    
+    ammoNum = 0, --剩余子弹数，只对能装弹的远程武器有效
+    useReload = false,--只对能装弹的远程武器为true
     
   }
 saveClass["Item"] = Item --注册保存类型

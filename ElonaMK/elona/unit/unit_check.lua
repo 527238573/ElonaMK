@@ -1,9 +1,28 @@
  --视野范围。
 function Unit:get_seen_range()
   --受到其他trait debuff影响。失明等
-  return 7 
+  return 7.9
 end
 
+function Unit:seesXY(x,y)
+  local range = self:get_seen_range()
+  local wanted_range= c.dist_2d(self.x,self.y,x,y)
+  if wanted_range>range then return false end
+  if self ==p.mc then
+    return self.map:isMCSeen(x,y)
+  else
+    return self.map:seeLine(self.fx,self.fy,x,y)
+  end
+end
+
+function Unit:seesUnit(unit)
+  if self ==unit then return true end
+  if unit.map == self.map then
+    return self:seesXY(unit.x,unit.y)
+  else
+    return false
+  end
+end
 
 
 function Unit:getName()
@@ -66,9 +85,18 @@ function Unit:canOperate()
 end
 
 
+function Unit:getHPRate()
+  return math.min(1,math.max(0,self.hp/self.max_hp))
+end
+function Unit:getMPRate()
+  return math.min(1,math.max(0,self.mp/self.max_mp))
+end
 
 --在小队中对队伍负重的贡献。最小为0.
 function Unit:getTeamCarryContribution()
   return math.max(0,self:getMaxCarry() - self.inv:getWeight())
 end
 
+function Unit:hasFlag(flag)
+  return self.type.flags[flag]
+end

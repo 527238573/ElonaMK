@@ -294,3 +294,28 @@ c.shader_grey = love.graphics.newShader[[
       return vec4(luminosity,luminosity,luminosity,cp.a);
     }]]
     
+
+
+function c.damageIns(dmg,dtype,subtype,resist_pen,resist_mul)
+  dmg = dmg or 0--伤害值
+  dtype = dtype or 1-- 类型0真实1物理2魔法 
+  subtype = subtype or nil --子类型抗性。
+  resist_pen = resist_pen or 0
+  resist_mul = resist_mul or 0
+  return {dmg= dmg,dtype=dtype,subtype = subtype,resist_pen =resist_pen,resist_mul = resist_mul}
+end
+
+c.damageType =
+{
+  bash = 1,--钝击
+  cut = 1,--劈砍
+  stab =1,--穿刺
+  fire = 2,--火焰，精神
+  ice = 2,-- 冰水
+  nature = 2, --自然
+  earth = 2, --大地
+  dark = 2, --暗
+  light = 2, --光
+}
+
+  

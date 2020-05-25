@@ -6,17 +6,27 @@ end
 function Item:isWeapon()
   return self.type.weapon
 end
+function Item:isMeleeWeapon()
+  return self.type.is_melee
+end
+function Item:isRangeWeapon()
+  return self.type.rangeWeapon
+end
+
+
 
 function Item:getEquipType()
   return self.type.equipType
 end
-function Item:getPV()
-  return self.pv
+function Item:getAR()
+  return self.AR
 end
 
-function Item:getDV()
-  return self.dv
+function Item:getMR()
+  return self.MR
 end
+
+
 
 
 
@@ -31,8 +41,8 @@ end
 function Item:initEquipment(level)
   local itype = self.type
   local dlevel = level - self.type.sLevel
-  self.dv = math.floor(itype.DV+dlevel*itype.DV_grow)
-  self.pv = math.floor(itype.PV+dlevel*itype.PV_grow)
+  self.AR = math.floor(itype.AR+dlevel*itype.AR_grow)
+  self.MR = math.floor(itype.MR+dlevel*itype.MR_grow)
   if not itype.weapon then return end--必须是武器
   self.diceNum =itype.diceNum
   self.to_hit =itype.to_hit
@@ -43,6 +53,11 @@ function Item:initEquipment(level)
   self.to_hit_range =itype.to_hit_range
   self.diceFace_range =math.floor(itype.diceFace_range +dlevel*itype.face_grow_range*itype.shotCost/100*2)
   self.baseAtk_range =math.floor(itype.baseAtk_range+dlevel*itype.base_grow_range*itype.shotCost/100)
+  if itype.R_key =="reload" then --对需要装弹的武器
+    self.useReload = true
+    self.ammoNum = itype.maxAmmo --当前子弹数设为最大。 
+  end
+  
 end
 
 
@@ -84,8 +99,13 @@ function Item:resetEquipmentName()
     name = name..dmgstr
     if self.to_hit~=0 then name = name..string.format("(%d)",self.to_hit) end
   end
-  if self.pv>0 or self.dv>0 then
-    name = name..string.format(" [%d,%d]",self.dv,self.pv)
+  if self.AR>0 or self.MR>0 then
+    name = name..string.format(" [%d,%d]",self.AR,self.MR)
   end
   self.displayName = name
+end
+
+function Item:getRandomHitEffect()
+  local hetable = self.type.hit_effect
+  return hetable[rnd(#hetable)]
 end

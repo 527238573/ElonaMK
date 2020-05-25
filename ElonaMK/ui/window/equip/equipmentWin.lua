@@ -89,7 +89,7 @@ local function drawBack(x,y,w,h)
   local weaponlist = p.mc.weapon_list
   love.graphics.setFont(c.font_c18)
   love.graphics.setColor(0.3,0.3,0.3)
-  love.graphics.print(string.format("(DV:%d  PV:%d)  %s  %.1fkg",weaponlist.dv,weaponlist.pv,"装备总重量:",weaponlist.totalWeight), x+491, y+410)
+  love.graphics.print(string.format("(AR:%d  MR:%d)  %s  %.1fkg",weaponlist.AR,weaponlist.MR,"装备总重量:",weaponlist.totalWeight), x+491, y+410)
   ui.drawFix(x,y,w,h)
   
   

@@ -16,6 +16,9 @@ local addDeadTree
 local addFlower
 local addPlant
 local addRoad
+local generateMonster
+
+
 
 function dirt.generate(newmap,ovmap,x,y)
   newmap.name = tl("野外","Wilderness")
@@ -96,6 +99,8 @@ function dirt.generate(newmap,ovmap,x,y)
   addPlant(newmap,ovmap,x,y,false)
   addFlower(newmap,ovmap,x,y,false)
   addRoad(newmap,ovmap,x,y,true)
+  
+  generateMonster(newmap,ovmap,x,y)
 end
 
 function grass.generate(newmap,ovmap,x,y)
@@ -185,6 +190,8 @@ function grass.generate(newmap,ovmap,x,y)
   addPlant(newmap,ovmap,x,y,false)
   addFlower(newmap,ovmap,x,y,false)
   addRoad(newmap,ovmap,x,y,false)
+  
+  generateMonster(newmap,ovmap,x,y)
 end
 
 function desert.generate(newmap,ovmap,x,y)
@@ -227,6 +234,8 @@ function desert.generate(newmap,ovmap,x,y)
   end
   addDeadTree(newmap,ovmap,x,y,false)
   addPlant(newmap,ovmap,x,y,false)
+  
+  generateMonster(newmap,ovmap,x,y)
 end
 
 function snowland.generate(newmap,ovmap,x,y)
@@ -275,6 +284,8 @@ function snowland.generate(newmap,ovmap,x,y)
   addPlant(newmap,ovmap,x,y,true)
   addFlower(newmap,ovmap,x,y,true)
   addRoad(newmap,ovmap,x,y,false)
+  
+  generateMonster(newmap,ovmap,x,y)
 end
 
 
@@ -394,6 +405,8 @@ function addRoad(newmap,ovmap,x,y,isDirt)
   
   local baseter = ti["dirt"]
   if isDirt then baseter = ti["dirt_road"] end
+  
+  
   --选取中心点
   local cx,cy = math.floor(newmap.realw/2),math.floor(newmap.realh/2)
   cx = cx+rnd(-5,5)
@@ -401,6 +414,16 @@ function addRoad(newmap,ovmap,x,y,isDirt)
   newmap.block[cy*newmap.realw+cx+1]=1
   newmap.ter[cy*newmap.realw+cx+1] = baseter
   local chance = {[0] = 1, [1] = 0.98,[2]=0.7,[3] = 0.5,[4] =0.2 }
+  
+  
+  --写入地格
+  local function road_square(posx,posy)
+    local ipos = posy*newmap.realw+posx+1
+    newmap.block[ipos]=1
+    newmap.ter[ipos] = baseter 
+  end
+  
+  
   
   local function make_road(mdx,mdy,sdx,sdy)
     local curx,cury = cx,cy
@@ -418,9 +441,7 @@ function addRoad(newmap,ovmap,x,y,isDirt)
         if rnd()<rate then
           if not newmap:inbounds_real(posx,posy) then return end
           --写入地格
-          local ipos = posy*newmap.realw+posx+1
-          newmap.block[ipos]=1
-          newmap.ter[ipos] = baseter 
+          road_square(posx,posy)
         end
       end
     end
@@ -435,10 +456,7 @@ function addRoad(newmap,ovmap,x,y,isDirt)
         local posx,posy = cx +i,cy
         local rate = chance[math.abs(i)]
         if rnd()<rate and  newmap:inbounds_real(posx,posy) then
-          --写入地格
-          local ipos = posy*newmap.realw+posx+1
-          newmap.block[ipos]=1
-          newmap.ter[ipos] = baseter 
+          road_square(posx,posy)
         end
       end
   end
@@ -447,14 +465,26 @@ function addRoad(newmap,ovmap,x,y,isDirt)
         local posx,posy = cx ,cy+i
         local rate = chance[math.abs(i)]
         if rnd()<rate and  newmap:inbounds_real(posx,posy) then
-          --写入地格
-          local ipos = posy*newmap.realw+posx+1
-          newmap.block[ipos]=1
-          newmap.ter[ipos] = baseter 
+          road_square(posx,posy)
         end
       end
   end
   
-  
 end
+
+function generateMonster(newmap,ovmap,x,y)
+  local mon_num = rnd(4,6)
+  local maxlevel = 5
+  local monlist = {}
+  rawset(newmap,"monlist",monlist) --保存列表
+  local gentype = Unit.randomUnitTypeByLevel(maxlevel)
+  
+  for i=1,mon_num do
+    local utype = gentype()
+    local unit = Unit.create(utype.id,nil,"wild")
+    table.insert(monlist,unit)
+    newmap:monsterSpawn(unit,rnd(0,newmap.w-1),rnd(0,newmap.h-1),false)
+  end
+end
+
 

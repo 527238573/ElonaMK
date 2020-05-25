@@ -86,9 +86,9 @@ local function loadMaterial()
         dataT[key] = assert(tonumber(val))
       elseif  key=="range" then
         dataT[key] = assert(tonumber(val))
-      elseif  key=="DV" then
+      elseif  key=="AR" then
         dataT[key] = assert(tonumber(val))
-      elseif  key=="PV" then
+      elseif  key=="MR" then
         dataT[key] = assert(tonumber(val))
       elseif  key=="weight" then
         dataT[key] = assert(tonumber(val))
@@ -262,13 +262,13 @@ local function loadWeapon()
         dataT[key] = flagsTable(val)
       elseif key =="equipType" then
         dataT[key] = assert(val)
-      elseif  key=="DV" then
+      elseif  key=="AR" then
         dataT[key] = tonumber(val) or 0
-      elseif  key=="PV" then
+      elseif  key=="MR" then
         dataT[key] = tonumber(val) or 0
-      elseif  key=="DV_grow" then
+      elseif  key=="AR_grow" then
         dataT[key] = tonumber(val) or 0
-      elseif  key=="PV_grow" then
+      elseif  key=="MR_grow" then
         dataT[key] = tonumber(val) or 0
       elseif key == "weapon_skill" then
         dataT[key] = flagsTable(val)
@@ -292,42 +292,10 @@ local function loadWeapon()
         dataT[key] = tonumber(val) or 0
       elseif  key=="m_dps" then
         --无效
-      elseif  key=="F_key" then
-        if val =="" then val = nil end
-        dataT[key] = val
-        if val =="shot" then dataT.rangeWeapon = true end --标记远程。
-      elseif  key=="fixShotCost" then
-        if dataT.rangeWeapon then  dataT[key] = strToBoolean(val,true) end
-      elseif  key=="shotCost" then
-        if dataT.rangeWeapon then dataT[key] = assert(tonumber(val)) end
-      elseif  key=="diceNum_range" then
-        if dataT.rangeWeapon then dataT[key] = assert(tonumber(val)) end
-      elseif  key=="diceFace_range" then
-        if dataT.rangeWeapon then dataT[key] = assert(tonumber(val)) end
-      elseif  key=="baseAtk_range" then
-        if dataT.rangeWeapon then dataT[key] = assert(tonumber(val)) end
-      elseif  key=="face_grow_range" then
-        if dataT.rangeWeapon then dataT[key] = assert(tonumber(val)) end
-      elseif  key=="base_grow_range" then
-        if dataT.rangeWeapon then dataT[key] = assert(tonumber(val)) end
-      elseif  key=="to_hit_range" then
-        if dataT.rangeWeapon then dataT[key] = tonumber(val) or 0 end
-      elseif  key=="r_dps" then
-        --无效
-      elseif  key=="maxAmmo" then
-        if dataT.rangeWeapon then dataT[key] = assert(tonumber(val)) end
-      elseif  key=="ammo_type" then
-        if dataT.rangeWeapon then 
-          if val =="" then val = nil end
-          dataT[key] = val
-        end
-      elseif  key=="R_key" then
-        if val =="" then val = nil end
-        dataT[key] = val
-      elseif  key=="reloadCost" then
-        dataT[key] = tonumber(val) or 100
+      elseif  key=="is_melee" then
+        dataT[key] = strToBoolean(val,false)
       else
-        error("error item key:"..key)
+        error("error weapon key:"..key)
       end
     end
     --此类型默认的值。
@@ -364,6 +332,91 @@ local function loadWeapon()
   debugmsg("load weapon Nubmer:"..(index-1))
   file:close()
 end
+
+local function loadRangeWeapon()
+  
+  local file = assert(io.open("data/item/item_rangeWeapon1.csv","r"))
+  local index = 1
+  local line = file:read()
+  local attrName = string.split(line,",") 
+  attrName[1] = "id" --utf8头，需要修正
+
+  line = file:read()
+  while(line) do
+    local strDH = string.split(line,",") 
+    local id = strDH[1]
+    local name = strDH[2]
+    local dataT = data.item[id]
+    if dataT==nil then
+      error("error range weapon id :"..id.." name:"..name)
+    end
+    if not dataT.weapon then
+      error("error (not a weapon) range weapon id :"..id.." name:"..name)
+    end
+    setmetatable(dataT,nil)--先取消
+    dataT.rangeWeapon = true --只要在这张表里的都是rangeweapon
+    for i=3,#strDH do
+      local val = strDH[i]
+      local key = attrName[i] 
+      if key=="fixShotCost" then
+        dataT[key] = strToBoolean(val,true)
+      elseif  key=="shotCost" then
+        dataT[key] = assert(tonumber(val))
+      elseif  key=="diceNum_range" then
+        dataT[key] = assert(tonumber(val))
+      elseif  key=="diceFace_range" then
+        dataT[key] = assert(tonumber(val))
+      elseif  key=="baseAtk_range" then
+        dataT[key] = assert(tonumber(val))
+      elseif  key=="face_grow_range" then
+        dataT[key] = assert(tonumber(val))
+      elseif  key=="base_grow_range" then
+        dataT[key] = assert(tonumber(val))
+      elseif  key=="to_hit_range" then
+        dataT[key] = tonumber(val) or 0
+      elseif  key=="maxRange" then
+        dataT[key] = tonumber(val) or 7.9
+      elseif  key=="dispersion" then
+        dataT[key] = tonumber(val) or 100
+      elseif  key=="pellet" then
+        dataT[key] = tonumber(val) or 1
+      elseif  key=="r_dps" then
+        --无效
+      elseif  key=="maxAmmo" then
+        dataT[key] = assert(tonumber(val))
+      elseif  key=="ammo_type" then
+        if val =="" then val = nil end
+        dataT[key] = val
+      elseif  key=="R_key" then
+        if val =="" then val = nil end
+        dataT[key] = val
+      elseif  key=="reloadCost" then
+        dataT[key] = tonumber(val) or 0.4
+      elseif key=="bullet" then
+        if val =="" then val = "bullet1" end
+        dataT[key] = val
+      elseif key=="shootSound" then
+        if val =="" then val = nil end
+        dataT[key] = val
+      elseif key=="reloadSound" then
+        if val =="" then val = nil end
+        dataT[key] = val
+      elseif key=="bulletSound" then
+        if val =="" then val = nil end
+        dataT[key] = val
+      else
+        error("error rangeweapon key:"..key.." i:"..i)
+      end
+    end
+    
+    setmetatable(dataT,data.dataMeta) --重设
+    line = file:read()
+    index = index+1
+  end
+  debugmsg("load rangeweapon Nubmer:"..(index-1))
+  file:close()
+end
+
 
 
 local function loadEquipment()
@@ -418,13 +471,13 @@ local function loadEquipment()
         dataT[key] = assert(val)
       elseif  key=="sLevel" then
         dataT[key] = assert(tonumber(val))
-      elseif  key=="DV" then
+      elseif  key=="AR" then
         dataT[key] = tonumber(val) or 0
-      elseif  key=="PV" then
+      elseif  key=="MR" then
         dataT[key] = tonumber(val) or 0
-      elseif  key=="DV_grow" then
+      elseif  key=="AR_grow" then
         dataT[key] = tonumber(val) or 0
-      elseif  key=="PV_grow" then
+      elseif  key=="MR_grow" then
         dataT[key] = tonumber(val) or 0
       else
         error("error equipment item key:"..key)
@@ -473,5 +526,6 @@ return function ()
   loadMaterial()
   loadItemType()
   loadWeapon()
+  loadRangeWeapon()
   loadEquipment()
 end

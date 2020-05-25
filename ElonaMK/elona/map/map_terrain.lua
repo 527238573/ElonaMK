@@ -106,6 +106,8 @@ function Map:move_cost(x,y)
   local bid = self.block[y*self.realw+x+1]
   local tinfo = data.ter[tid]
   local binfo = data.block[bid]
+  --if bid==nil then error("x,y:"..x.." "..y) end
+  
   if not binfo.pass then return -1 end
   local cost = tinfo.move_cost + binfo.move_cost
   return cost

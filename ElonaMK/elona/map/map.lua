@@ -63,9 +63,13 @@ function Map.new(x,y,edge)
   
   o.transparent={}
   
+  o.activeUnit_num = 0--登记活跃单位的数量。
   o.activeUnits = {} --活跃中的单位列表。以key为值。无先后顺序。
   o.activeFields = {} --所有地图上的field。以key为值。无先后顺序。
   --其他npc列表
+  
+  o.frames = {}--地图上的活动特效。--不会保存
+  o.projectiles={} --地图中的弹道投射物等。--不会保存
   
   for i=1,o.realw*o.realh do --无效区域内只有ter 和block，做装饰用。
     o.ter[i] = 1 --默认为index为1 的类型 ，是泥土实地，最基本的ter类型
@@ -105,6 +109,7 @@ function Map:updateRL(dt)
   end
   for _,unit in ipairs(leaveUnits) do
     self.activeUnits[unit]=nil
+    self.activeUnit_num = self.activeUnit_num-1
   end
   
   local leaveFields = {}
@@ -125,6 +130,8 @@ function Map:updateAnim(dt)
     unit:updateAnim(dt)
   end
   self.seen.time = self.seen.time+dt
+  self:updateFrames(dt)
+  self:updateProjectiles(dt)
 end
 
 

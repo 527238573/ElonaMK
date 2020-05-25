@@ -175,6 +175,10 @@ local function loadUnitType()
           dataT.animFemale = data.unitAnim[val]
         end 
         if dataT.animFemale ==nil then debugmsg("emptyUnitAnim id:"..dataT.id)  end
+      elseif key == "flags" then
+        dataT.flags = flagsTable(val)
+      elseif key == "rarity" then 
+        dataT[key] = tonumber(val) or 1
       else
         error("error unit key:"..key)
       end

@@ -20,6 +20,7 @@ end
 
 
 local rightPanel = require"ui/mainGame/rightPanel"
+local bottomPanel = require"ui/mainGame/bottom/bottomPanel"
 local clock = require"ui/mainGame/clock"
 
 
@@ -31,6 +32,7 @@ function ui.uiLayer(dt)
   ui.cameraMove(dt) --移动镜头渐变 
   clock() --时钟UI
   rightPanel() --右侧面板UI
+  bottomPanel()
   Window.windowRoot(dt) --窗口UI
 end
 
@@ -63,8 +65,9 @@ local function mainKeypressed(key)
   if key=="pickup" then  p:pickup_action() end
   if key=="drop" then  p:drop_action() end
   if key=="useItem" then p:useItem_action() end
-  
-  if key=="j" then ui.ynAskWin:Open(callb,"什么问题什么问题什么问题什么问题什么问题什？") end
+  if key=="fire" then p:fire_action() end 
+  if key=="reload" then p:reload_action() end 
+  if key=="j" then g.test1() end
 end
 
 --主界面下按下按键

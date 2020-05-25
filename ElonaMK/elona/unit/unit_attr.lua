@@ -29,6 +29,17 @@ g.attr = {
   wil_p = 1,
   mag_p = 1,
   chr_p = 1,
+  
+  --各种抗性
+  res_bash =0,
+  res_cut =0,
+  res_stab =0,
+  res_fire = 0,
+  res_ice =0,
+  res_nature =0,
+  res_earth =0,
+  res_dark =0,
+  res_light =0,
 }
 g.skills = {
   --专业技能
@@ -101,6 +112,17 @@ function Unit.unitInitAttrAndBouns(unit)
     wil_p = 1,
     mag_p = 1,
     chr_p = 1,
+    
+    --抗性
+    res_bash =0,
+    res_cut =0,
+    res_stab =0,
+    res_fire = 0,
+    res_cold =0,
+    res_nature =0,
+    res_earth =0,
+    res_dark =0,
+    res_light =0,
   }
 
 
@@ -241,4 +263,30 @@ function Unit:getSkillLevelAndExp(skillid)
   local org = self.attr[skillid]
   local level = math.floor( self.attr[skillid])
   return level,org-level
+end
+
+--护甲值 即时
+function Unit:getAR()
+  return  math.max(0,self.weapon_list.AR)
+end
+
+function Unit:getMR()
+  return  math.max(0,self.weapon_list.MR)
+end
+
+--单一属性的抗性，-8到8之间。
+function Unit:getResistance(atktype)
+  local res_str = "res_bash"
+  if atktype=="bash" then res_str="res_bash" 
+  elseif atktype=="cut" then res_str="res_cut" 
+  elseif atktype=="stab" then res_str="res_stab" 
+  elseif atktype=="fire" then res_str="res_fire" 
+  elseif atktype=="ice" then res_str="res_ice" 
+  elseif atktype=="nature" then res_str="res_nature" 
+  elseif atktype=="earth" then res_str="res_earth" 
+  elseif atktype=="dark" then res_str="res_dark" 
+  elseif atktype=="light" then res_str="res_light" 
+  else return 0 end
+  local rnum = math.floor(self.attr[res_str]+self.bonus[res_str])
+  return c.clamp(rnum,-8,8)
 end
