@@ -17,6 +17,18 @@ function Map:addSquareFrame(framec,x,y,dx,dy)
   table.insert(self.frames,framec)
 end
 
+function Map:addBulletPierceFrame(proj,nx,ny,ndx,ndy)
+  local frame = FrameClip.new(proj.id)
+  frame:setTimeToFrame(2)
+  frame.squarex = ndx --坐标
+  frame.squarey = ndy
+  frame.x = nx*64+32
+  frame.y = ny*64+64
+  frame.rotation = proj.rotation
+  table.insert(self.frames,frame)
+end
+
+
 
 function Map:updateFrames(dt)
   local list = self.frames

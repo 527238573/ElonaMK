@@ -26,7 +26,7 @@ c.font_x14 = love.graphics.newFont("assets/fzfs.ttf",14);
 --c.font_x12 = love.graphics.newFont("assets/fzfs.ttf",12);
 
 
-
+c.source_dir = love.filesystem.getSource().."/"
 c.null_t = {}
 c.timeSpeed = 2.25 /0.7 --行动点数，速度 和实际时间的换算  （行动点数/速度/tiemspeed = 实际时间）（回合数 = 实际时间秒*timeSpeed）1回合 = 0.444
 c.one_turn = 1/c.timeSpeed

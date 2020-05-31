@@ -8,7 +8,7 @@ data.face ={}
 local flagsTable =data.flagsTable
 
 local function loadClass()
-  local file = assert(io.open("data/unit/class1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/unit/class.csv","r"))
   local dataclass= data.class
   local index = 1
   local line = file:read()
@@ -58,7 +58,7 @@ end
 
 local function loadRace()
   
-  local file = assert(io.open("data/unit/race1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/unit/race.csv","r"))
   local datarace= data.race
   local index = 1
   local line = file:read()
@@ -125,7 +125,7 @@ end
 
 
 local function loadUnitType()
-  local file = assert(io.open("data/unit/unit1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/unit/unit.csv","r"))
   local index = 1
   local line = file:read()
   local attrName = string.split(line,",") 

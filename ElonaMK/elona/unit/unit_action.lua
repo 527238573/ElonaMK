@@ -41,11 +41,6 @@ function Unit:walk_to(dest_x,dest_y)
   
   local dx = self.x-dest_x
   local dy = self.y-dest_y
-  local fx = self.x*64
-  local fy = self.y*64+map:getAltitude(self.x,self.y)
-  local tx = dest_x*64
-  local ty = dest_y*64+map:getAltitude(dest_x,dest_y)
-  
   
   local costtime  = map:move_cost(dest_x,dest_y)/self:getSpeed()
   costtime = (dx~=0 and dy~=0) and costtime*1.4 or costtime

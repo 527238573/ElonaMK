@@ -45,67 +45,69 @@ local function drawSquareToBatch(map,x,y)
   
   local dx,dy = x-lastSX,y-lastSY
   local sx,sy = dx*64,(-dy-1)*64 --左上角相对坐标
+  local scale = 2/data.terScale
+  
   
   local info = data.ter[tid]
   if info.type=="edged" then
     --左上角
     if up== tid then
       if left ==tid then
-        batch:add(info[5],sx,sy,0,1,1)
+        batch:add(info[5],sx,sy,0,scale,scale)
       else
-        batch:add(info[4],sx,sy,0,1,1)
+        batch:add(info[4],sx,sy,0,scale,scale)
       end
     else
       if left ==tid then
-        batch:add(info[2],sx,sy,0,1,1)
+        batch:add(info[2],sx,sy,0,scale,scale)
       else
-        batch:add(info[1],sx,sy,0,1,1)
+        batch:add(info[1],sx,sy,0,scale,scale)
       end
     end
     --右上角
     if up== tid then
       if right ==tid then
-        batch:add(info[5],sx+32,sy,0,1,1)
+        batch:add(info[5],sx+32,sy,0,scale,scale)
       else
-        batch:add(info[6],sx+32,sy,0,1,1)
+        batch:add(info[6],sx+32,sy,0,scale,scale)
       end
     else
       if right ==tid then
-        batch:add(info[2],sx+32,sy,0,1,1)
+        batch:add(info[2],sx+32,sy,0,scale,scale)
       else
-        batch:add(info[3],sx+32,sy,0,1,1)
+        batch:add(info[3],sx+32,sy,0,scale,scale)
       end
     end
     --左下角
     if down== tid then
       if left ==tid then
-        batch:add(info[5],sx,sy+32,0,1,1)
+        batch:add(info[5],sx,sy+32,0,scale,scale)
       else
-        batch:add(info[4],sx,sy+32,0,1,1)
+        batch:add(info[4],sx,sy+32,0,scale,scale)
       end
     else
       if left ==tid then
-        batch:add(info[8],sx,sy+32,0,1,1)
+        batch:add(info[8],sx,sy+32,0,scale,scale)
       else
-        batch:add(info[7],sx,sy+32,0,1,1)
+        batch:add(info[7],sx,sy+32,0,scale,scale)
       end
     end
     --右下角
     if down== tid then
       if right ==tid then
-        batch:add(info[5],sx+32,sy+32,0,1,1)
+        batch:add(info[5],sx+32,sy+32,0,scale,scale)
       else
-        batch:add(info[6],sx+32,sy+32,0,1,1)
+        batch:add(info[6],sx+32,sy+32,0,scale,scale)
       end
     else
       if right ==tid then
-        batch:add(info[8],sx+32,sy+32,0,1,1)
+        batch:add(info[8],sx+32,sy+32,0,scale,scale)
       else
-        batch:add(info[9],sx+32,sy+32,0,1,1)
+        batch:add(info[9],sx+32,sy+32,0,scale,scale)
       end
     end
   else
-    batch:add(info[1],sx,sy,0,1,1)
+    batch:add(info[1],sx,sy,0,scale,scale)
   end
   
   --drawHierarchy
@@ -137,9 +139,9 @@ local function drawSquareToBatch(map,x,y)
       local to_render_info = v.info
       local rotation = htileRad[v.val]
       local quad = to_render_info[htileIndex[v.val]]
-      local ox = 32 --一半，取中心点旋转
-      local oy = 32 
-      batch:add(quad,sx+32,sy+32,rotation,1,1,ox,oy) --直接使用常数
+      local ox = 32/scale --一半，取中心点旋转
+      local oy = 32/scale
+      batch:add(quad,sx+32,sy+32,rotation,scale,scale,ox,oy) --直接使用常数
     end
   end
 end

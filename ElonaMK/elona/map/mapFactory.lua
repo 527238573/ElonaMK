@@ -7,7 +7,7 @@ require"elona/map/mapgen/Vernis"
 require"elona/map/mapgen/field"
 
 
-local path =love.filesystem.getSourceBaseDirectory().."/ElonaMK/data/map/"
+local path =c.source_dir.."data/map/"
 
 --从地图文件模板创建地图。
 function Map.createFromTemplateId(id)
@@ -47,7 +47,7 @@ function Map.createFromTemplateId(id)
   return newmap
 end
 
-local overmapPath =love.filesystem.getSourceBaseDirectory().."/ElonaMK/data/overmap/"
+local overmapPath =c.source_dir.."data/overmap/"
 function  Map.createOverMapFromTemplateId(id)
   local file  =  overmapPath..id..".lua"
   local template,err = table.loadAdv(file)

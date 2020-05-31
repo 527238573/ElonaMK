@@ -63,10 +63,26 @@ end
 
 --检测远程命中。已经有子弹projectile飞来，检测能否躲过去。被命中就返回true，然后计算接受伤害。躲过就返回false子弹继续飞
 function Unit:check_range_hit(projectile)
-  local istarget = projectile.dest_unit ==self --是否是目标单位。如果不是，就属于意外中弹，被命中率较低。
-  if istarget then
-    return rnd()<0.9 --9成中弹
-  else
-    return rnd()<0.3 --3成中弹
+  local hitrate = 0.35--被乱弹打中的机率
+  if projectile.dest_unit ==self then
+    hitrate = hitrate+1 --必定命中
   end
+  if projectile.dest_unit==nil then
+    hitrate = hitrate+0.2 --被无目标射击打中的概率。
+    if  self.x == projectile.dest_x and self.y== projectile.dest_y then
+      hitrate = hitrate+0.25 --被无目标射击打中的概率。
+    end
+  end
+  --散弹和强力穿弹都会提升乱弹概率。
+  if projectile.pierce_through then
+    hitrate = hitrate+0.4
+  end
+  if projectile.multi_shot then
+    hitrate = hitrate+0.5
+  end
+  
+  
+  if rnd()>hitrate then return false end
+  
+  return rnd()<0.9 --经过数值运算的结果。
 end

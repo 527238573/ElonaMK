@@ -15,8 +15,6 @@ Unit = {
     max_mp = 1,--因为计算复杂，所以不是实时更新。
     karma = 0,--善恶值
     fame = 0,--名声
-    attr = nil,--存储的属性。
-    bnous = nil,--加成。
     status = 0, ---动画状态 类似 {rate =0,dx = 0,dy =0,dz=0,face = 1,rot = 0,scaleX = 1,scaleY =1,camera_dx = 0,camera_dy = 0,flying =0,}  
     anim_id = "null",
     sex_male = true, --male为true， female为false
@@ -25,7 +23,6 @@ Unit = {
     delay_bar = 0, --可视化的delay时间
     delay_barmax = 0.1,--可视化delay的总时间。
     delay_barname = "noname",--可视化delay的可见名称。
-    map =nil, --父地图的状态。
     class_id = "null", --classid。因为可能更换职业，所以
     protrait = 0,
     weapon_list= {},--临时数据结构
@@ -33,12 +30,24 @@ Unit = {
     dead = false,--死亡状态，
     
     
+    
+    
   }
 saveClass["Unit"] = Unit --注册保存类型
 
+local niltable = { --默认值为nil的成员变量
+  attr = true,--存储的属性。
+  bnous = true,--加成。
+  map=true,--父地图的状态。
+  target = true,--目标。mc的目标用蓝色的框标注
+}
 Unit.__index = Unit
 Unit.__newindex = function(o,k,v)
-  if Unit[k]==nil and k~="map" then error("使用了Unit的意料之外的值。") else rawset(o,k,v) end
+  if Unit[k]==nil and niltable[k]==nil then error("使用了Unit的意料之外的值。") else rawset(o,k,v) end
+end
+
+function Unit:preSave()
+  self.target= nil --清除引用，
 end
 
 --读取完成后自动调用。不再使用index。id是字符串，永不变化。
@@ -147,6 +156,8 @@ function Unit:updateRL(dt)
     self.delay =0
     self.delay_id = "null"
     --行动。
+    self:checkTarget()--检查目标合法性。--不合法自动取消。
+    
     if p.mc ==self then
       ui.mainGameKeyCheck(dt)
     else

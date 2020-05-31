@@ -54,9 +54,9 @@ local function drawDelayBar(unit,camera,screenx,screeny)
   love.graphics.setColor(0.4,0.4,1)
   love.graphics.rectangle("fill",screenx-30*zoom,screeny+6*zoom,60*precent*zoom,10*zoom)
   love.graphics.setColor(1,1,1)
-  if zoom==1 and unit.delay_barname then
+  if zoom==1 and unit.delay_barname~="" then
     love.graphics.setFont(c.font_c14)
-    love.graphics.printf(unit.delay_barname,screenx-32,screeny+4,64,"center")
+    love.graphics.printf(unit.delay_barname,screenx-32,screeny+3,64,"center")
   end
 end
 

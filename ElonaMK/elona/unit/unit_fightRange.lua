@@ -94,8 +94,24 @@ end
 function Unit:fastShootAction(show_msg)
   if not self:can_shoot(show_msg) then return end
   --出现不能攻击的情况，debuff之类。可能delay
-  
-  local target = self:findNearestEnemy()
+  local target
+  if self:checkTarget() then --优先检定玩家指定的目标
+    if self.target.unit then -- 单位目标
+      if self:isHostile(self.target.unit) then--符合射击条件
+        target= self.target.unit --合法目标
+      else
+        self.target = nil --清除目标
+      end
+    elseif self.target.x and not (self.x==self.target.x and self.y == self.target.y) then --地面目标,不能以自身位置为目标
+      target = {not_unit= true,x= self.target.x,y = self.target.y}-- 地面目标，
+    else
+      self.target = nil --清除目标
+    end
+  end
+  --自动寻找目标
+  if target ==nil then
+    target = self:findNearestEnemy()
+  end
   if target ==nil then
     if show_msg then addmsg(tl("你找不到可以射击的目标！","You cant find a target to shoot."),"info") end
     return
@@ -119,6 +135,13 @@ function Unit:fastShootAction(show_msg)
       end
       local curCosttime = (shoot_index-1)*atk_intv +self:shoot_cost(oneWeapon)
       costTime = math.max(costTime,curCosttime)
+      if oneWeapon.item:getMaxAmmo() ==1 then
+        showbar = true--当打一枪上一堂需要showbar
+        local reload_sound = oneWeapon.item:getReloadSound()--播放装弹
+        if reload_sound then
+          g.playSound_delay(reload_sound,self.x,self.y,(shoot_index)*atk_intv)
+        end
+      end
       shoot_index = shoot_index +1
     end
   end
@@ -126,19 +149,38 @@ function Unit:fastShootAction(show_msg)
     addmsg(tl("需要装填弹药!","You need to reload to shoot!"),"info")
     g.playSound("shoot_fail",self.x,self.y) 
   end
-  self:short_delay(costTime,"shoot")
+  if showbar then
+    self:short_delay(costTime,"shoot")
+    self:bar_delay(costTime-0.2,"","shoot")
+  else
+    self:short_delay(costTime,"shoot")
+  end
 end
 
 
 function Unit:range_weapon_attack(target,weapon)
   local weaponItem = weapon.item
-  local proj = Projectile.new(weaponItem:getBulletFrames())
-  proj.shot_dispersion = weaponItem:getDispersion()
-  proj.max_range = weaponItem:getMaxRange()
+  local snum = weaponItem:getPellet()
+  for i =1,snum do --绝大部分枪一次只发一发，散弹一次多发
+    local proj = Projectile.new(weaponItem:getBulletFrames())
+    proj.shot_dispersion = weaponItem:getDispersion()
+    proj.max_range = weaponItem:getMaxRange()
+    if weaponItem:hasFlag("SNIPER") then
+      proj.pierce_through = true
+      proj.pierce =3
+      proj.speed = 1500
+    end
+    if snum>1 then proj.multi_shot = true end
+    
+    if target.not_unit  then
+      proj:attack(p.mc,nil,nil,nil,target.x,target.y) --射击地面 
+    else
+      proj:attack(p.mc,nil,nil,target,target.x,target.y) 
+    end
+  end
   
-  proj:attack(p.mc,nil,nil,target,target.x,target.y)
+  
   weaponItem.ammoNum = math.max(0,weaponItem.ammoNum-1)
-  
   local fire_sound = weaponItem:getShootSound()
   if fire_sound then
     g.playSound(fire_sound,self.x,self.y) 

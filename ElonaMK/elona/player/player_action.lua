@@ -65,3 +65,12 @@ function Player:reload_action()
   if p.mc:is_dead() then return end
   p.mc:reloadAction(true)
 end
+
+--取消目标
+function Player:esc_action()
+  if p.mc.target then
+    p.mc.target = nil
+    g.playSound("click1")
+  end
+  
+end

@@ -9,7 +9,7 @@ local function loadFieldType()
   
   local picbase = "data/field/anim/"
   
-  local file = assert(io.open("data/field/field1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/field/field.csv","r"))
   local index = 1
   local line = file:read()
   local attrName = string.split(line,",") 

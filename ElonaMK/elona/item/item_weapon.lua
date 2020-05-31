@@ -33,3 +33,7 @@ end
 function Item:getReloadSound()
   return self.type.reloadSound
 end
+
+function Item:getPellet()
+  return self.type.pellet
+end

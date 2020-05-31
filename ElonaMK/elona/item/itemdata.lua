@@ -15,7 +15,7 @@ data.material ={}
 data.material_seq ={}
 
 local function loadEnchantment()
-  local file = assert(io.open("data/item/enchantment1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/item/enchantment.csv","r"))
   local index = 1
   local line = file:read()
   local attrName = string.split(line,",") 
@@ -63,7 +63,7 @@ end
 
 
 local function loadMaterial()
-  local file = assert(io.open("data/item/materials1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/item/materials.csv","r"))
   local index = 1
   local line = file:read()
   local attrName = string.split(line,",") 
@@ -130,7 +130,7 @@ end
 
 local function loadItemType()
 
-  local file = assert(io.open("data/item/item_generic1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/item/item_generic.csv","r"))
   local index = 1
   local line = file:read()
   local attrName = string.split(line,",") 
@@ -208,13 +208,37 @@ local function loadItemType()
   end
   debugmsg("load item Nubmer:"..(index-1))
   file:close()
+  
+  --loadname
+  file = assert(io.open(c.source_dir.."data/item/item_generic_name.csv","r"))
+  line = file:read()
+  attrName = string.split(line,",") 
+  attrName[1] = "id" --utf8头，需要修正
+  line = file:read()
+  while(line) do
+    local strDH = string.split(line,",") 
+    local dataT = nil
+    for i=1,#strDH do
+      local val = strDH[i]
+      local key = attrName[i] 
+      if key=="id" then
+        dataT = data.item[val]
+      elseif  key=="name" then
+        dataT[key] = val
+      elseif key =="description" then
+        dataT[key] = val
+      end
+    end
+    line = file:read()
+  end    
+  file:close()
 end
 
 
 
 local function loadWeapon()
 
-  local file = assert(io.open("data/item/item_weapon1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/item/item_weapon.csv","r"))
   local index = 1
   local line = file:read()
   local attrName = string.split(line,",") 
@@ -331,11 +355,36 @@ local function loadWeapon()
   end
   debugmsg("load weapon Nubmer:"..(index-1))
   file:close()
+  
+  --loadname
+  file = assert(io.open(c.source_dir.."data/item/item_weapon_name.csv","r"))
+  line = file:read()
+  attrName = string.split(line,",") 
+  attrName[1] = "id" --utf8头，需要修正
+  line = file:read()
+  while(line) do
+    local strDH = string.split(line,",") 
+    local dataT = nil
+    for i=1,#strDH do
+      local val = strDH[i]
+      local key = attrName[i] 
+      if key=="id" then
+        dataT = data.item[val]
+      elseif  key=="name" then
+        dataT[key] = val
+      elseif key =="description" then
+        dataT[key] = val
+      end
+    end
+    line = file:read()
+  end    
+  file:close()
+  
 end
 
 local function loadRangeWeapon()
   
-  local file = assert(io.open("data/item/item_rangeWeapon1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/item/item_rangeWeapon.csv","r"))
   local index = 1
   local line = file:read()
   local attrName = string.split(line,",") 
@@ -421,7 +470,7 @@ end
 
 local function loadEquipment()
   
-  local file = assert(io.open("data/item/item_equipment1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/item/item_equipment.csv","r"))
   local index = 1
   local line = file:read()
   local attrName = string.split(line,",") 
@@ -515,6 +564,30 @@ local function loadEquipment()
     index = index+1
   end
   debugmsg("load equipment Nubmer:"..(index-1))
+  file:close()
+  
+  --loadname
+  file = assert(io.open(c.source_dir.."data/item/item_equipment_name.csv","r"))
+  line = file:read()
+  attrName = string.split(line,",") 
+  attrName[1] = "id" --utf8头，需要修正
+  line = file:read()
+  while(line) do
+    local strDH = string.split(line,",") 
+    local dataT = nil
+    for i=1,#strDH do
+      local val = strDH[i]
+      local key = attrName[i] 
+      if key=="id" then
+        dataT = data.item[val]
+      elseif  key=="name" then
+        dataT[key] = val
+      elseif key =="description" then
+        dataT[key] = val
+      end
+    end
+    line = file:read()
+  end    
   file:close()
   
 end

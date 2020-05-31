@@ -39,7 +39,7 @@ local keyMapping_Game =
   space ={"space"},
   fire ={"f"},--开火
   reload ={"r"}, --装载
-  
+  esc = {"escape"},
 }
 
 local reverseKey_Game

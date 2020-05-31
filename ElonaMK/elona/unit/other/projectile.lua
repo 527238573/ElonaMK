@@ -8,7 +8,7 @@ Projectile = {
   rotation = 0, --旋转。
   speed = 1000,
   flying = false,--飞行中，还是爆炸中。
-  
+  pierce = 0,--穿透能力
 }
 
 Projectile.__index = Projectile
@@ -39,7 +39,7 @@ function Projectile:getImgQuad()
   return frameT.img,frameT[frameIndex]
 end
 
-
+--dest_unit可以为nil，向地面射击
 function Projectile:attack(source_unit,sx,sy,dest_unit,dx,dy,map)
   sx = sx or source_unit.x+source_unit.status.dx/64
   sy = sy or source_unit.y+source_unit.status.dy/64
@@ -85,13 +85,15 @@ function Projectile:attack(source_unit,sx,sy,dest_unit,dx,dy,map)
   self.lastAxis = useX and sx or sy
   self.sourceAxis = useX and sx or sy
   self.useX = useX
-  
   self.timeFlying = self.max_range/realspeed
-  if movex==0 and movey ==0 then self.timeFlying = 0 end --特殊的为0 的情况
-  
-  --local arct = math.atan2 (self.move_y, self.move_x)
-  --debugmsg(" arct:"..arct.." y:"..self.move_y.." x:"..self.move_x)
   self.rotation =   -math.atan2 (movey, movex)
+  
+  if movex==0 and movey ==0 then--特殊数学情况
+    self.rotation =rnd()*math.pi*2
+    self.speedX =1
+    self.speedY =1
+    self.timeFlying = 0--射不出去就销毁了
+  end
   self:updatePos(self.source_x,self.source_y)
   self.flying =true
   --加入地图
@@ -141,9 +143,13 @@ function Projectile:updateAnim(dt,map)
     --检测碰撞
     --debugmsg("ndxndy:"..ndx.." "..ndy.."selfxselfy:"..self.x.." "..self.y)
     if self:checkHit(ndx,ndy,map)then
-      self:updatePos(nx,ny)--成功碰撞，停在碰撞点
-      self.flying = false
-      return 
+      if self.pierce>0 then
+        map:addBulletPierceFrame(self,nx,ny,ndx,ndy) --加入击中特效，继续飞行
+      else
+        self:updatePos(nx,ny)--成功碰撞，停在碰撞点
+        self.flying = false
+        return 
+      end
     end
     lastA = nextaa
   end
@@ -182,19 +188,29 @@ function Projectile:checkHit(ndx,ndy,map)
   
   local unit =map:unit_at(ndx,ndy)
   if unit then
-    if self.source_unit:isHostile(unit) or unit == self.dest_unit then
+    if self.source_unit:isHostile(unit) or unit == self.dest_unit  then
       --考虑射中
       if unit:check_range_hit(self) then
+        self.pierce = self.pierce-1--继续穿透能力降低
         return true
       end
     end
   else --为空
     if ndx ==self.dest_x and ndy ==self.dest_y then --射击到原位置
-      if math.abs(self.dest_unit.x -ndx)<=1 and math.abs(self.dest_unit.y -ndy)<=1 then
-        if rnd()<0.5 then --只要目标单位没有走出1格距离，还是有一半鸡率射中
-          if unit:check_range_hit(self) then
-            return true
+      if self.dest_unit then --存在目标单位
+        if math.abs(self.dest_unit.x -ndx)<=1 and math.abs(self.dest_unit.y -ndy)<=1 then
+          if rnd()<0.5 then --只要目标单位没有走出1格距离，还是有一半鸡率射中
+            if self.dest_unit:check_range_hit(self) then
+              self.pierce = self.pierce-1--继续穿透能力降低
+              return true
+            end
           end
+        end
+      else
+        --无目标射击，射击到目标地点，没有单位.
+        if rnd()>0.2 then  
+          self.pierce = self.pierce-10
+          return true 
         end
       end
     end
@@ -204,9 +220,11 @@ function Projectile:checkHit(ndx,ndy,map)
   if movecost<0 then--无法通过的地格
     if map:isTranspant(ndx,ndy) then
       if rnd()<0.85 then
+        self.pierce = self.pierce-2--继续穿透能力降低
         return true  --不可通过，但是可以视野穿过。85%机率挡住
       end
     else
+      self.pierce = self.pierce-2--继续穿透能力降低
       return true--完全被挡
     end
   end
@@ -219,6 +237,7 @@ function Projectile:checkHit(ndx,ndy,map)
       jl = math.min(40+(mv-80)/3,70)  --上限掩体70几率
     end
     if rnd()<jl/100 then
+      self.pierce = self.pierce-1--继续穿透能力降低
       return true
     end
   end

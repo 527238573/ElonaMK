@@ -68,4 +68,9 @@ function FrameClip:getImgQuad()
   return frameT.img,frameT[frameIndex]
 end
 
+function FrameClip:setTimeToFrame(frameindex)
+  local frameT = self.type
+  self.time = frameT.secPerFrame*(frameindex-1)
+end
+
 

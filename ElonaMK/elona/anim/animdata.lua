@@ -10,7 +10,7 @@ local function loadUnitAnim()
   
   local picbase = "data/unit/anim/"
   
-  local file = assert(io.open("data/unit/anim_unit1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/unit/anim_unit.csv","r"))
   local index = 1
   local line = file:read()
   local attrName = string.split(line,",") 

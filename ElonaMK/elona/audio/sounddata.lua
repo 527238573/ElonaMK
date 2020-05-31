@@ -91,6 +91,7 @@ return function()
   data.sound["swing_light_4"].volume = 0.1
   data.sound["miss"].volume = 0.6
   
+  --gun目录
 --data.sound["weapon_fire_9mm"].volume = 0.2
   --data.sound["weapon_fire_762x39"].volume = 0.2
   --data.sound["weapon_fire_762x51"].volume = 0.2
@@ -100,6 +101,15 @@ return function()
   data.sound["hit_flesh_3"].volume = 0.05
   data.sound["shoot_fail"].volume = 0.05
   data.sound["reload_s_nail"].volume = 0.2
+  data.sound["reload_s_flare"].volume = 0.3
+  data.sound["reload_b_1"].volume = 0.2
+  data.sound["ammo"].volume = 0.5
+  data.sound["arrow1"].volume = 0.5
+  data.sound["bolt1"].volume = 0.5
+  data.sound["gun1"].volume = 0.5
+  data.sound["laser1"].volume = 0.5
+  data.sound["fire_sniper1"].volume = 0.07
+  data.sound["fire_shotgun2"].volume = 0.5
   --声音组
   addSoundGroup("bash_hit",{"bash_hit1","bash_hit2"})
   addSoundGroup("cut_hit",{"cut_hit1","cut_hit2","cut_hit3"})

@@ -20,10 +20,10 @@ function love.load()
   --g.init()--game model(roguelike ) init
   --ui.init() -- userinterface init
   --render.init()  --rendering system init
+  
+  --error("source:"..love.filesystem.getSource().."base:"..love.filesystem.getSourceBaseDirectory())
   data.init()
   
-  
- 
   --love.graphics.setFont(c.font_c14)
   --love.graphics.setBackgroundColor(70/255,70/255,70/255) 
   love.graphics.setBackgroundColor(0,0,0) 

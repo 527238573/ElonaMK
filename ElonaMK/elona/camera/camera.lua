@@ -74,6 +74,13 @@ function Camera:updateSeenRect()
   self.seen_maxY = self.centerY +self.half_seen_H
 end
 
+--传入model的坐标。
+function Camera:canSee(cx,cy,radius)
+  return cx+radius>=self.seen_minX  or  cx-radius<=self.seen_maxX or cy+radius>=self.seen_minY  or  cy-radius<=self.seen_maxY
+  
+end
+
+
 
 function Camera:modelToScreen(x,y)
   return (x-self.seen_minX)*self.workZoom+self.workx,(self.seen_maxY-y)*self.workZoom+self.worky--注意maxY，模型坐标轴与屏幕坐标Y轴相反

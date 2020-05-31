@@ -142,3 +142,6 @@ c.pic["slider_bar"] = {
 }
 
 
+local iteminfo_img=love.graphics.newImage("assets/ui/iteminfo.png")
+c.pic["iteminfo_s9"] = c.createS9Table(iteminfo_img,0,0,26,30,6,8,6,6)
+

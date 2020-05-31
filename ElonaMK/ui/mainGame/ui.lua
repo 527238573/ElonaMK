@@ -22,7 +22,7 @@ end
 local rightPanel = require"ui/mainGame/rightPanel"
 local bottomPanel = require"ui/mainGame/bottom/bottomPanel"
 local clock = require"ui/mainGame/clock"
-
+local touch = require"ui/mainGame/touch"
 
 
 --主界面ui
@@ -30,6 +30,8 @@ function ui.uiLayer(dt)
   ui.updateTurboKey(dt) --UI界面按键连发
   p.mc:camera_Focus()--先定位镜头到位置
   ui.cameraMove(dt) --移动镜头渐变 
+  
+  touch()--鼠标控制。--受镜头影响，放在镜头后
   clock() --时钟UI
   rightPanel() --右侧面板UI
   bottomPanel()
@@ -67,6 +69,7 @@ local function mainKeypressed(key)
   if key=="useItem" then p:useItem_action() end
   if key=="fire" then p:fire_action() end 
   if key=="reload" then p:reload_action() end 
+  if key=="esc" then p:esc_action() end 
   if key=="j" then g.test1() end
 end
 

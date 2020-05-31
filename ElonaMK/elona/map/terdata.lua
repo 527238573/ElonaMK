@@ -4,6 +4,7 @@
 data.ter = {} --index的数组
 local terImg = love.graphics.newImage("data/terrain/terrain.png")
 data.terImg = terImg
+data.terScale = 1 --默认放大倍数
 
 local twidth = terImg:getWidth()
 local theight = terImg:getHeight()
@@ -26,7 +27,7 @@ local flagsTable =data.flagsTable
 
 local function loadTer()
 
-  local file = assert(io.open("data/terrain/ter1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/terrain/ter.csv","r"))
 
 
   local datater= data.ter
@@ -66,7 +67,8 @@ local function loadTer()
 
     --读取quad
     local function loadQuad(x,y,size,tt)
-      table.insert(tt,love.graphics.newQuad(x*64,y*64,size,size,twidth,theight))
+      local scale = data.terScale/2
+      table.insert(tt,love.graphics.newQuad(x*64*scale,y*64*scale,size*scale,size*scale,twidth,theight))
     end
     if dataT.type =="edged" then
       loadQuad(dataT.quadX,     dataT.quadY,    32,dataT)
@@ -97,12 +99,33 @@ local function loadTer()
 
   debugmsg("load terNubmer:"..(index-1))
   file:close()
-
+  
+  --loadname
+  file = assert(io.open(c.source_dir.."data/terrain/ter_name.csv","r"))
+  line = file:read()
+  local attrName = string.split(line,",") 
+  attrName[1] = "index" --utf8头，需要修正
+  line = file:read()
+  while(line) do
+    local strDH = string.split(line,",") 
+    local dataT = nil
+    for i=1,#strDH do
+      local val = strDH[i]
+      local key = attrName[i] 
+      if key=="index" then
+        dataT = datater[tonumber(val)]
+      elseif  key=="name" then
+        dataT[key] = val
+      end
+    end
+    line = file:read()
+  end    
+  file:close()
 
 end
 
 local function loadBlock()
-  local file = assert(io.open("data/terrain/block1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/terrain/block.csv","r"))
 
 
   local datablock= data.block
@@ -198,14 +221,36 @@ local function loadBlock()
 
   debugmsg("load blockNubmer:"..(index-1))
   file:close()
-
+  
+  
+  --loadname
+  file = assert(io.open(c.source_dir.."data/terrain/block_name.csv","r"))
+  line = file:read()
+  local attrName = string.split(line,",") 
+  attrName[1] = "index" --utf8头，需要修正
+  line = file:read()
+  while(line) do
+    local strDH = string.split(line,",") 
+    local dataT = nil
+    for i=1,#strDH do
+      local val = strDH[i]
+      local key = attrName[i] 
+      if key=="index" then
+        dataT = datablock[tonumber(val)]
+      elseif  key=="name" then
+        dataT[key] = val
+      end
+    end
+    line = file:read()
+  end    
+  file:close()
 
 end
 
 
 local function loadOvermapTer()
   
-  local file = assert(io.open("data/terrain/overmap1.csv","r"))
+  local file = assert(io.open(c.source_dir.."data/terrain/overmap.csv","r"))
   local imgw = data.overmapImg:getWidth()
   local imgh = data.overmapImg:getHeight()
 

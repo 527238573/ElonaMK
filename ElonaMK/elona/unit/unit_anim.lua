@@ -8,8 +8,16 @@ end
 function Unit:camera_Focus()
   local x = self.x*64+32+self.status.camera_dx
   local y = self.y*64+32+self.status.camera_dy
-  
   g.camera:setCenter(x,y)
+end
+
+--获得当前动画偏移值dxdy
+function Unit:get_anim_dxdy()
+  local anim = self:get_unitAnim() --anim数据
+  local status = self.status
+  local dx=status.dx
+  local dy=(anim.h-anim.anchorY)*anim.scalefactor +status.dy+status.dz
+  return dx,dy
 end
 
 
@@ -126,10 +134,7 @@ end
 function Unit:drop_frames_to_map()
   local list = self.frames
   if #list==0 then return end
-  local anim = self:get_unitAnim() --anim数据
-  local status = self.status
-  local dx=status.dx
-  local dy=(anim.h-anim.anchorY)*anim.scalefactor +status.dy+status.dz
+  local dx,dy = self:get_anim_dxdy()
   
   local i=1
   while i<=#list do
