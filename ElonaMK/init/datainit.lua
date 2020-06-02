@@ -33,6 +33,12 @@ function data.flagsTable(flagstr)
   end
   return ret
 end
+--使用数组来排列flag
+function data.flagsArrayTable(flagstr)
+  if flagstr =="" then return {} end
+  return string.split(flagstr,"|")
+end
+
 
 function data.flagsIndexTable(flagstr)
   if flagstr =="" then return {} end

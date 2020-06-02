@@ -165,6 +165,7 @@ function Unit:range_weapon_attack(target,weapon)
     local proj = Projectile.new(weaponItem:getBulletFrames())
     proj.shot_dispersion = weaponItem:getDispersion()
     proj.max_range = weaponItem:getMaxRange()
+    proj.hitLevel = self:getHitLevel(weapon)--命中等级
     if weaponItem:hasFlag("SNIPER") then
       proj.pierce_through = true
       proj.pierce =3

@@ -139,18 +139,18 @@ local function bresenham2d(fx,fy,tx,ty,interactFunc)
   if dx>0 then dx = 1 elseif dx<0 then dx = -1 else dx = 0 end
   if dy>0 then dy = 1 elseif dy<0 then dy = -1 else dy = 0 end
   local maxa = math.max(ax,ay)
-  if maxa ==0 then interactFunc(fx,fy,fz);return end
+  if maxa ==0 then interactFunc(fx,fy);return end
   if maxa ==ax then
     for cx = fx,tx,dx do
       local cy  = math.floor((cx - fx)/(tx - fx) *(ty - fy)+fy+0.5)--四舍五入
-      if not interactFunc(cx,cy,cz) then
+      if not interactFunc(cx,cy) then
           break
       end
     end
   else
     for cy = fy,ty,dy do
       local cx  = math.floor((cy - fy)/(ty - fy) *(tx - fx)+fx+0.5)--四舍五入
-      if not interactFunc(cx,cy,cz) then
+      if not interactFunc(cx,cy) then
           break
       end
     end

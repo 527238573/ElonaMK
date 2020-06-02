@@ -296,6 +296,7 @@ local function loadWeapon()
         dataT[key] = tonumber(val) or 0
       elseif key == "weapon_skill" then
         dataT[key] = flagsTable(val)
+        dataT.weapon_skill_a = data.flagsArrayTable(val)--数组排列。
       elseif key == "hit_effect" then
         dataT[key] = flagsIndexTable(val)
       elseif  key=="atkCost" then

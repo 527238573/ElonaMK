@@ -61,6 +61,71 @@ function Unit:take_damage(source,dam)
   end
 end
 
+
+--获取躲闪等级。是为
+function Unit:getDodgeLevel()
+  local dex = self:cur_dex()
+  local per = self:cur_per()
+  local val = dex*0.85+per*0.15
+  local dodgeLevel = math.max(1, val/c.averageAttrGrow-5)--低于一定属性就为1.属性起码8以上，才能开始闪避。
+  --还有其他装备buff附加的等级，todo
+  return dodgeLevel
+end
+
+--获取命中等级。传输的是装备的武器条目。
+function Unit:getHitLevel(weapon)
+  --根据武器类型取得等级来决定命中等级。
+  local skill1,skill2 --最多关联两个skill
+  local weaponItem --可能为空。
+  if weapon.unarmed then
+    skill1 = "martial_arts"--格斗技能
+  else
+    weaponItem = weapon.item
+    skill1 = weaponItem.type.weapon_skill_a[1] or "martial_arts" --不能为空。
+    skill2 = weaponItem.type.weapon_skill_a[2] --最多两个。多了不算在内。
+  end
+  
+  local skill_level,exp=self:getSkillLevelAndExp(skill1)
+  if skill2 then
+    local l = self:getSkillLevelAndExp(skill2)
+    skill_level = (skill_level+l)/2
+  end
+  local hitLevel = skill_level--基本
+  --todo，算上装备和buff的
+  return math.max(1,skill_level+2)
+  
+end
+
+--根据命中等级和闪避等级，取得命中概率。
+local function hitRate(hitLevel,dodgeLevel)
+  --命中率最小20%，最大当然是100%.
+  --命中等级1.5倍时100%
+  --命中等级 = 闪避等级时，命中率90%
+  --同等级单位最大的闪避：60%命中。也就是。闪避等级两倍于命中等级时候，60命中。
+  --4倍约37%左右命中
+  --最小值20%命中
+  --单一公式：-(x-6)^2/8+5
+  local x = hitLevel/(dodgeLevel*0.25)
+  if x>=6 then return 1 end
+  return math.max(0.2,(-(x-6)^2/8+5)*0.2)
+  --[[
+  --(x-1)^2/2+1,-(x-5)^2/2+5,-(x-6)^2/8+5  公式曲线
+  if x<1 then
+    return 0.2
+  elseif x<3 then
+    return ((x-1)^2/2+1)*0.2
+  elseif x<4 then
+    return (-(x-5)^2/2+5)*0.2
+  elseif x<6 then
+    return (-(x-6)^2/8+5)*0.2
+  end
+  return 1  
+  ]]
+end
+
+
+
+
 --检测远程命中。已经有子弹projectile飞来，检测能否躲过去。被命中就返回true，然后计算接受伤害。躲过就返回false子弹继续飞
 function Unit:check_range_hit(projectile)
   local hitrate = 0.35--被乱弹打中的机率
@@ -81,8 +146,12 @@ function Unit:check_range_hit(projectile)
     hitrate = hitrate+0.5
   end
   
-  
   if rnd()>hitrate then return false end
   
-  return rnd()<0.9 --经过数值运算的结果。
+  local selfDodgeLevel = self:getDodgeLevel()
+  local hit_probability = hitRate(projectile.hitLevel,selfDodgeLevel)
+  local hit = rnd()<hit_probability--经过数值运算的结果。
+  debugmsg(string.format("hitlevel:%.1f,dodgeLevel:%.1f,dex:%d, rate:%.2f",projectile.hitLevel,selfDodgeLevel,self:cur_dex(),hit_probability))
+  
+  return hit 
 end

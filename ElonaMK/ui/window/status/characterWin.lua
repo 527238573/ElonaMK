@@ -150,8 +150,8 @@ local function drawBack(x,y,w,h)
   local c_per,b_per = mc:cur_per(),mc:base_per()
   local c_ler,b_ler = mc:cur_ler(),mc:base_ler()
   local c_wil,b_wil = mc:cur_wil(),mc:base_wil()
-  local c_mag,b_mag = mc:cur_mag(),mc:base_mag()+1
-  local c_chr,b_chr = mc:cur_chr(),mc:base_chr()-1
+  local c_mag,b_mag = mc:cur_mag(),mc:base_mag()
+  local c_chr,b_chr = mc:cur_chr(),mc:base_chr()
   
   valColor(c_str,b_str);love.graphics.print(string.format("%d",c_str), x+175, y+192+iconlength*0) --改成一次性的读取翻译
   valColor(c_con,b_con);love.graphics.print(string.format("%d",c_con), x+175, y+192+iconlength*1) --改成一次性的读取翻译

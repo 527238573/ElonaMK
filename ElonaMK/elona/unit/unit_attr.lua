@@ -113,6 +113,7 @@ function Unit.unitInitAttrAndBouns(unit)
     mag_p = 1,
     chr_p = 1,
     
+    total_point = 1,--总属性加值。  race class 提供的总属性合计。
     --抗性
     res_bash =0,
     res_cut =0,
@@ -138,14 +139,14 @@ function Unit.unitInitAttrAndBouns(unit)
 end
 
 
-
+local level_afactor = 1.3 --固定参数，越大每级升级需要提升的属性越多
 --根据种族 职业 等级，初始化属性。
 function Unit:initAttr(race,class,level,attrFactor)
   self:resetPotential(race,class)
   for aname,_ in pairs(g.main_attr) do
     local baseVal = (race[aname] +class[aname])*1.2--等级1基础值
     local potential = self.attr[aname.."_p"] 
-    baseVal = baseVal +(level-1)*potential --等级成长值。
+    baseVal = baseVal +(level-1)*(potential-0.2)*level_afactor --等级成长值。
     baseVal = attrFactor*baseVal --属性初始值调整。
     self.attr[aname] = baseVal
   end
@@ -156,11 +157,16 @@ end
 
 --传输的是具体类型。
 function Unit:resetPotential(race,class)
+  local totalp = 0
   for aname,_ in pairs(g.main_attr) do
-    local basePotential = 0.6
-    basePotential = basePotential + race[aname]*0.08 +class[aname]*0.09
+    
+    local basePotential = 0.4 
+    basePotential = basePotential + race[aname]*0.1 +class[aname]*0.1
     self.attr[aname.."_p"] = basePotential
+    totalp = totalp+race[aname]+class[aname]
   end
+  totalp = totalp+16--略加一点基础值。
+  self.attr.total_point = totalp
 end
 
 function Unit:initSkills(skills,level)
@@ -173,9 +179,14 @@ function Unit:initSkills(skills,level)
   end
 end
 
+--提升1点属性获得1点xp.，属性基数越大，升级需要经验越多。
+function Unit:getLevelUpExp()
+  return self.attr.total_point*0.1*level_afactor
+end
 
-
-
+--取得等级增长平均属性。 level可以不为整数。
+local aver =7.5--假设平均7.5点点数.  已经接近主角平均值
+c.averageAttrGrow = (aver+2)*0.1 *level_afactor--1.235
 
 
 

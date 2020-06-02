@@ -11,6 +11,7 @@ require"ui/window/equip/equipWin"
 require"ui/window/item/inventoryWin"
 require"ui/window/item/pickDropWin"
 require"ui/window/item/itemUseWin"
+require"ui/window/test/testWin"
 require"ui/mainGame/cameraMove"
 function ui.uiInit()
   --g.popwindow = nil--弹出窗口
@@ -71,6 +72,7 @@ local function mainKeypressed(key)
   if key=="reload" then p:reload_action() end 
   if key=="esc" then p:esc_action() end 
   if key=="j" then g.test1() end
+  if key=="k" then ui.testWin:Open() end
 end
 
 --主界面下按下按键

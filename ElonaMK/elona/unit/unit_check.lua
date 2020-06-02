@@ -11,7 +11,7 @@ function Unit:seesXY(x,y)
   if self ==p.mc then
     return self.map:isMCSeen(x,y)
   else
-    return self.map:seeLine(self.fx,self.fy,x,y)
+    return self.map:seeLine(self.x,self.y,x,y)
   end
 end
 

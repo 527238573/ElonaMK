@@ -10,7 +10,7 @@ Projectile = {
   flying = false,--飞行中，还是爆炸中。
   pierce = 0,--穿透能力
 }
-
+--在unit_fightrange里有额外大量初始化成员。
 Projectile.__index = Projectile
 
 
