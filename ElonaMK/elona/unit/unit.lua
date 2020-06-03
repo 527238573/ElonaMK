@@ -15,29 +15,38 @@ Unit = {
     max_mp = 1,--因为计算复杂，所以不是实时更新。
     karma = 0,--善恶值
     fame = 0,--名声
-    status = 0, ---动画状态 类似 {rate =0,dx = 0,dy =0,dz=0,face = 1,rot = 0,scaleX = 1,scaleY =1,camera_dx = 0,camera_dy = 0,flying =0,}  
-    anim_id = "null",
     sex_male = true, --male为true， female为false
     delay = 0,--动作延迟的状态。
     delay_id ="null",
     delay_bar = 0, --可视化的delay时间
     delay_barmax = 0.1,--可视化delay的总时间。
     delay_barname = "noname",--可视化delay的可见名称。
-    class_id = "null", --classid。因为可能更换职业，所以
     protrait = 0,
-    weapon_list= {},--临时数据结构
+    weapon_list= {AR=0,MR =0,totalWeight = 0,melee ={{unarmed = true}},range={}},--临时数据结构
     faction = 5,--所属势力，默认wild，（敌对的）
     dead = false,--死亡状态，
-    
-    
     
     
   }
 saveClass["Unit"] = Unit --注册保存类型
 
 local niltable = { --默认值为nil的成员变量
+  class = true,--职业类型
+  class_id = true, --职业id --classid。因为可能更换职业，所以需要登记
+  anim = true,--动画数据
+  anim_id = true,--动画数据的id
+  status = true,---动画状态 类似 {rate =0,dx = 0,dy =0,dz=0,face = 1,rot = 0,scaleX = 1,scaleY =1,camera_dx = 0,camera_dy = 0,flying =0,}  
   attr = true,--存储的属性。
-  bnous = true,--加成。
+  ebonus = true,--较为固定的加成。装备和特性所带来的加成，基本不会变动。
+  bonus = true,--加成。快速实时变动，各种buff，状态。
+  skill = true,--存储的技能。
+  clips = true,----animClip列表
+  frames = true,--frameClip列表
+  inv = true,--背包实体
+  equipment = true, --装备列表--内涵1-5位置
+  damage_queue = true,-- --延迟伤害队列
+  
+  animdelay_list = true,--延迟动画调用。里面是function，所以不能保存。里面有东西会在保存时直接丢失掉，但不重要
   map=true,--父地图的状态。
   target = true,--目标。mc的目标用蓝色的框标注
 }
@@ -54,10 +63,10 @@ end
 function Unit:loadfinish()
   rawset(self,"type",assert(data.unit[self.id]))
   --如果新版增加字段，则需要补充。
-  rawset(self,"anim",assert(data.unitAnim[self.anim_id]))
-  rawset(self,"class",assert(data.class[self.class_id]))
+  self.anim = assert(data.unitAnim[self.anim_id])
+  self.class = assert(data.class[self.class_id])
+  self.animdelay_list = {noSave = true} --重建新的。
   
-  rawset(self,"animdelay_list",{noSave = true}) --重建新的。
 end
 
 function Unit.new(typeid,level)
@@ -65,11 +74,15 @@ function Unit.new(typeid,level)
   local o= {}
   o.id = typeid
   o.type = utype
-  o.level = level or 1
+  setmetatable(o,Unit)
+  
+  o.level = level 
   o.class = utype.class
   o.class_id = o.class.id
   o.status={rate=0,dx = 0,dy =0,dz = 0,face = 8,rot = 0,scaleX = 1,scaleY =1,camera_dx = 0,camera_dy = 0,} --动画状态
-  Unit.unitInitAttrAndBouns(o)
+  o.skill = {}
+  o:createBaseAttr()
+  o:createBonusAttr()
   
   if utype.sex =="male" then
     o.sex_male = true
@@ -87,12 +100,9 @@ function Unit.new(typeid,level)
   o.inv =  Inventory.new(false,o)
   o.equipment = {} --内涵1-5位置
   
-  
-  
   o.damage_queue={} --延迟伤害队列
   o.animdelay_list = {noSave = true} --延迟动画调用。里面是function，所以不能保存。里面有东西会在保存时直接丢失掉，但不重要
   
-  setmetatable(o,Unit)
   return o
 end
 

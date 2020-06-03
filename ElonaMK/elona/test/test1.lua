@@ -31,7 +31,7 @@ end
 
 
 function g.test1()
-
+  Test.genMonster()
   --local file = assert(io.open(c.source_dir.."data/item/test.txt","r"))
   --local index = 1
   --local line = file:read()

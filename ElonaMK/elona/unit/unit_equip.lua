@@ -67,15 +67,16 @@ function Unit:takeoffEquipment(slot,interactive)
   if self.equipment[slot] then
     if self:canUnwearItem(slot,interactive) then
       self:dropEquipmentToInventory(slot)
+      self:on_equip_change()
     end
   end
-  self:on_equip_change()
 end
 
 --更换装备之后。直接调用此函数。
 function Unit:on_equip_change()
   self:buildWeaponList()
-  
+  --重读固有加成属性。（装备和）
+  self:reloadEquipBouns()
 end
 
 
