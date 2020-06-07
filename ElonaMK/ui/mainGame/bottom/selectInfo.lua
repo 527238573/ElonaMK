@@ -18,11 +18,11 @@ local function draw_unit_info(unit,x,y,w,h)
   love.graphics.printf(unit:getName(), x+10, y+18,w-20,"center")
   
   local iconlength = 22
-  drawBar(1,3,x+10, y+43,w-20,22,4)
-  drawBar(1,4,x+10, y+43+iconlength,w-20,22,4)
+  drawBar(unit:getHPRate(),3,x+10, y+43,w-20,22,4)
+  drawBar(unit:getMPRate(),4,x+10, y+43+iconlength,w-20,22,4)
   love.graphics.setColor(1,1,1)
-  love.graphics.printf(string.format("%d/%d",unit.hp,unit:getMaxHP()), x+10, y+43,w-20,"center")
-  love.graphics.printf(string.format("%d/%d",unit.mp,unit:getMaxMP()), x+10, y+43+iconlength,w-20,"center")
+  love.graphics.printf(string.format("%d/%d",unit.hp,unit.max_hp), x+10, y+43,w-20,"center")
+  love.graphics.printf(string.format("%d/%d",unit.mp,unit.max_mp), x+10, y+43+iconlength,w-20,"center")
    --todo更多信息
 end
 local tname = tl("地面","Ground")

@@ -84,12 +84,7 @@ function Unit:canOperate()
 end
 
 
-function Unit:getHPRate()
-  return math.min(1,math.max(0,self.hp/self.max_hp))
-end
-function Unit:getMPRate()
-  return math.min(1,math.max(0,self.mp/self.max_mp))
-end
+
 
 --在小队中对队伍负重的贡献。最小为0.
 function Unit:getTeamCarryContribution()

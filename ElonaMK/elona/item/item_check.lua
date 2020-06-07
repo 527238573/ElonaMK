@@ -1,4 +1,9 @@
 
+--简短名字。
+function Item:getShortName()
+  return self.type.name 
+end
+
 
 --在背包等地方显示的名字
 function Item:getDisplayName()
@@ -10,6 +15,7 @@ function Item:getDisplayName()
   end 
   return str
 end
+
 --显示名称的颜色。
 function Item:getDisplayNameColor()
   return 0,0,0 --暂用黑色。

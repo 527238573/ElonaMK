@@ -31,11 +31,11 @@ function Unit.create(id,level,faction)
   unit:initSkills(skills,level) 
   
   if faction then  unit:setFaction(faction) end
-  unit.max_hp = unit:getMaxHP()
-  unit.max_mp = unit:getMaxMP()
-  unit.hp = unit.max_hp 
-  unit.mp = unit.max_mp 
+  
   unit:on_equip_change()--刷新装备数据
+  unit:resetMaxHPMP()--上面一条已经刷过，保险起见
+  unit.hp = unit.max_hp
+  unit.mp = unit.max_mp
   return unit
 end
 
@@ -60,12 +60,10 @@ function Unit.createMC(id,classid)
   unit:initSkills(skills,1) --初始化1级属性。
   
   unit:setFaction("player")
-  unit.max_hp = unit:getMaxHP()
-  unit.max_mp = unit:getMaxMP()
-  unit.hp = unit.max_hp 
-  unit.mp = unit.max_mp 
   unit:on_equip_change()--刷新装备数据
-  
+  unit:resetMaxHPMP()--上面一条已经刷过，保险起见
+  unit.hp = unit.max_hp
+  unit.mp = unit.max_mp
   return unit
 end
 

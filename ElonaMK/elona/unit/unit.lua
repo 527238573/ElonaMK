@@ -37,7 +37,7 @@ local niltable = { --默认值为nil的成员变量
   anim_id = true,--动画数据的id
   status = true,---动画状态 类似 {rate =0,dx = 0,dy =0,dz=0,face = 1,rot = 0,scaleX = 1,scaleY =1,camera_dx = 0,camera_dy = 0,flying =0,}  
   attr = true,--存储的属性。
-  ebonus = true,--较为固定的加成。装备和特性所带来的加成，基本不会变动。
+  basis = true,--较为固定的属性。基础属性+装备和特性所带来的加成，基本不会变动。
   bonus = true,--加成。快速实时变动，各种buff，状态。
   skill = true,--存储的技能。
   clips = true,----animClip列表

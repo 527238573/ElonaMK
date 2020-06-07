@@ -22,6 +22,7 @@ Bonus = {
   wil_p = 0,
   mag_p = 0,
   chr_p = 0,
+  exp_point = 0,
   
   --各种抗性。
   res_bash =0,
@@ -47,34 +48,45 @@ Bonus.__newindex = function(o,k,v)
 end
 
 function Unit:createBonusAttr()
-  self.ebonus = setmetatable({},Bonus)
+  self.basis = setmetatable({},Bonus)
   self.bonus = setmetatable({},Bonus)  
 end
 
 
-function Unit:reloadEquipBouns()
-  self.ebonus = setmetatable({},Bonus) --直接重建
-  self.ebonus["AR"] = math.max(0,self.weapon_list.AR)
-  self.ebonus["MR"] = math.max(0,self.weapon_list.AR)
+function Unit:reloadBasisBonus()
+  self.basis = setmetatable({},Bonus) --直接重建
+  for key,_ in pairs(g.attr) do
+    if g.main_attr [key] then
+      self.basis[key] = math.floor( self.attr[key]) 
+    else
+      self.basis[key] = self.attr[key] 
+    end
+  end
+  
+  self.basis["AR"] = math.max(0,self.weapon_list.AR)
+  self.basis["MR"] = math.max(0,self.weapon_list.MR)
+  self:resetMaxHPMP() --有任何变动都会刷新最大hpmp
 end
 
 function Unit:reloadRealTimeBouns()
   self.bonus = setmetatable({},Bonus)  
+  
+  self:resetMaxHPMP()--有任何变动都会刷新最大hpmp
 end
 
 
 
 function Unit:getBonus(bonusName)
-  return self.ebonus[bonusName] + self.bonus[bonusName]
+  return self.basis[bonusName] + self.bonus[bonusName]
 end
 
 --护甲值 即时
 function Unit:getAR()
-  return  self.ebonus["AR"] +self.bonus["AR"] --后续可能会有百分比的加成
+  return  self.basis["AR"] +self.bonus["AR"] --后续可能会有百分比的加成
 end
 
 function Unit:getMR()
-  return  self.ebonus["MR"] +self.bonus["MR"] --后续可能会有百分比的加成
+  return  self.basis["MR"] +self.bonus["MR"] --后续可能会有百分比的加成
 end
 
 --单一属性的抗性，-8到8之间。
@@ -90,6 +102,6 @@ function Unit:getResistance(atktype)
   elseif atktype=="dark" then res_str="res_dark" 
   elseif atktype=="light" then res_str="res_light" 
   else error("unknow attack type:"..atktype) end
-  local rnum = math.floor(self.ebonus[res_str]+self.bonus[res_str])
+  local rnum = math.floor(self.basis[res_str]+self.bonus[res_str])
   return c.clamp(rnum,-8,8)
 end

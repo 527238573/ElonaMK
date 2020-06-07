@@ -14,7 +14,7 @@ function g.fastStart()
   --大地图位置
   p:setPosition(26,31)
   
-  local mc = Unit.createMC("Nilo","gunner")
+  local mc = Unit.createMC("Nilo","thief")
   p.mc = mc
   p.team[1] = mc
   cmap:unitSpawn(mc,38,20,true)
@@ -22,12 +22,19 @@ function g.fastStart()
   p.team[2] = Unit.createMC("teenage_girl","warrior")
   cmap:unitSpawn(p.team[2],35,20,true)
   
+  p.inv:addItem(Item.create("dagger"))
+  p.inv:addItem(Item.create("dagger"))
+  p.inv:addItem(Item.create("long_sword"))
+  p.inv:addItem(Item.create("mace"))
+  p.inv:addItem(Item.create("huge_sword"))
+  p.inv:addItem(Item.create("wakizashi"))
+  
   local item = Item.create("saving_pot")
   p.inv:addItem(item)
   item = Item.create("pistol")
   p.inv:addItem(item)
   item = Item.create("pistol")
-  p.inv:addItem(item)
+  p.inv:addItem(Item.create("pistol"))
   item = Item.create("machine_gun")
   p.inv:addItem(item)
   item = Item.create("repeating_bow")

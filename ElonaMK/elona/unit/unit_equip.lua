@@ -75,8 +75,8 @@ end
 --更换装备之后。直接调用此函数。
 function Unit:on_equip_change()
   self:buildWeaponList()
-  --重读固有加成属性。（装备和）
-  self:reloadEquipBouns()
+  --重读固有加成属性。（装备和基本属性和特性）
+  self:reloadBasisBonus()
 end
 
 
@@ -95,18 +95,19 @@ function Unit:buildWeaponList()
       ar = ar+eq:getAR()
       mr = mr+eq:getMR()
       if eq:isWeapon() then
-        local weapon = {item = eq,}
         if eq:isMeleeWeapon() then
+          local weapon = {item = eq,isMelee = true}
           table.insert(weapon_list.melee,weapon)
         end
         if eq:isRangeWeapon() then
+          local weapon = {item = eq,isMelee = false}
           table.insert(weapon_list.range,weapon)
         end
       end
     end
   end
   if #(weapon_list.melee) ==0 then --当没有可用的近战武器，以徒手攻击为武器。
-    local weapon = {unarmed = true} --代表。徒手格斗。具体数据实时计算
+    local weapon = {unarmed = true,isMelee = true} --代表。徒手格斗。具体数据实时计算
     table.insert(weapon_list.melee,weapon)
   end
   
@@ -116,20 +117,39 @@ function Unit:buildWeaponList()
   self.weapon_list = weapon_list
 end
 
-function Unit:getWeaponBaseAtk(weapon)--取决于技能等级
-  return weapon.baseAtk
+--刷新一下weapon的相关数据，用于显示。实际战斗不会用这些，而是取实时值。
+--[[
+function Unit:loadWeaponListData()
+  local meleeList = self.weapon_list.melee
+  for i=1,#meleeList do
+    local oneWeapon = meleeList[i]
+    if oneWeapon.unarmed then
+      local dice_num,dice_face,base_atk = self:getUnarmedAtkData()
+      oneWeapon.dice = dice_num
+      oneWeapon.face = dice_face
+      oneWeapon.base = base_atk +self:getWeaponBaseBonus(oneWeapon)
+      oneWeapon.modifier = self:getWeaponModifier(oneWeapon)
+    else
+      local weaponItem = oneWeapon.item
+      oneWeapon.dice = weaponItem.diceNum
+      oneWeapon.face = weaponItem.diceFace
+      oneWeapon.base = weaponItem.baseAtk +self:getWeaponBaseBonus(oneWeapon)
+      oneWeapon.modifier = self:getWeaponModifier(oneWeapon)
+    end
+  end
+  
+  local rangeList = self.weapon_list.range
+  for i=1,#rangeList do
+    local oneWeapon = rangeList[i]
+    local weaponItem = oneWeapon.item
+    oneWeapon.dice = weaponItem.diceNum_range
+    oneWeapon.face = weaponItem.diceFace_range
+    oneWeapon.base = weaponItem.baseAtk_range +self:getWeaponBaseBonus(oneWeapon)
+    oneWeapon.modifier = self:getWeaponModifier(oneWeapon)
+    oneWeapon.pellet = weaponItem:getPellet()
+  end
   
 end
-function Unit:getWeaponMeleeModifier(weapon)--取决于技能等级
-  return 1
-end
-
-function Unit:getUnarmedDice()--取决于技能等级
-  return 2,6,2
-end
-
-function Unit:getUnarmedModifier()--取决于技能等级
-  return 1
-end
+--]]
 
 

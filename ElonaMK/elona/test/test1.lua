@@ -25,6 +25,7 @@ function Test.genMonster()
     local utype = gentype()
     local unit = Unit.create(utype.id,nil,"wild")
     cmap:monsterSpawn(unit,p.mc.x,p.mc.y+3,false)
+    unit:setFaction("wild")
   end
 
 end
@@ -32,6 +33,8 @@ end
 
 function g.test1()
   Test.genMonster()
+  --addmsg("aaaaaaaaaaaaaaaaaaaaaaaaa")
+  --addmsg("bbbbbbbbbbbbbbbbbbbb","bad")
   --local file = assert(io.open(c.source_dir.."data/item/test.txt","r"))
   --local index = 1
   --local line = file:read()

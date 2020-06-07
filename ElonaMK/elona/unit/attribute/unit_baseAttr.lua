@@ -31,7 +31,7 @@ g.attr = { --attr 已有的成员：
   mag_p = 1,
   chr_p = 1,
   
-  total_point = 1,--总属性加值。  race class 提供的总属性合计。
+  exp_point = 1,--总属性加值。  race class 提供的总属性合计。 会影响每级需要经验 
   --抗性已经不属于基本属性 在bouns里查看抗性。
 }
 
@@ -74,14 +74,14 @@ function Unit:resetPotential(race,class)
     totalp = totalp+race[aname]+class[aname]
   end
   totalp = totalp+16--略加一点基础值。
-  self.attr.total_point = totalp
+  self.attr.exp_point = totalp
 end
 
 
 
 --提升1点属性获得1点xp.，属性基数越大，升级需要经验越多。
 function Unit:getLevelUpExp()
-  return self.attr.total_point*0.1*level_afactor
+  return self.attr.exp_point*0.1*level_afactor
 end
 
 --取得等级增长平均属性。 level可以不为整数。
@@ -90,18 +90,16 @@ c.averageAttrGrow = (aver+2)*0.1 *level_afactor--1.235
 
 
 
-function Unit:getSpeed()
-  return self.attr.speed
-end
 
-function Unit:cur_str() return math.floor(self.attr.str)+math.floor(self.bonus.str) end
-function Unit:cur_con() return math.floor(self.attr.con)+math.floor(self.bonus.con) end
-function Unit:cur_dex() return math.floor(self.attr.dex)+math.floor(self.bonus.dex) end
-function Unit:cur_per() return math.floor(self.attr.per)+math.floor(self.bonus.per) end
-function Unit:cur_ler() return math.floor(self.attr.ler)+math.floor(self.bonus.ler) end
-function Unit:cur_wil() return math.floor(self.attr.wil)+math.floor(self.bonus.wil) end
-function Unit:cur_mag() return math.floor(self.attr.mag)+math.floor(self.bonus.mag) end
-function Unit:cur_chr() return math.floor(self.attr.chr)+math.floor(self.bonus.chr) end
+--因为attr
+function Unit:cur_str() return math.floor(self.basis.str+self.bonus.str) end
+function Unit:cur_con() return math.floor(self.basis.con+self.bonus.con) end
+function Unit:cur_dex() return math.floor(self.basis.dex+self.bonus.dex) end
+function Unit:cur_per() return math.floor(self.basis.per+self.bonus.per) end
+function Unit:cur_ler() return math.floor(self.basis.ler+self.bonus.ler) end
+function Unit:cur_wil() return math.floor(self.basis.wil+self.bonus.wil) end
+function Unit:cur_mag() return math.floor(self.basis.mag+self.bonus.mag) end
+function Unit:cur_chr() return math.floor(self.basis.chr+self.bonus.chr) end
 
 function Unit:base_str() return math.floor(self.attr.str) end
 function Unit:base_con() return math.floor(self.attr.con) end
@@ -113,20 +111,28 @@ function Unit:base_mag() return math.floor(self.attr.mag) end
 function Unit:base_chr() return math.floor(self.attr.chr) end
 
 --潜力
-function Unit:potential_str() return self.attr.str_p+self.bonus.str_p end
-function Unit:potential_con() return self.attr.con_p+self.bonus.con_p end
-function Unit:potential_dex() return self.attr.dex_p+self.bonus.dex_p end
-function Unit:potential_per() return self.attr.per_p+self.bonus.per_p end
-function Unit:potential_ler() return self.attr.ler_p+self.bonus.ler_p end
-function Unit:potential_wil() return self.attr.wil_p+self.bonus.wil_p end
-function Unit:potential_mag() return self.attr.mag_p+self.bonus.mag_p end
-function Unit:potential_chr() return self.attr.chr_p+self.bonus.chr_p end
+function Unit:potential_str() return self.basis.str_p+self.bonus.str_p end
+function Unit:potential_con() return self.basis.con_p+self.bonus.con_p end
+function Unit:potential_dex() return self.basis.dex_p+self.bonus.dex_p end
+function Unit:potential_per() return self.basis.per_p+self.bonus.per_p end
+function Unit:potential_ler() return self.basis.ler_p+self.bonus.ler_p end
+function Unit:potential_wil() return self.basis.wil_p+self.bonus.wil_p end
+function Unit:potential_mag() return self.basis.mag_p+self.bonus.mag_p end
+function Unit:potential_chr() return self.basis.chr_p+self.bonus.chr_p end
 
 --
-function Unit:cur_life() return math.floor(self.attr.life)+math.floor(self.bonus.life)end
-function Unit:cur_mana() return math.floor(self.attr.mana)+math.floor(self.bonus.mana)end
-function Unit:cur_speed() return math.floor(self.attr.speed)+math.floor(self.bonus.speed)end
+function Unit:cur_life() return math.floor(self.basis.life)+math.floor(self.bonus.life)end
+function Unit:cur_mana() return math.floor(self.basis.mana)+math.floor(self.bonus.mana)end
+function Unit:cur_speed() return math.floor(self.basis.speed)+math.floor(self.bonus.speed)end
 function Unit:base_life() return math.floor(self.attr.life)end
 function Unit:base_mana() return math.floor(self.attr.mana)end
 function Unit:base_speed() return math.floor(self.attr.speed)end
-function Unit:getSpeed() return math.floor(self.attr.speed)+math.floor(self.bonus.speed) end
+function Unit:getSpeed() return math.floor(self.basis.speed)+math.floor(self.bonus.speed) end
+
+--获得
+function Unit:cur_main_attr(attr_id)
+  assert(g.main_attr[attr_id])
+  local funcName = "cur_"..attr_id
+  return self[funcName](self)
+  
+end

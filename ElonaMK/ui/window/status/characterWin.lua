@@ -86,18 +86,18 @@ local function drawBack(x,y,w,h)
   love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+50,y+164,0,1,1)
   love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+410,y+164,0,1,1)
   love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+50,y+460,0,1,1)
-  love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+540,y+460,0,1,1)
+  love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+640,y+460,0,1,1)
   love.graphics.setColor(0.4,0.4,0.4)
   love.graphics.setFont(c.font_c16)
   love.graphics.print(tl("主要属性 (本来值)","Attributes  (Org)"), x+73, y+162) --改成一次性的读取翻译
   love.graphics.print(tl("潜力","Potential"), x+290, y+162) --改成一次性的读取翻译
   love.graphics.print(tl("其他属性","Others"), x+433, y+162)
-  love.graphics.print(tl("攻击修正","Attack Rolls"), x+73, y+458)
-  love.graphics.print(tl("防御修正","Defense Rolls"), x+563, y+458)
+  love.graphics.print(tl("武器: 伤害(DPS,命中)","Weapon: Damage(DPS,Hit rate)"), x+73, y+458)
+  love.graphics.print(tl("战斗修正","Battle Rolls"), x+663, y+458)
   love.graphics.line(x+73, y+180,x+363, y+180)
   love.graphics.line(x+410, y+180,x+740, y+180)
-  love.graphics.line(x+73, y+476,x+443, y+476)
-  love.graphics.line(x+540, y+476,x+740, y+476)
+  love.graphics.line(x+73, y+476,x+543, y+476)
+  love.graphics.line(x+590, y+476,x+740, y+476)
   --attrIcon
   love.graphics.setColor(1,1,1)
   local iconlength = 34 
@@ -182,11 +182,11 @@ local function drawBack(x,y,w,h)
   love.graphics.print(potenrial_str(mc:potential_mag()), x+265, y+192+iconlength*6) --改成一次性的读取翻译
   love.graphics.print(potenrial_str(mc:potential_chr()), x+265, y+192+iconlength*7) --改成一次性的读取翻译
   
-  drawBar(1,3,x+530, y+192+iconlength*0-2,230,22,4)
-  drawBar(1,4,x+530, y+192+iconlength*1-2,230,22,4)
+  drawBar(mc:getHPRate(),3,x+530, y+192+iconlength*0-2,230,22,4)
+  drawBar(mc:getMPRate(),4,x+530, y+192+iconlength*1-2,230,22,4)
   love.graphics.setColor(1,1,1)
-  love.graphics.printf(string.format("%d/%d",mc.hp,mc:getMaxHP()), x+530, y+192+iconlength*0,230,"center")
-  love.graphics.printf(string.format("%d/%d",mc.mp,mc:getMaxMP()), x+530, y+192+iconlength*1,230,"center")
+  love.graphics.printf(string.format("%d/%d",mc.hp,mc.max_hp), x+530, y+192+iconlength*0,230,"center")
+  love.graphics.printf(string.format("%d/%d",mc.mp,mc.max_mp), x+530, y+192+iconlength*1,230,"center")
   
   local c_life,b_life = mc:cur_life(),mc:base_life()
   local c_mana,b_mana = mc:cur_mana(),mc:base_mana()
@@ -213,6 +213,7 @@ function characterWin.keyinput(key)
 end
 
 function characterWin.win_open()
+  
 end
 
 function characterWin.win_close()

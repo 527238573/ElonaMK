@@ -35,9 +35,9 @@ local function oneMember(index,btn_opt,x,y)
           love.graphics.printf("DEAD", x-5, y,80,"center")
         else
           love.graphics.setColor(1,1,1)
-          local liferate = 1--math.min(1,math.max(0,unit.hp/unit:getMaxHP()))
+          local liferate = unit:getHPRate()
           love.graphics.draw(lifebar_q.img,lifebar_q.green,x+4,y+3,0,liferate,1,0,0)
-          local mprate = 1--math.min(1,math.max(0,unit.mp/unit:getMaxMP()))
+          local mprate = unit:getMPRate()
           love.graphics.draw(lifebar_q.img,lifebar_q.blue,x+4,y+8,0,mprate,1,0,0)
         end
       end)

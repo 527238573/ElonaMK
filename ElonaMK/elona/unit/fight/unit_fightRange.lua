@@ -2,7 +2,7 @@
 function Unit:can_shoot(show_msg)
   local rangeList= self.weapon_list.range
   if #rangeList<1 then 
-    if show_msg then addmsg(tl("你没有可以射击的武器。","You need a weapon to shoot."),"info") end
+    if show_msg then addmsg(tl("你没有远程武器。","You need a weapon to shoot."),"info") end
     return false 
   end
   local canshoot = true
@@ -74,21 +74,7 @@ function Unit:reloadAction(show_msg)
   self:bar_delay(costTime,"reload","reload")
 end
 
---指定远程武器射击耗时。
-function Unit:shoot_cost(weapon)
-  local weaponItem = weapon.item
-  local scost = weaponItem:getShotCost()
-  local speed = 70
-  if weaponItem.type.fixShotCost == false then
-    speed = self:getSpeed()
-  end
-  return c.clamp(scost*70/speed,0.1,3)
-end
 
-function Unit:reload_cost(weapon)
-  local weaponItem = weapon.item
-  return weaponItem:getReloadCost()
-end
 
 
 function Unit:fastShootAction(show_msg)
@@ -165,19 +151,22 @@ function Unit:range_weapon_attack(target,weapon)
     local proj = Projectile.new(weaponItem:getBulletFrames())
     proj.shot_dispersion = weaponItem:getDispersion()
     proj.max_range = weaponItem:getMaxRange()
-    proj.hitLevel = self:getHitLevel(weapon)--命中等级
+    
     if weaponItem:hasFlag("SNIPER") then
       proj.pierce_through = true
       proj.pierce =3
       proj.speed = 1500
     end
     if snum>1 then proj.multi_shot = true end
+    local dam_ins = setmetatable({},Damage)
+    proj.dam_ins = dam_ins
+    dam_ins.hitLevel = self:getHitLevel(weapon)
+     --计算伤害
+    dam_ins.dam =(self:getWeaponRandomDamage(weapon)+self:getWeaponBaseBonus(weapon))*self:getWeaponModifier(weapon)
     
-    if target.not_unit  then
-      proj:attack(p.mc,nil,nil,nil,target.x,target.y) --射击地面 
-    else
-      proj:attack(p.mc,nil,nil,target,target.x,target.y) 
-    end
+    local unitTraget =target;
+    if target.not_unit  then unitTraget =nil end --射击地面 
+    proj:attack(p.mc,nil,nil,unitTraget,target.x,target.y) 
   end
   
   

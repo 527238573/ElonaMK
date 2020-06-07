@@ -41,6 +41,9 @@ g.skills = {
 }
 
 function Unit:initSkills(skills,level)
+  for skillid,_ in pairs(g.skills) do
+    self.skill[skillid] = 1
+  end
   for skillid,_ in pairs(skills) do
     if level<20 then
       self.skill[skillid] = 4+0.8*level
@@ -50,10 +53,14 @@ function Unit:initSkills(skills,level)
   end
 end
 
+
+function Unit:getSkillLevel(skillid)
+  return math.floor(self.skill[skillid])
+end
 --返回原始等级
 function Unit:getSkillLevelAndExp(skillid)
   assert(g.skills[skillid])
   local org = self.skill[skillid]
-  local level = math.floor( self.skill[skillid])
+  local level = math.floor(self.skill[skillid])
   return level,org-level
 end

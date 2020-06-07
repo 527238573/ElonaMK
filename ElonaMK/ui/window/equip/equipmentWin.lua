@@ -64,22 +64,22 @@ local function drawBack(x,y,w,h)
   love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+200,y+40,0,1,1)
   love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+660,y+40,0,1,1)
   love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+50,y+460,0,1,1)
-  love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+540,y+460,0,1,1)
+  love.graphics.draw(c.pic.ui_clip.img,c.pic.ui_clip.attr,x+640,y+460,0,1,1)
   love.graphics.setColor(0.4,0.4,0.4)
   love.graphics.setFont(c.font_c16)
   love.graphics.print(tl("部位","Category"), x+73, y+40) --改成一次性的读取翻译
   love.graphics.print(tl("装备名称","Name"), x+223, y+40) --改成一次性的读取翻译
   love.graphics.print(tl("重量","Weight"), x+683, y+40) --改成一次性的读取翻译
   
-  love.graphics.print(tl("攻击修正","Attack Rolls"), x+73, y+458)
-  love.graphics.print(tl("防御修正","Defense Rolls"), x+563, y+458)
+  love.graphics.print(tl("武器: 伤害(DPS,命中)","Weapon: Damage(DPS,Hit rate)"), x+73, y+458)
+  love.graphics.print(tl("战斗修正","Battle Rolls"), x+663, y+458)
   
   love.graphics.line(x+53, y+58,x+140, y+58)
   love.graphics.line(x+203, y+58,x+330, y+58)
   love.graphics.line(x+663, y+58,x+750, y+58)
   
-  love.graphics.line(x+73, y+476,x+443, y+476)
-  love.graphics.line(x+540, y+476,x+740, y+476)
+  love.graphics.line(x+73, y+476,x+543, y+476)
+  love.graphics.line(x+590, y+476,x+740, y+476)
 
   love.graphics.setColor(0.5,0.5,0.4,0.2)
   love.graphics.rectangle("fill",x+30,y+64,w-60,lineh)
@@ -89,7 +89,7 @@ local function drawBack(x,y,w,h)
   local weaponlist = p.mc.weapon_list
   love.graphics.setFont(c.font_c18)
   love.graphics.setColor(0.3,0.3,0.3)
-  love.graphics.print(string.format("(AR:%d  MR:%d)  %s  %.1fkg",weaponlist.AR,weaponlist.MR,"装备总重量:",weaponlist.totalWeight), x+491, y+410)
+  love.graphics.printf(string.format("%s  %.1fkg","装备总重量:",weaponlist.totalWeight), x+491, y+410,270,"right")
   ui.drawFix(x,y,w,h)
   
   

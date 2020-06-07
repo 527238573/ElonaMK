@@ -2,6 +2,10 @@ function Item:getShotCost()
   return self.type.shotCost
 end
 
+function Item:getMeleeCost()
+  return self.type.atkCost
+end
+
 function Item:getShootSound()
   return self.type.shootSound
 end
@@ -36,4 +40,24 @@ end
 
 function Item:getPellet()
   return self.type.pellet
+end
+
+function Item:randomWeaponDamage(isMelee)
+  if isMelee then
+    local roll = 0
+    local dnum = math.max(1,self.diceNum)
+    for i=1,dnum do
+      roll = roll+rnd()
+    end
+    roll = roll/dnum
+    return self.baseAtk + roll*self.diceFace
+  else
+    local roll = 0
+    local dnum = math.max(1,self.diceNum_range)
+    for i=1,dnum do
+      roll = roll+rnd()
+    end
+    roll = roll/dnum
+    return self.baseAtk_range + roll*self.diceFace_range
+  end
 end

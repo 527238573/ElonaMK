@@ -25,6 +25,7 @@ function Unit:deal_damage(source,dam_ins,delay)
       deal_dam = deal_dam*((2-subresist)/2)
     end
   end
+  deal_dam = math.max(0,deal_dam) --最小为0，不能为负值。
   dam_ins.deal_dam = deal_dam --回传一个数值，实际攻击
   --apply damage
   if deal_dam<=0 then return end
@@ -72,29 +73,6 @@ function Unit:getDodgeLevel()
   return dodgeLevel
 end
 
---获取命中等级。传输的是装备的武器条目。
-function Unit:getHitLevel(weapon)
-  --根据武器类型取得等级来决定命中等级。
-  local skill1,skill2 --最多关联两个skill
-  local weaponItem --可能为空。
-  if weapon.unarmed then
-    skill1 = "martial_arts"--格斗技能
-  else
-    weaponItem = weapon.item
-    skill1 = weaponItem.type.weapon_skill_a[1] or "martial_arts" --不能为空。
-    skill2 = weaponItem.type.weapon_skill_a[2] --最多两个。多了不算在内。
-  end
-  
-  local skill_level,exp=self:getSkillLevelAndExp(skill1)
-  if skill2 then
-    local l = self:getSkillLevelAndExp(skill2)
-    skill_level = (skill_level+l)/2
-  end
-  local hitLevel = skill_level--基本
-  --todo，算上装备和buff的
-  return math.max(1,skill_level+2)
-  
-end
 
 --根据命中等级和闪避等级，取得命中概率。
 local function hitRate(hitLevel,dodgeLevel)
@@ -123,7 +101,18 @@ local function hitRate(hitLevel,dodgeLevel)
   ]]
 end
 
-
+--近战命中判定，返回0，miss。返回1，命中，返回。。。其他格挡等等。
+function Unit:check_melee_hit(dam_ins,fdelay)
+  local selfDodgeLevel = self:getDodgeLevel()
+  local hit_probability = hitRate(dam_ins.hitLevel,selfDodgeLevel)
+  local hit = 0
+  if rnd()<hit_probability then
+    self:deal_damage(self,dam_ins,fdelay)
+    hit =1
+  end
+  debugmsg(string.format("meleeDam:%.1f, hitlevel:%.1f,dodgeLevel:%.1f,dex:%d, rate:%.2f",dam_ins.dam,dam_ins.hitLevel,selfDodgeLevel,self:cur_dex(),hit_probability))
+  return hit
+end
 
 
 --检测远程命中。已经有子弹projectile飞来，检测能否躲过去。被命中就返回true，然后计算接受伤害。躲过就返回false子弹继续飞
@@ -148,10 +137,15 @@ function Unit:check_range_hit(projectile)
   
   if rnd()>hitrate then return false end
   
+  local dam_ins = projectile.dam_ins
+  
   local selfDodgeLevel = self:getDodgeLevel()
-  local hit_probability = hitRate(projectile.hitLevel,selfDodgeLevel)
+  local hit_probability = hitRate(dam_ins.hitLevel,selfDodgeLevel)
   local hit = rnd()<hit_probability--经过数值运算的结果。
-  debugmsg(string.format("hitlevel:%.1f,dodgeLevel:%.1f,dex:%d, rate:%.2f",projectile.hitLevel,selfDodgeLevel,self:cur_dex(),hit_probability))
+  if hit then
+    self:deal_damage(self,dam_ins,0)
+  end
+  debugmsg(string.format("hitlevel:%.1f,dodgeLevel:%.1f,dex:%d, rate:%.2f",dam_ins.hitLevel,selfDodgeLevel,self:cur_dex(),hit_probability))
   
   return hit 
 end

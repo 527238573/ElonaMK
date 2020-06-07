@@ -297,6 +297,9 @@ local function loadWeapon()
       elseif key == "weapon_skill" then
         dataT[key] = flagsTable(val)
         dataT.weapon_skill_a = data.flagsArrayTable(val)--数组排列。
+      elseif key == "weapon_skill_range" then
+        dataT[key] = flagsTable(val)
+        dataT.weapon_skill_range_a = data.flagsArrayTable(val)--数组排列。
       elseif key == "hit_effect" then
         dataT[key] = flagsIndexTable(val)
       elseif  key=="atkCost" then
@@ -430,6 +433,8 @@ local function loadRangeWeapon()
         dataT[key] = tonumber(val) or 100
       elseif  key=="pellet" then
         dataT[key] = tonumber(val) or 1
+      elseif  key=="sLevel" then
+        dataT[key] = assert(tonumber(val))
       elseif  key=="r_dps" then
         --无效
       elseif  key=="maxAmmo" then

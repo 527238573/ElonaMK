@@ -46,18 +46,17 @@ function Item:initEquipment(level)
   if not itype.weapon then return end--必须是武器
   self.diceNum =itype.diceNum
   self.to_hit =itype.to_hit
-  self.diceFace =math.floor(itype.diceFace +dlevel*itype.face_grow*itype.atkCost/100*2)
-  self.baseAtk =math.floor(itype.baseAtk+dlevel*itype.base_grow*itype.atkCost/100)
+  self.diceFace =math.floor(itype.diceFace +dlevel*itype.face_grow*itype.atkCost*2.25*2)
+  self.baseAtk =math.floor(itype.baseAtk+dlevel*itype.base_grow*itype.atkCost*2.25)
   if not itype.rangeWeapon then return end --远程武器
   self.diceNum_range =itype.diceNum_range
   self.to_hit_range =itype.to_hit_range
-  self.diceFace_range =math.floor(itype.diceFace_range +dlevel*itype.face_grow_range*itype.shotCost/100*2)
-  self.baseAtk_range =math.floor(itype.baseAtk_range+dlevel*itype.base_grow_range*itype.shotCost/100)
+  self.diceFace_range =math.floor(itype.diceFace_range +dlevel*itype.face_grow_range*itype.shotCost*2.25*2)
+  self.baseAtk_range =math.floor(itype.baseAtk_range+dlevel*itype.base_grow_range*itype.shotCost*2.25)
   if itype.R_key =="reload" then --对需要装弹的武器
     self.useReload = true
     self.ammoNum = itype.maxAmmo --当前子弹数设为最大。 
   end
-  
 end
 
 
