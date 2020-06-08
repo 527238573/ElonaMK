@@ -5,7 +5,8 @@ Damage ={
   resist_pen =0, --固定穿透
   resist_mul = 0,--百分比穿透。
   hitLevel = 1,--命中等级。
-  
+  cause = "attack",--造成伤害的原因。一般就是伤害型攻击（普攻，法术）。其他还有毒，抹杀，流血，陷阱等等。
+  crital = false,--暴击的伤害？
 }
 local niltable = { --默认值为nil的成员变量
   subtype = true, --副类型， bash，cut，stab，fire，ice，nature，earth，dark，light 这种，可能增加更多。相应的抗性res_+属性名。

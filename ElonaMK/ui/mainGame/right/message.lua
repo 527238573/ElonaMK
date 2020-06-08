@@ -10,6 +10,9 @@ local colortable=
   good = {150/255,250/255,150/255},
   bad = {250/255,150/255,150/255},
   warning = {230/255,230/255,130/255},
+  death = {250/255,150/255,150/255},
+  hit = {230/255,230/255,130/255},
+  enemy_hit = {250/255,150/255,150/255},
 }
 local window_width =296
 local maxLen = 600
@@ -34,7 +37,8 @@ end
 function ui.message.addmsg(msg,msgtype)
   msgtype = msgtype or "info"
   if msg == nil then return end
-  if msg ==lastMsg then
+  
+  if msg ==lastMsg and (msgtype~="hit") and  (msgtype~="enemy_hit") then
     if love.timer.getTime() - lastTime<0.4 then
       return --时间太短不跟新
     end

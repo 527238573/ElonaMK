@@ -24,7 +24,11 @@ function Unit:seesUnit(unit)
   end
 end
 
---展示显示的名字。
+--用于 展示的短名。如 少女
+function Unit:getShortName()
+  return self.type.name
+end
+--展示显示的名字。全名，少女 索菲娅 typename +自名字。
 function Unit:getName()
   return self.type.name
 end

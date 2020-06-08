@@ -51,3 +51,7 @@ end
 function Unit:isInEnemyFaction()
   return self.faction>3
 end
+
+function Unit:isInPlayerFaction()
+  return self.faction==1
+end

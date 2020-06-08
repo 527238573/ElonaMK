@@ -11,7 +11,7 @@ function Unit:melee_attack(target)
     attack_cost_time = math.max(attack_cost_time,melee_costTime)
   end
   local fhit=self:attack_animation(target,attack_cost_time)
-  debugmsg("melee costtime:"..attack_cost_time)
+  --debugmsg("melee costtime:"..attack_cost_time)
   
   for i=1,#meleeList do
     local oneWeapon = meleeList[i]
@@ -43,7 +43,7 @@ function Unit:melee_weapon_attack(target,weapon,fdelay)
     dam_ins.subtype = "stab" --穿刺
   end
   --命中判定
-  local hit = target:check_melee_hit(dam_ins,fdelay)
+  local hit = target:check_melee_hit(self,dam_ins,fdelay)
   if hit ==0 then
     --未命中
     target:melee_miss_animation(self,fdelay,hit_effect)

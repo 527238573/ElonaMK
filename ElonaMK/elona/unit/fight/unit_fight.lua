@@ -29,10 +29,28 @@ function Unit:deal_damage(source,dam_ins,delay)
   dam_ins.deal_dam = deal_dam --回传一个数值，实际攻击
   --apply damage
   if deal_dam<=0 then return end
+  
+  
+  --挨揍的
+  if source and source:isInPlayerFaction() then
+    if dam_ins.crital then
+      addmsg(string.format("crit%d!",deal_dam),"hit")
+    else
+      addmsg(string.format("(%d)",deal_dam),"hit")
+    end
+  elseif self:isInPlayerFaction() then
+    if dam_ins.crital then
+      addmsg(string.format("crit%d!",deal_dam),"enemy_hit")
+    else
+      addmsg(string.format("(%d)",deal_dam),"enemy_hit")
+    end
+  end
+  
+  
   if delay<=0 then 
-    self:take_damage(source,deal_dam)
+    self:take_damage(source,dam_ins)
   else
-    table.insert(self.damage_queue,{source = source,dam=deal_dam,delay = delay})--延迟伤害
+    table.insert(self.damage_queue,{source = source,dam_ins=dam_ins,delay = delay})--延迟伤害
   end
   --on_hurt
 end
@@ -45,7 +63,7 @@ function Unit:update_damage(dt)
     local dam_t = self.damage_queue[i]
     dam_t.delay = dam_t.delay  - dt
     if dam_t.delay<=0 then
-      self:take_damage(dam_t.source,dam_t.dam)
+      self:take_damage(dam_t.source,dam_t.dam_ins)
       table.remove(self.damage_queue,i)
     else
       i= i+1
@@ -53,12 +71,12 @@ function Unit:update_damage(dt)
   end
 end
 
-function Unit:take_damage(source,dam)
-  debugmsg("takedam:"..dam)
+function Unit:take_damage(source,dam_ins)
+  debugmsg("takedam:"..dam_ins.dam)
   if self:is_dead() then return end
-  self.hp = self.hp-dam
+  self.hp = self.hp-dam_ins.dam
   if self.hp<=0 then 
-    self:die(source)
+    self:die(source,dam_ins)
   end
 end
 
@@ -102,12 +120,12 @@ local function hitRate(hitLevel,dodgeLevel)
 end
 
 --近战命中判定，返回0，miss。返回1，命中，返回。。。其他格挡等等。
-function Unit:check_melee_hit(dam_ins,fdelay)
+function Unit:check_melee_hit(source,dam_ins,fdelay)
   local selfDodgeLevel = self:getDodgeLevel()
   local hit_probability = hitRate(dam_ins.hitLevel,selfDodgeLevel)
   local hit = 0
   if rnd()<hit_probability then
-    self:deal_damage(self,dam_ins,fdelay)
+    self:deal_damage(source,dam_ins,fdelay)
     hit =1
   end
   debugmsg(string.format("meleeDam:%.1f, hitlevel:%.1f,dodgeLevel:%.1f,dex:%d, rate:%.2f",dam_ins.dam,dam_ins.hitLevel,selfDodgeLevel,self:cur_dex(),hit_probability))
@@ -142,8 +160,36 @@ function Unit:check_range_hit(projectile)
   local selfDodgeLevel = self:getDodgeLevel()
   local hit_probability = hitRate(dam_ins.hitLevel,selfDodgeLevel)
   local hit = rnd()<hit_probability--经过数值运算的结果。
+  
+  local source = projectile.source_unit
+  if hit or projectile.dest_unit == self then --只有命中或想要命中的子弹才显示，无意并擦过的子弹不显示。
+    local con1 = self:isInPlayerFaction() 
+    local con2 = source and source:isInPlayerFaction() 
+    if con1 or con2 then
+      local selfname = self:getShortName()
+      
+      if hit then
+        if source then
+          local sourcename = source:getShortName()
+          addmsg(string.format(tl("%s射中了%s。","%s shot hit %s."),sourcename,selfname),"info")
+        else
+          addmsg(string.format(tl("%s被射中了.","%s have been shot."),selfname),"info")
+        end
+      else
+        if source then
+          local sourcename = source:getShortName()
+          addmsg(string.format(tl("%s躲开了%s的射击。","%s dodged %s's shot."),selfname,sourcename),"info")
+        else
+          addmsg(string.format(tl("%s躲开了射击。","%s dodged the shot."),selfname),"info")
+        end
+      end
+    end
+  end
+  
+  
+  
   if hit then
-    self:deal_damage(self,dam_ins,0)
+    self:deal_damage(source,dam_ins,0)
   end
   debugmsg(string.format("hitlevel:%.1f,dodgeLevel:%.1f,dex:%d, rate:%.2f",dam_ins.hitLevel,selfDodgeLevel,self:cur_dex(),hit_probability))
   
