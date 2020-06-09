@@ -79,7 +79,7 @@ end
 
 
 
---提升1点属性获得1点xp.，属性基数越大，升级需要经验越多。
+--提升1点属性获得1点exp.，属性基数越大，升级需要经验越多。
 function Unit:getLevelUpExp()
   return self.attr.exp_point*0.1*level_afactor
 end
@@ -120,6 +120,8 @@ function Unit:potential_wil() return self.basis.wil_p+self.bonus.wil_p end
 function Unit:potential_mag() return self.basis.mag_p+self.bonus.mag_p end
 function Unit:potential_chr() return self.basis.chr_p+self.bonus.chr_p end
 
+
+
 --
 function Unit:cur_life() return math.floor(self.basis.life)+math.floor(self.bonus.life)end
 function Unit:cur_mana() return math.floor(self.basis.mana)+math.floor(self.bonus.mana)end
@@ -134,5 +136,73 @@ function Unit:cur_main_attr(attr_id)
   assert(g.main_attr[attr_id])
   local funcName = "cur_"..attr_id
   return self[funcName](self)
-  
 end
+
+--增长主属性经验。 explv代表经验的等级。经验的等级影响较为微弱，只有相差非常大时，才有明显限制。
+function Unit:train_attr(attr_id,exp,explv)
+  exp = math.max(0,exp)
+  local attr = self.attr[attr_id]
+  local cur_a = math.floor(attr)
+  local cur_lv =cur_a/c.averageAttrGrow --大约是当前经验等级
+  local lv_fix = 1 --等级的修正。
+  local potential_id = attr_id.."_p"
+  local potentail = self.basis[potential_id]+self.bonus[potential_id]
+  
+  --先确定当前升级需要经验。
+  local growExp = 1000+cur_a
+  if cur_a<100 then -- 100属性以下需要经验偏少，前期升级加快。
+    growExp = 1120-(cur_a-120)^2/20
+  end
+  local lv_c = cur_a-explv
+  if lv_c>20 then --获得经验等级差距过大，经验消减，100-200级之间快速衰减 当差距250级时达到最低20%，
+    lv_fix = 0.8/(1+math.exp((lv_c-150)/20))+0.2
+  end
+  local real_grow = exp/growExp * lv_fix * potentail
+  self:grow_attr(attr_id,real_grow)
+end
+
+
+local grow_str = {
+  str = tl("%s感到肌肉变强壮了。","%s's muscles feel stronger."),
+  con = tl("%s变的能承受更多打击。","%s begins to feel good when being hit hard."),
+  dex = tl("%s更加敏捷了。","%s becomes dexterous."),
+  per = tl("%s感到世界更加清晰了。","%sfeels more in touch with the world."),
+  ler = tl("%s的好奇心上升了。","%s feels studious."),
+  wil = tl("%s的意志更加坚定。","%s's will hardens."),
+  mag = tl("%s与魔力的共鸣加强了。","%s's resonance with magic improves."),
+  chr = tl("%s感到世界对自己更友好了。","%s enjoys showing off self."),
+  level = tl("%s等级提升了！","%s level up!!")
+}
+
+function Unit:grow_attr(attr_id,grow)
+  local attr = self.attr[attr_id]
+  local cur_a = math.floor(attr)
+  attr = attr +grow
+  self.attr[attr_id] = attr
+  if cur_a~=math.floor(attr) then --属性变动
+    self:reloadBasisBonus()--需要重新load已经变化
+    if self:isInPlayerFaction() then --音效
+      local selfname = self:getShortName()
+      addmsg(string.format(grow_str[attr_id],selfname),"good")
+      --音效
+      g.playSound("ding3") 
+    end
+  end
+  
+  self.exp = self.exp +grow
+  local next_exp = self:getLevelUpExp()
+  if self.exp>=next_exp then
+    self.exp = self.exp - next_exp
+    self.level = self.level+1
+    self:reloadBasisBonus()--需要重新load已经变化
+    self:reloadRealTimeBouns() --重载所有加成，可能有被等级影响的部分。
+    if self:isInPlayerFaction() then --音效
+      local selfname = self:getShortName()
+      addmsg(string.format(grow_str.level,selfname),"good")
+      --音效
+      g.playSound("ding1",self.x,self.y) 
+    end
+    
+  end
+end
+

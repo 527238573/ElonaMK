@@ -14,7 +14,7 @@ local colortable=
   hit = {230/255,230/255,130/255},
   enemy_hit = {250/255,150/255,150/255},
 }
-local window_width =296
+local window_width =290
 local maxLen = 600
 local old_text =nil
 local msg_text = love.graphics.newText(c.font_c16)
@@ -37,8 +37,8 @@ end
 function ui.message.addmsg(msg,msgtype)
   msgtype = msgtype or "info"
   if msg == nil then return end
-  
-  if msg ==lastMsg and (msgtype~="hit") and  (msgtype~="enemy_hit") then
+  local count_msg = (msgtype~="hit") and  (msgtype~="enemy_hit") --符合条件才count数值。
+  if msg ==lastMsg and count_msg then
     if love.timer.getTime() - lastTime<0.4 then
       return --时间太短不跟新
     end
@@ -61,10 +61,12 @@ function ui.message.addmsg(msg,msgtype)
   local colorT = assert(colortable[msgtype])
   table.insert(textTable,colorT)
   table.insert(textTable,msg)
-  lastMsg = msg
-  lastCount =1
-  lastIndex = #textTable
-  lastTime = love.timer.getTime()
+  if count_msg then
+    lastMsg = msg
+    lastCount =1
+    lastIndex = #textTable
+    lastTime = love.timer.getTime()
+  end
   needFlush = true
 end
 addmsg = ui.message.addmsg

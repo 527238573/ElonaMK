@@ -28,9 +28,9 @@ function Unit:deal_damage(source,dam_ins,delay)
   deal_dam = math.max(0,deal_dam) --最小为0，不能为负值。
   dam_ins.deal_dam = deal_dam --回传一个数值，实际攻击
   --apply damage
+  
+  --apply damage
   if deal_dam<=0 then return end
-  
-  
   --挨揍的
   if source and source:isInPlayerFaction() then
     if dam_ins.crital then
@@ -45,7 +45,6 @@ function Unit:deal_damage(source,dam_ins,delay)
       addmsg(string.format("(%d)",deal_dam),"enemy_hit")
     end
   end
-  
   
   if delay<=0 then 
     self:take_damage(source,dam_ins)

@@ -32,7 +32,9 @@ end
 
 
 function g.test1()
-  Test.genMonster()
+  --Test.genMonster()
+  p.mc:train_attr("str",100,9999)
+  
   --addmsg("aaaaaaaaaaaaaaaaaaaaaaaaa")
   --addmsg("bbbbbbbbbbbbbbbbbbbb","bad")
   --local file = assert(io.open(c.source_dir.."data/item/test.txt","r"))
