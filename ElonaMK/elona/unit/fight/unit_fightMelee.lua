@@ -17,12 +17,18 @@ function Unit:melee_attack(target)
   local hit_effect = self:getWeaponRandomHitEffect(meleeList[1]) --取第一个武器的效果做message描述
   self:melee_attack_message(target,hit_effect)
 
-
+  local tlevel = target:getDodgeLevel()
+  local exp_fix = attack_cost_time/#meleeList --武器经验修正。 获取经验的速度，与攻速无关。
+  
   for i=1,#meleeList do
     local oneWeapon = meleeList[i]
     self:melee_weapon_attack(target,oneWeapon,fhit+(i-1)*atk_intv)--2武器间隔0.2，4武器间隔0.1
+    
+    self:train_weapon_skill(oneWeapon,exp_fix,tlevel)
   end
-
+  
+  --获得技能的训练。
+  self:train_melee_attack(attack_cost_time,target.level)
 end
 
 
@@ -56,6 +62,8 @@ function Unit:melee_weapon_attack(target,weapon,fdelay)
   else
     target:melee_hit_animation(self,fdelay,hit_effect)
   end
+  
+  
 end
 
 

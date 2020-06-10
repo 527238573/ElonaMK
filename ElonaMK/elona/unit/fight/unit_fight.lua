@@ -123,9 +123,12 @@ function Unit:check_melee_hit(source,dam_ins,fdelay)
   local selfDodgeLevel = self:getDodgeLevel()
   local hit_probability = hitRate(dam_ins.hitLevel,selfDodgeLevel)
   local hit = 0
+  self:train_attr("dex",rnd(6,8),dam_ins.hitLevel)--训练敏捷，无论是否击中。
   if rnd()<hit_probability then
     self:deal_damage(source,dam_ins,fdelay)
     hit =1
+  else
+    self:train_attr("dex",rnd(4,8),dam_ins.hitLevel)--训练敏捷， 躲闪成功。
   end
   debugmsg(string.format("meleeDam:%.1f, hitlevel:%.1f,dodgeLevel:%.1f,dex:%d, rate:%.2f",dam_ins.dam,dam_ins.hitLevel,selfDodgeLevel,self:cur_dex(),hit_probability))
   return hit
@@ -186,9 +189,11 @@ function Unit:check_range_hit(projectile)
   end
   
   
-  
+  self:train_attr("dex",rnd(4,6),dam_ins.hitLevel)--训练敏捷，无论是否击中。
   if hit then
     self:deal_damage(source,dam_ins,0)
+  else
+    self:train_attr("dex",rnd(5,7),dam_ins.hitLevel)--训练敏捷，躲闪成功。
   end
   debugmsg(string.format("hitlevel:%.1f,dodgeLevel:%.1f,dex:%d, rate:%.2f",dam_ins.hitLevel,selfDodgeLevel,self:cur_dex(),hit_probability))
   

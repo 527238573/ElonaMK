@@ -27,21 +27,23 @@ function Test.genMonster()
     cmap:monsterSpawn(unit,p.mc.x,p.mc.y+3,false)
     unit:setFaction("wild")
   end
+end
 
+function Test.test_message()
+  addmsg("aaaaaaaaaaaaaaaaaaaaaaaaa")
+  addmsg("bbbbbbbbbbbbbbbbbbbb","bad")
+end
+
+function Test.grow_attr()
+  --p.mc:train_attr("str",100,9999)
+  p.mc:train_skill("cutting",100,999)
 end
 
 
 function g.test1()
-  --Test.genMonster()
-  p.mc:train_attr("str",100,9999)
-  
-  --addmsg("aaaaaaaaaaaaaaaaaaaaaaaaa")
-  --addmsg("bbbbbbbbbbbbbbbbbbbb","bad")
-  --local file = assert(io.open(c.source_dir.."data/item/test.txt","r"))
-  --local index = 1
-  --local line = file:read()
+  Test.genMonster()
+  --Test.grow_attr()
 
-  --debugmsg((line))
   -- ui.ynAskWin:Open(callb,"什么问题什么问题什么问题什么问题什么问题什？")
 
 end

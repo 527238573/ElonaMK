@@ -64,3 +64,36 @@ function Unit:getSkillLevelAndExp(skillid)
   local level = math.floor(self.skill[skillid])
   return level,org-level
 end
+
+
+local skill_up_str = tl("%s的%s技能提升了。","%s's %s skill increases.")
+--trian技能。
+function Unit:train_skill(skill_id,exp,explv)
+  exp = math.max(0,exp)
+  local skill = self.skill[skill_id]
+  local cur_lv = math.floor(skill)
+  local growExp = 1000 --技能等级每级提升的经验都一样。
+  local skill_data = g.skills[skill_id]
+  
+  local lv_fix =1
+  local lv_c =cur_lv-self.level
+  if lv_c>10 then lv_fix = 0 elseif lv_c>0 then lv_fix  = 0.8^lv_c end --超过自身等级10级不得经验
+  lv_c = cur_lv - explv --
+  if lv_c>10 then lv_fix  = lv_fix* math.max(0,1-(lv_c-10)*0.03) end -- 给出的经验质量等级太低不得经验。
+  local realexp = exp*lv_fix
+  skill = skill +realexp/growExp
+  self.skill[skill_id] = skill
+  if cur_lv~=math.floor(skill) then --等级提升
+    --self:reloadBasisBonus()--暂时不需要load等级。
+    if self:isInPlayerFaction() then --音效
+      local selfname = self:getShortName()
+      local skillname = skill_data.name
+      addmsg(string.format(skill_up_str,selfname,skillname),"good")
+      --音效
+      g.playSound("ding3") 
+    end
+  end
+  --提升技能等级有益于相应属性等级提升。
+  self:train_attr(skill_data.main_attr,realexp/3,cur_lv)
+end
+

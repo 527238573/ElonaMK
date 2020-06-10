@@ -111,6 +111,12 @@ function Unit:fastShootAction(show_msg)
   local atk_intv = math.max(0.1,0.3 -#rangeList*0.05)
   local shoot_index =1--第几个射击的武器。
   
+  local tlevel =0
+  if not target.not_unit then
+    tlevel = target:getDodgeLevel()
+  end
+  local exp_fix = 1/#rangeList --武器经验。 获取经验的速度，与攻速无关。
+  
   for i=1,#rangeList do
     local oneWeapon = rangeList[i]
     if hasAmmoToShoot(oneWeapon) then --有弹药
@@ -129,11 +135,14 @@ function Unit:fastShootAction(show_msg)
         end
       end
       shoot_index = shoot_index +1
+      self:train_weapon_skill(oneWeapon,exp_fix*curCosttime,tlevel)--获取经验的速度，与攻速无关。
     end
   end
   if shoot_index<=1 then --没能射击
     addmsg(tl("需要装填弹药!","You need to reload to shoot!"),"info")
     g.playSound("shoot_fail",self.x,self.y) 
+  else
+    self:train_range_attack(costTime,target.level)
   end
   if showbar then
     self:short_delay(costTime,"shoot")

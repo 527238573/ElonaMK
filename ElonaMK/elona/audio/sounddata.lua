@@ -52,6 +52,10 @@ end
 
 return function()
   loadSound()
+  data.sound["ding1"].volume = 1
+  data.sound["ding2"].volume = 1
+  data.sound["ding3"].volume = 1
+  
   data.sound["pop2"].volume = 1
   data.sound["bash_hit1"].volume = 0.1
   data.sound["bash_hit2"].volume = 0.1

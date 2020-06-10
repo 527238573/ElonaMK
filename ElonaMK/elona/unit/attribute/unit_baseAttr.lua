@@ -56,7 +56,7 @@ function Unit:initAttr(race,class,level,attrFactor)
     local potential = self.attr[aname.."_p"] 
     baseVal = baseVal +(level-1)*(potential-0.2)*level_afactor --等级成长值。
     baseVal = attrFactor*baseVal --属性初始值调整。
-    self.attr[aname] = baseVal
+    self.attr[aname] = math.max(1,baseVal)--最下为1，不能为0
   end
   self.attr.life = race.life
   self.attr.mana = race.mana

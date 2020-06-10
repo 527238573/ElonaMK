@@ -167,3 +167,33 @@ function Unit:reload_cost(weapon)
   local weaponItem = weapon.item
   return weaponItem:getReloadCost()
 end
+
+
+function Unit:train_weapon_skill(weapon,fix,level)
+  local skill1,skill2 --最多关联两个skill
+  if weapon.unarmed then
+    skill1 = "martial_arts"--格斗技能
+  else
+    local weaponItem = weapon.item
+    if weapon.isMelee then
+      skill1 = weaponItem.type.weapon_skill_a[1] or "martial_arts" --不能为空。
+      skill2 = weaponItem.type.weapon_skill_a[2] --最多两个。多了不算在内。
+    else
+      skill1 = weaponItem.type.weapon_skill_range_a[1] or "throw" --不能为空。
+      skill2 = weaponItem.type.weapon_skill_range_a[2] --最多两个。多了不算在内。
+    end
+  end
+  if skill2 then
+    exp=exp/2
+    self:train_skill(skill2,rnd(10,20)*fix,level)
+  end
+  self:train_skill(skill1,rnd(10,20)*fix,level)
+  self:train_attr(g.skills[skill1].main_attr,rnd(6,11)*fix,level)--训练次属性
+end
+
+function Unit:train_melee_attack(fix,level)
+  self:train_attr("str",rnd(10,16)*fix,level)--获取经验的速度，与攻速无关。
+end
+function Unit:train_range_attack(fix,level)
+  self:train_attr("per",rnd(10,16)*fix,level)--获取经验的速度，与攻速无关。
+end
