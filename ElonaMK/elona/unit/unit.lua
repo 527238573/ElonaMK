@@ -6,7 +6,6 @@ Unit = {
     name = "noname",
     x=0, --位置。
     y=0,
-    saveType = "Unit",--注册保存类型
     level = 1,--等级
     exp = 0,--经验。
     hp = 0,--生命
@@ -28,7 +27,7 @@ Unit = {
     
     
   }
-saveClass["Unit"] = Unit --注册保存类型
+saveMetaType("Unit",Unit) --注册保存类型
 
 local niltable = { --默认值为nil的成员变量
   class = true,--职业类型
@@ -49,8 +48,13 @@ local niltable = { --默认值为nil的成员变量
   animdelay_list = true,--延迟动画调用。里面是function，所以不能保存。里面有东西会在保存时直接丢失掉，但不重要
   map=true,--父地图的状态。
   target = true,--目标。mc的目标用蓝色的框标注
+  
+  abilities_level = true, --技能等级列表。删除后的技能，会保留技能等级。技能次数用完或装备移除等，都会保留技能等级。
+  abilities = true,--技能列表，数组。
+  actionBar = true, --动作条，1-8的位置放技能或物品引用。
+  effects = true,--effect列表，数组。
+  traits = true,--traits列表，数组。
 }
-Unit.__index = Unit
 Unit.__newindex = function(o,k,v)
   if Unit[k]==nil and niltable[k]==nil then error("使用了Unit的意料之外的值。") else rawset(o,k,v) end
 end
@@ -65,7 +69,6 @@ function Unit:loadfinish()
   --如果新版增加字段，则需要补充。
   self.anim = assert(data.unitAnim[self.anim_id])
   self.class = assert(data.class[self.class_id])
-  self.animdelay_list = {noSave = true} --重建新的。
   
 end
 
@@ -101,8 +104,13 @@ function Unit.new(typeid,level)
   o.equipment = {} --内涵1-5位置
   
   o.damage_queue={} --延迟伤害队列
-  o.animdelay_list = {noSave = true} --延迟动画调用。里面是function，所以不能保存。里面有东西会在保存时直接丢失掉，但不重要
+  o.animdelay_list = {} --延迟动画调用。里面是function，可以保存。
   
+  o.abilities_level = {}
+  o.abilities = {}
+  o.effects = {}
+  o.traits = {}
+  o:initActionBar()
   return o
 end
 
@@ -158,10 +166,13 @@ end
 
 function Unit:updateRL(dt)
   self:update_damage(dt)
+  if self.dead then return end
+  self:updateEffectsRL(dt)
   
+  --计算delay
   if self.delay_bar>0 then self.delay_bar = self.delay_bar -dt end --跟新delaybar。
   self.delay = self.delay -dt
-  
+  --可行动部分。
   if self.delay<=0 then 
     self.delay =0
     self.delay_id = "null"
@@ -180,6 +191,7 @@ end
 
 
 function Unit:updateAnim(dt)
+  self:updateEffectsAnim(dt)
   self:clips_update(dt)
   self:updateFrameClips(dt)
   self:updateAnimDelayFunc(dt)

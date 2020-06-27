@@ -1,13 +1,10 @@
 --用来存放field的list，一个地格可以有多个field，所以一个地格对应一个list。
 FieldList = { 
   --一些默认值
-  saveType = "FieldList",--注册保存类型
   x=0,
   y=0,
 }
-saveClass["FieldList"] = FieldList --注册保存类型
-FieldList.__index = FieldList
-
+ saveMetaType("FieldList",FieldList)--注册保存类型
 
 
 function FieldList.new(map,x,y)

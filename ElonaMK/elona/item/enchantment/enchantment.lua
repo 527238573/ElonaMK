@@ -8,9 +8,7 @@ Enchantment = {
     
     
   }
-saveClass["Enchantment"] = Enchantment --注册保存类型
-
-Enchantment.__index = Enchantment
+saveMetaType("Enchantment",Enchantment)--注册保存类型
 Enchantment.__newindex = function(o,k,v)
   if Enchantment[k]==nil then error("使用了Enchantment的意料之外的值:"..tostring(k)) else rawset(o,k,v) end
 end

@@ -184,7 +184,7 @@ function Unit:train_weapon_skill(weapon,fix,level)
     end
   end
   if skill2 then
-    exp=exp/2
+    fix=fix/2
     self:train_skill(skill2,rnd(10,20)*fix,level)
   end
   self:train_skill(skill1,rnd(10,20)*fix,level)

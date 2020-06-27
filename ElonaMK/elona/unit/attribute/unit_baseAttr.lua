@@ -181,7 +181,7 @@ function Unit:grow_attr(attr_id,grow)
   self.attr[attr_id] = attr
   if cur_a~=math.floor(attr) then --属性变动
     self:reloadBasisBonus()--需要重新load已经变化
-    if self:isInPlayerFaction() then --音效
+    if self:isInPlayerTeam() then --音效
       local selfname = self:getShortName()
       addmsg(string.format(grow_str[attr_id],selfname),"good")
       --音效
@@ -196,7 +196,7 @@ function Unit:grow_attr(attr_id,grow)
     self.level = self.level+1
     self:reloadBasisBonus()--需要重新load已经变化
     self:reloadRealTimeBouns() --重载所有加成，可能有被等级影响的部分。
-    if self:isInPlayerFaction() then --音效
+    if self:isInPlayerTeam() then --音效
       local selfname = self:getShortName()
       addmsg(string.format(grow_str.level,selfname),"good")
       --音效

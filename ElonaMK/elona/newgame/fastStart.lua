@@ -124,4 +124,10 @@ function g.fastStart()
   g.camera:setCenter(38*64,20*64)
   g.wcamera:updateRect(wmap)
   g.wcamera:setCenter(38*64,20*64)
+  
+  
+  
+  p.mc:learnAbility("fire_ball")
+  p.mc:learnAbility("jump_slash")
+  p.mc:learnAbility("round_slash")
 end

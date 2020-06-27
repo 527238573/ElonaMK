@@ -142,7 +142,7 @@ function Unit:fastShootAction(show_msg)
     addmsg(tl("需要装填弹药!","You need to reload to shoot!"),"info")
     g.playSound("shoot_fail",self.x,self.y) 
   else
-    self:train_range_attack(costTime,target.level)
+    if not target.not_unit then self:train_range_attack(costTime,target.level) end
   end
   if showbar then
     self:short_delay(costTime,"shoot")
@@ -175,7 +175,7 @@ function Unit:range_weapon_attack(target,weapon)
     
     local unitTraget =target;
     if target.not_unit  then unitTraget =nil end --射击地面 
-    proj:attack(p.mc,nil,nil,unitTraget,target.x,target.y) 
+    proj:attack(self,nil,nil,unitTraget,target.x,target.y,self.map) 
   end
   
   
@@ -186,7 +186,7 @@ function Unit:range_weapon_attack(target,weapon)
   end
 end
 
-
+saveFunction(Unit.range_weapon_attack)--注册function，变为可延迟的
 
 
 

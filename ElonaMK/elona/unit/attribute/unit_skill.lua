@@ -85,7 +85,7 @@ function Unit:train_skill(skill_id,exp,explv)
   self.skill[skill_id] = skill
   if cur_lv~=math.floor(skill) then --等级提升
     --self:reloadBasisBonus()--暂时不需要load等级。
-    if self:isInPlayerFaction() then --音效
+    if self:isInPlayerTeam() then --音效
       local selfname = self:getShortName()
       local skillname = skill_data.name
       addmsg(string.format(skill_up_str,selfname,skillname),"good")

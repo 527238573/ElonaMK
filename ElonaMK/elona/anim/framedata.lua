@@ -63,6 +63,12 @@ local function loadFrames()
   load1f("bullet4",32,32,0.05)
   load1f("arrow_wood",32,32,0.06)
   load1f("lazerbullet",32,32,0.05)
+  
+  
+  --ability
+  load1f("magic_circle",32,32,0.15)
+  load1f("small_magic",32,32,0.10)
+  load1f("single_circle",64,64,0.3)
 end
 
 

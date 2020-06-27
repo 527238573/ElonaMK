@@ -1,15 +1,12 @@
 --一共三种：地面的，个人背包，队伍背包（玩家专用。）
 Inventory = { 
   --一些默认值
-  saveType = "Inventory",--注册保存类型
   maxWeight = 100,
   maxNum = 400,
   weight = 0,
 }
+saveMetaType("Inventory",Inventory)--注册保存类型
 
-saveClass["Inventory"] = Inventory --注册保存类型
-
-Inventory.__index = Inventory
 Inventory.__newindex = function(o,k,v)
   if Inventory[k]==nil then error("使用了Inventory的意料之外的值。") else rawset(o,k,v) end
 end

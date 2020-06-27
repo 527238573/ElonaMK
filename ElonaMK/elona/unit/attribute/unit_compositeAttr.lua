@@ -22,7 +22,14 @@ end
 function Unit:getMPRate()
   return math.min(1,math.max(0,self.mp/self.max_mp))
 end
+
+function Unit:getExpRate()
+  return math.min(1,math.max(0,self.exp/self:getLevelUpExp()))
+end
 --去其他二级属性，只在要取值的时候现场计算。
+
+
+
 
 --最大搬运量
 function Unit:getMaxCarry()

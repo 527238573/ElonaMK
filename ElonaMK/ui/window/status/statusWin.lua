@@ -34,6 +34,7 @@ local function pressLeft()
       else
         curentActiveWin = subWins[i-1]
       end
+      curentActiveWin.win_open()
       return 
     end
   end
@@ -48,6 +49,7 @@ local function pressRight()
       else
         curentActiveWin = subWins[i+1]
       end
+      curentActiveWin.win_open()
       return 
     end
   end
@@ -57,6 +59,7 @@ end
 local function changeTab(index)
   if subWins[index]== curentActiveWin then return end
   curentActiveWin = subWins[index]
+  curentActiveWin.win_open()
   g.playSound("card1")
 end
 
@@ -78,7 +81,7 @@ function statusWin:win_open()
   --s_win.x = (c.win_W-ui.right_w)/2-400
   --s_win.y = (c.win_H-ui.bottom_h)/2-300
   curentActiveWin = subWins[1]
-  
+  curentActiveWin.win_open()
 end
 
 

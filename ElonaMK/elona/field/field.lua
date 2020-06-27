@@ -4,7 +4,6 @@ Field = {
     type = nil,--类型数据。
     id = "null", --type的id
     name = "noname", --名字，可能同种不同子类会使用不同名字
-    saveType = "Field",--注册保存类型
     parent = nil, -- 父list
     color = {1,1,1,1},--自身颜色。
     life = 0,--从创建起自身存在时间。
@@ -17,9 +16,7 @@ Field = {
     try_to_stack_with = function() return false end,
     
  }
- saveClass["Field"] = Field --注册保存类型
- 
-Field.__index = Field
+ saveMetaType("Field",Field)--注册保存类型
 Field.__newindex = function(o,k,v)
   if Field[k]==nil and k~="parent" and k~= "map" then error("使用了Field的意料之外的值。") else rawset(o,k,v) end
 end

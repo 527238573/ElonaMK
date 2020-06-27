@@ -1,10 +1,8 @@
 
 Calendar = {
-  saveType = "Calendar",--注册保存类型
+  
 }
-
-saveClass["Calendar"] = Calendar --注册保存类型
-Calendar.__index = Calendar
+saveMetaType("Calendar",Calendar)--注册保存类型
 Calendar.__newindex = function(o,k,v)
   if Calendar[k]==nil then error("使用了Calendar的意料之外的值:"..tostring(k)) else rawset(o,k,v) end
 end

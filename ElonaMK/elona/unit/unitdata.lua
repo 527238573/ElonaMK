@@ -1,5 +1,5 @@
 
-local lovefs = require("file/lovefs")
+
 data.class ={}
 data.race ={}
 data.unit ={}
@@ -83,6 +83,12 @@ local function loadRace()
         dataT[key] = tonumber(val) or 100
       elseif  key=="speed" then
         dataT[key] = tonumber(val) or 100
+      elseif  key=="dodge_mod" then
+        dataT[key] = math.min(0.5,math.max(-0.5, tonumber(val) or 0))
+      elseif  key=="melee_mod" then
+        dataT[key] = math.min(0.5,math.max(-0.5, tonumber(val) or 0))
+      elseif  key=="range_mod" then
+        dataT[key] = math.min(0.5,math.max(-0.5, tonumber(val) or 0))
       elseif  key=="height" then
         dataT[key] = tonumber(val) or 150
       elseif  key=="weight" then
@@ -114,6 +120,29 @@ local function loadRace()
     index = index+1
   end
   debugmsg("load race Nubmer:"..(index-1))
+  file:close()
+  
+  
+  --loadname
+  file = assert(io.open(c.source_dir.."data/unit/race_name.csv","r"))
+  line = file:read()
+  attrName = string.split(line,",") 
+  attrName[1] = "id" --utf8头，需要修正
+  line = file:read()
+  while(line) do
+    local strDH = string.split(line,",") 
+    local dataT = nil
+    for i=1,#strDH do
+      local val = strDH[i]
+      local key = attrName[i] 
+      if key=="id" then
+        dataT = datarace[val]
+      elseif  key=="name" then
+        dataT[key] = val
+      end
+    end
+    line = file:read()
+  end    
   file:close()
 end
 
@@ -208,6 +237,7 @@ local function loadUnitType()
 end
 
 local function loadUnitFace()
+  local lovefs = require("file/lovefs")
   --debugmsg("source:"..love.filesystem.getSource())
   local fs = lovefs(love.filesystem.getSource().."/data/pic/face")
   for _, v in ipairs(fs.files) do --
@@ -225,4 +255,6 @@ return function ()
   loadUnitType()
   loadUnitFace()
   
+  data.race["eulderna"].dodge_mod =0.1
+  data.race["eulderna"].melee_mod =-0.1
 end

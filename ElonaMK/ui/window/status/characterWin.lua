@@ -70,8 +70,8 @@ local function drawBack(x,y,w,h)
   love.graphics.print(string.format("%d kg",mc:getWeight()), x+310, y+60+lineH*3) 
   
   love.graphics.print(string.format("%d",mc.level), x+485, y+60) 
-  love.graphics.print(string.format("%d",mc.exp), x+485, y+60+lineH) 
-  love.graphics.print(string.format("%d",1234), x+485, y+60+lineH*2) 
+  love.graphics.print(string.format("%d",mc.exp*1000), x+485, y+60+lineH) 
+  love.graphics.print(string.format("%d",mc:getLevelUpExp()*1000), x+485, y+60+lineH*2) 
   love.graphics.print("无",        x+485, y+60+lineH*3) 
   
   

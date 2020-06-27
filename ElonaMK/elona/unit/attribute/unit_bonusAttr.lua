@@ -1,6 +1,5 @@
 Bonus = { 
   --一些默认值
-  saveType = "Bonus",--注册保存类型
   --合法的加成属性值名称。除此以外都不合法。
   --基本属性
   life = 0,
@@ -37,12 +36,15 @@ Bonus = {
   
   AR=0,--护甲
   MR=0,--魔抗
+  
+  dodge_mod = 0,--三大平衡修正，范围-0.5 到0.5。（正值增益）
+  melee_mod = 0,
+  range_mod = 0,--仅非机械武器伤害。
+  
   --flag形式的加成也登记在此。大于0就会生效。
 }
 
-saveClass["Bonus"] = Bonus --注册保存类型
-
-Bonus.__index = Bonus
+saveMetaType("Bonus",Bonus)--注册保存类型
 Bonus.__newindex = function(o,k,v)
   if Bonus[k]==nil then error("使用了Bonus的意料之外的值:"..k) else rawset(o,k,v) end
 end
@@ -54,24 +56,33 @@ end
 
 
 function Unit:reloadBasisBonus()
-  self.basis = setmetatable({},Bonus) --直接重建
+  local bas_t = setmetatable({},Bonus) --直接重建
+  self.basis = bas_t
   for key,_ in pairs(g.attr) do
     if g.main_attr [key] then
-      self.basis[key] = math.floor( self.attr[key]) 
+      bas_t[key] = math.floor( self.attr[key]) 
     else
-      self.basis[key] = self.attr[key] 
+      bas_t[key] = self.attr[key] 
     end
+  end
+  for _,tra in ipairs(self.traits) do
+    tra:calculate_bonus(bas_t)
   end
   
   self.basis["AR"] = math.max(0,self.weapon_list.AR)
   self.basis["MR"] = math.max(0,self.weapon_list.MR)
   self:resetMaxHPMP() --有任何变动都会刷新最大hpmp
+  --debugmsg("reloadBasisBonus")
 end
 
 function Unit:reloadRealTimeBouns()
-  self.bonus = setmetatable({},Bonus)  
-  
+  local bon_t = setmetatable({},Bonus)  
+  self.bonus = bon_t
+  for _,eff in ipairs(self.effects) do
+    eff:calculate_bonus(bon_t)
+  end
   self:resetMaxHPMP()--有任何变动都会刷新最大hpmp
+  --debugmsg("reloadRealTimeBouns")
 end
 
 
@@ -103,5 +114,10 @@ function Unit:getResistance(atktype)
   elseif atktype=="light" then res_str="res_light" 
   else error("unknow attack type:"..atktype) end
   local rnum = math.floor(self.basis[res_str]+self.bonus[res_str])
+  return c.clamp(rnum,-8,8)
+end
+
+function Unit:getResistanceByResId(res_id)
+   local rnum = math.floor(self.basis[res_id]+self.bonus[res_id])
   return c.clamp(rnum,-8,8)
 end

@@ -2,11 +2,9 @@ local Overmap = {
     w = 10,--宽
     h = 10, --高默认值，
     id = "null",
-    saveType = "Overmap",--注册保存类型
     refreshMiniMap = false,
   }
-
-saveClass["Overmap"] = Overmap --注册保存类型
+saveMetaType("Overmap",Overmap)--注册保存类型
 
 Overmap.__index = Overmap
 Overmap.__newindex = function(o,k,v)

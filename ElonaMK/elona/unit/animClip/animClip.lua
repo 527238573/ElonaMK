@@ -1,12 +1,9 @@
 AnimClip = {
   type = 0,--AnimClip的类型。
   id ="null",--。
-  saveType = "AnimClip",--注册保存类型
   priority = 1,
 }
-
-saveClass["AnimClip"] = AnimClip --注册保存类型
-AnimClip.__index = AnimClip
+saveMetaType("AnimClip",AnimClip)--注册保存类型
 
 --读取完成后自动调用。不再使用index。id是字符串，永不变化。
 function AnimClip:loadfinish()

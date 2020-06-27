@@ -5,7 +5,6 @@ local Map = {
     edge = 0,
     id = "null",
     name = tl("未知之地","Unknown place"),
-    saveType = "Map",--注册保存类型
     refreshMiniMap = false, --刷新小地图
     seen ={w=10,sx=1,sy=1,allseen = true,time = 0},
     transparent = {},
@@ -15,9 +14,9 @@ local Map = {
     gen_id ="",--map生成及刷新相关函数的id。data.mapgen[gen_id] 
     can_exit = false,--能否在边缘退出。
   }
-saveClass["Map"] = Map --注册保存类型
   
-Map.__index = Map
+saveMetaType("Map",Map)--注册保存类型
+  
 Map.__newindex = function(o,k,v)
   if Map[k]==nil then error("使用了Map的意料之外的值。") else rawset(o,k,v) end
 end

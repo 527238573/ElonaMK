@@ -15,7 +15,9 @@ local loadAnimClip = require"elona/unit/animClip/animMethod"
 local loadItemdata = require"elona/item/itemdata"
 local loadFielddata = require"elona/field/fielddata"
 local loadAudiodata = require"elona/audio/sounddata"
-
+local loadAbilitydata = require"elona/unit/ability/abilitydata"
+local loadEffectdata = require"elona/unit/effect/effectdata"
+local loadTraitdata = require"elona/unit/effect/traitdata"
 --scene
 require"Scenes/Scene"
 require"Scenes/mainMenu"
@@ -55,6 +57,14 @@ require"elona/unit/fight/unit_fightMelee"
 require"elona/unit/fight/unit_fightMeleeAnim"
 require"elona/unit/fight/unit_fightRange"
 require"elona/unit/fight/unit_weapon"
+require"elona/unit/ability/ability"
+require"elona/unit/ability/actionBar"
+require"elona/unit/ability/unit_ability"
+require"elona/unit/effect/effect"
+require"elona/unit/effect/unit_effect"
+require"elona/unit/effect/unit_effectCreate"
+require"elona/unit/effect/trait"
+require"elona/unit/effect/unit_trait"
 require"elona/anim/FrameClip"
 require"elona/anim/frameFactory"
 require"elona/item/item"
@@ -95,7 +105,9 @@ function data.init()
   loadItemdata()
   loadFielddata()
   loadAudiodata()
-  
+  loadAbilitydata()
+  loadEffectdata()
+  loadTraitdata()
   
   render.init()
   Item.initItemFactory()

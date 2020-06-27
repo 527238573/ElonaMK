@@ -498,6 +498,10 @@ function Unit:melee_hit_animation(source_u,delay,hit_effect)
   self:addClip(clip)
 end
 
+
+
+local function missFrameMoveUp(self,dt)self.dy = self.dy +dt*64 end
+saveFunction(missFrameMoveUp)
 --未击中的动画
 function Unit:melee_miss_animation(source_u,delay,hit_effect)
   local sound = "swing_mid"
@@ -509,6 +513,6 @@ function Unit:melee_miss_animation(source_u,delay,hit_effect)
     local frame = FrameClip.createUnitFrame("miss",0,-16,delay)
     frame.drop_to_map = true
     self:addFrameClip(frame)
-    frame.updateFunc = function(self,dt) self.dy = self.dy +dt*64 end
+    frame.updateFunc = missFrameMoveUp
   end
 end

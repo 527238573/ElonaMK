@@ -1,7 +1,6 @@
 FrameClip = {
   type = 0,--AnimClip的类型。
   id ="null",--。
-  noSave = true,--不能保存。
   priority = 1,
   
   x=0, --model坐标
@@ -9,13 +8,23 @@ FrameClip = {
   rotation = 0, --旋转。
   flipX = false,--翻转X轴
   flipY = false,--翻转Y轴
+  scaleX = 1,
+  scaleY =1,
+  shearX =0,
+  shearY =0,
   drop_to_map = false,--当附着在单位上时，单位死亡时掉落至地图继续播放。
+  
+  remaining_life = 1000,--当loop激活时 最多存活时间秒。
+  rotation_speed = 0,--转速。
+  rot_uv = 0,--
+  rot_uv_speed = 0,--
 }
-
-FrameClip.__index = FrameClip
-
---FrameClip作为临时播放的片段，不能保存，切换地图时也会全部销毁。
---永续循环型frameClip需要机制每次从新创建
+ saveMetaType("FrameClip",FrameClip)--注册保存类型
+--frameClip可以保存。
+function FrameClip:loadfinish()
+  rawset(self,"type",assert(data.frames[self.id]))
+  
+end
 
 
 
@@ -40,14 +49,19 @@ end
 function FrameClip:updateAnim(dt)
   if not self.pause and self.createFrame ~= g.curFrame  then --当前帧创建的对象不会时间经过。
     self.time = self.time+dt*self.playSpeed
+    if self.loop then self.remaining_life = self.remaining_life-dt end
     if self.updateFunc then self:updateFunc(dt) end--外围输入的自更新方法
   end
   self.life = self.life+dt
+  if self.rotation_speed ~=0 then self.rotation = self.rotation + self.rotation_speed*dt end
+  if self.rot_uv_speed~=0 then self.rot_uv = self.rot_uv + self.rot_uv_speed*dt end
 end
 
 function FrameClip:isFinish()
+  if self.finished then return true end
   if self.loop then
-    return self.life>1000
+    
+    return self.remaining_life<0
   else
     local frameT = self.type
     return self.time>frameT.secPerFrame*frameT.frameNum
@@ -73,4 +87,7 @@ function FrameClip:setTimeToFrame(frameindex)
   self.time = frameT.secPerFrame*(frameindex-1)
 end
 
-
+function FrameClip:setLoopPeriod(remaining_life)
+  self.loop = true
+  self.remaining_life = remaining_life
+end

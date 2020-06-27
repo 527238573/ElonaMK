@@ -5,7 +5,6 @@ Item = {
     id = "null", --type的id
     name = "noname",
     displayName = "",
-    saveType = "Item",--注册保存类型
     num = 1, --堆叠数量。需要用函数修改。
     weight = 0.1, --重量 。 改变重量或数量，导致重量变化需要通知parent
     parent = nil, --item，必在一个inventory中。
@@ -34,9 +33,7 @@ Item = {
     useReload = false,--只对能装弹的远程武器为true
     
   }
-saveClass["Item"] = Item --注册保存类型
-
-Item.__index = Item
+saveMetaType("Item",Item)--注册保存类型
 Item.__newindex = function(o,k,v)
   if Item[k]==nil and k~="parent" then error("使用了Item的意料之外的值:"..tostring(k)) else rawset(o,k,v) end
 end

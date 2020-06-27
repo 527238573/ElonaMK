@@ -39,11 +39,12 @@ function Projectile:getImgQuad()
   return frameT.img,frameT[frameIndex]
 end
 
---dest_unit可以为nil，向地面射击
+--dest_unit可以为nil，向地面射击  map不能为nil
 function Projectile:attack(source_unit,sx,sy,dest_unit,dx,dy,map)
   sx = sx or source_unit.x+source_unit.status.dx/64
   sy = sy or source_unit.y+source_unit.status.dy/64
-  map =map or cmap
+  map =map or source_unit.map --map为nil会出错，
+  
   self.source_unit = source_unit;self.dest_unit = dest_unit
   self.source_x = sx;self.source_y = sy;
   self.dest_x = dx;self.dest_y = dy;

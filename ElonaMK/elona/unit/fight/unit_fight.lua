@@ -32,13 +32,13 @@ function Unit:deal_damage(source,dam_ins,delay)
   --apply damage
   if deal_dam<=0 then return end
   --挨揍的
-  if source and source:isInPlayerFaction() then
+  if source and source:isInPlayerTeam() then
     if dam_ins.crital then
       addmsg(string.format("crit%d!",deal_dam),"hit")
     else
       addmsg(string.format("(%d)",deal_dam),"hit")
     end
-  elseif self:isInPlayerFaction() then
+  elseif self:isInPlayerTeam() then
     if dam_ins.crital then
       addmsg(string.format("crit%d!",deal_dam),"enemy_hit")
     else
@@ -165,15 +165,15 @@ function Unit:check_range_hit(projectile)
   
   local source = projectile.source_unit
   if hit or projectile.dest_unit == self then --只有命中或想要命中的子弹才显示，无意并擦过的子弹不显示。
-    local con1 = self:isInPlayerFaction() 
-    local con2 = source and source:isInPlayerFaction() 
+    local con1 = self:isInPlayerTeam() 
+    local con2 = source and source:isInPlayerTeam() 
     if con1 or con2 then
       local selfname = self:getShortName()
       
       if hit then
         if source then
           local sourcename = source:getShortName()
-          addmsg(string.format(tl("%s射中了%s。","%s shot hit %s."),sourcename,selfname),"info")
+          addmsg(string.format(tl("%s射中了%s。","%s's shot hit %s."),sourcename,selfname),"info")
         else
           addmsg(string.format(tl("%s被射中了.","%s have been shot."),selfname),"info")
         end

@@ -1,7 +1,25 @@
 
 
+local func_to_id = {}
+local id_to_func = {}
+function saveFunction(func) --保存回调函数，使回调函数可以保存在文件中。
+  assert(type(func)=="function")
+  if func_to_id[func]~=nil then debugmsg("save func repetition!");return end --已经存过。
+  table.insert(id_to_func,func)
+  func_to_id[func] = #id_to_func
+end
+local empty_func = function()end
+saveFunction(empty_func) --第一个函数始终为空。跨版本读取文件，所有回调都会变成空函数。
+function checkSaveFunc(func)
+  if func_to_id[func]==nil then error("check save func failed!!") end --已经存过。
+end
 
-saveClass= {}--各种class类型  
+local saveClass= {}--各种class类型  
+function saveMetaType(name,metaT)
+  saveClass[name] = metaT
+  metaT.saveType = name
+  metaT.__index = metaT
+end
 
 
 local tableLookup--防止循环引用,查找table
@@ -32,6 +50,10 @@ local function serialize(o,blank,filehandle,savesub)
     filehandle:write(string.format("%q",o))
   elseif type(o) == "boolean" then
     filehandle:write(tostring(o))
+  elseif type(o) == "function" then
+    local func_id = func_to_id[o]
+    if func_id ==nil then error("save function must registered:"..o) end
+    filehandle:write(string.format("{saveFuncIndex = %d}",func_id))
   elseif type(o) == "table" then
     
     local function savenormal()
@@ -161,6 +183,10 @@ local function linkOneTable(t,tables)
     if type(v) == "table" then
       if v.saveIndex then
         t[k] = tables[v.saveIndex]
+      elseif v.saveFuncIndex then --解析为
+        local func = id_to_func[v.saveFuncIndex]
+        if func ==nil then error ("find saveFunc id error:"..v.saveFuncIndex) end
+        t[k] = func
       else
         linkOneTable(v,tables)
       end

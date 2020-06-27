@@ -14,13 +14,15 @@ function Unit:die(killer,dam_ins)
   self:drop_frames_to_map()--掉落特效到地图上
   
   --解除在地图上的位置，activeUnit列表里靠自己清理。
-  if self.map then
-    self.map:unitLeave(self)
+  
+  local map =self.map
+  if map then
+    map:unitLeave(self)
   end
   --安排死亡动画。
   --
   local frame = FrameClip.createUnitFrame("red_dead")
-  cmap:addSquareFrame(frame,self.x,self.y,0,30)
+  if map then map:addSquareFrame(frame,self.x,self.y,0,30) end --map存在时才能添加
   g.playSound("kill",self.x,self.y) 
   
   --drop物品
@@ -31,7 +33,7 @@ end
 
 --播放死亡讯息。dam_ins里面有伤害来源原因。即便不是因dam_ins而死，也要创建dam_ins对象并把原因填入cause传过来。
 function Unit:die_message(killer,dam_ins)
-  local show_msg = self:isInPlayerFaction() or (killer==p.mc) or p.mc:seesUnit(self)
+  local show_msg = self:isInPlayerTeam() or (killer==p.mc) or p.mc:seesUnit(self)
   if not show_msg then 
     debugmsg("death not show")
     return 

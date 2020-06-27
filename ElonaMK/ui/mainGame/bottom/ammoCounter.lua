@@ -15,7 +15,7 @@ local type2index = {
     lazer = 2,
   }
 
-
+local ammoStr2 = tl("通常弹:∞","Normal Ammo:∞")
 local function oneRangeWeapon(oneWeapon,x,y)
   local weaponItem = oneWeapon.item
   local ammoStr=nil
@@ -26,7 +26,6 @@ local function oneRangeWeapon(oneWeapon,x,y)
     maxAmmo = weaponItem:getMaxAmmo()
     ammoStr=string.format("%d/%d",curAmmo,maxAmmo)
   end
-  local ammoStr2 = "通常弹:∞"
   local iconIndex = type2index[weaponItem:getAmmoType()] or 1
   local iconlist =  c.pic.bulletIcon
   
@@ -46,9 +45,11 @@ local function oneRangeWeapon(oneWeapon,x,y)
         else
           love.graphics.print(ammoStr, x+48, y+10)
         end
-        love.graphics.print(ammoStr2, x+48, y+30) 
+        love.graphics.setFont(c.font_c14)
+        love.graphics.print(ammoStr2, x+45, y+30) 
       else
-        love.graphics.print(ammoStr2, x+48, y+20) 
+        love.graphics.setFont(c.font_c14)
+        love.graphics.print(ammoStr2, x+45, y+20) 
       end
     end)
 end
@@ -56,8 +57,9 @@ end
 return function(x,y)
   local rangelist = p.mc.weapon_list.range
   local weaponNum = #rangelist
-  if weaponNum<1 then return end
+  if weaponNum<1 then return 0 end
   for i=1,weaponNum do
     oneRangeWeapon(rangelist[i],x,y-(weaponNum+1-i)*50)
   end
+  return weaponNum*50
 end

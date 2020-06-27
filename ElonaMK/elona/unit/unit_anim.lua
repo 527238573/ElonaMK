@@ -7,7 +7,7 @@ end
 --使相机聚焦单位
 function Unit:camera_Focus()
   local x = self.x*64+32+self.status.camera_dx
-  local y = self.y*64+32+self.status.camera_dy
+  local y = self.y*64+24+self.status.camera_dy
   g.camera:setCenter(x,y)
 end
 
@@ -18,6 +18,15 @@ function Unit:get_anim_dxdy()
   local dx=status.dx
   local dy=(anim.h-anim.anchorY)*anim.scalefactor +status.dy+status.dz
   return dx,dy
+end
+
+--对于挂在身上中心点的frame，获得脚根位置的偏移。
+function Unit:get_foot_offset()
+  local anim = self:get_unitAnim() --anim数据
+  local status = self.status
+  
+  local dh = anim.scalefactor*(anim.h - anim.anchorY)
+  return dh --如果计算跳起还要加上status.dz，以获得地面offset
 end
 
 
@@ -166,11 +175,12 @@ end
 
 -- 新 延迟调用。。。。
 function Unit:insertAnimDelayFunc(delay,func,...)
+  checkSaveFunc(func) --检查function 必须是可保存的。
   local onet = {delay = delay, args = {...},f= func}
   local list = self.animdelay_list
   list[#list+1] = onet
 end
 --清理 延迟调用。。。。
 function Unit:clearAnimDelayFunc()
-  self.animdelay_list = {noSave = true}
+  self.animdelay_list = {}
 end

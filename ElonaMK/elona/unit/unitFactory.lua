@@ -29,7 +29,7 @@ function Unit.create(id,level,faction)
   unit:initAttr(raceType,classType,level,unitType.attrFactor*raceType.startfactor) 
   local skills = unitType.skill
   unit:initSkills(skills,level) 
-  
+  unit:initTraits(raceType,classType)
   if faction then  unit:setFaction(faction) end
   
   unit:on_equip_change()--刷新装备数据
@@ -58,7 +58,7 @@ function Unit.createMC(id,classid)
   for k,v in pairs( classType.weapon_skills) do skills[k]=v  end
   for k,v in pairs( classType.profession_skills) do skills[k]=v  end
   unit:initSkills(skills,1) --初始化1级属性。
-  
+  unit:initTraits(raceType,classType)
   unit:setFaction("player")
   unit:on_equip_change()--刷新装备数据
   unit:resetMaxHPMP()--上面一条已经刷过，保险起见

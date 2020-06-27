@@ -55,3 +55,7 @@ end
 function Unit:isInPlayerFaction()
   return self.faction==1
 end
+
+function Unit:isInPlayerTeam()
+  return self==p.team[1] or self==p.team[2] or self==p.team[3] or self==p.team[4]
+end

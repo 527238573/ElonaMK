@@ -39,9 +39,49 @@ function Test.grow_attr()
   p.mc:train_skill("cutting",100,999)
 end
 
+function Test.magic_circle()
+  local mc = p.mc
+  local frame = FrameClip.createUnitFrame("single_circle")
+  frame:setLoopPeriod(4)
+  frame.scaleX = 0.5
+  frame.scaleY = 0.25
+  frame.dy = -32
+  frame.underUnit = true
+  frame.rot_uv_speed = 1
+  
+  mc:addFrameClip(frame)
+  mc:short_delay(4,"chanting")
+    mc:bar_delay(4,"chant","chanting")
+  --g.playSound("kill",p.mc.x,p.mc.y+1)
+  local frame2 = FrameClip.createUnitFrame("small_magic")
+  --frame2.scaleY = 0.5
+  frame2:setLoopPeriod(4)
+  frame2.rotation_speed = -0.5
+   mc:addFrameClip(frame2)
+   
+   frame2 = FrameClip.createUnitFrame("magic_circle")
+   frame2:setLoopPeriod(4)
+  frame2.rotation_speed = -1
+   p.team[2]:addFrameClip(frame2)
+end
+
+function Test.test_effect()
+  p.mc:addEffect_chanting(3,2)
+    
+  local effect = Effect.new("test1")
+  effect.remain = 4
+  p.mc:addEffect(effect)
+  
+  effect = Effect.new("test2")
+  effect.remain = 6
+  p.mc:addEffect(effect)
+end
+
 
 function g.test1()
   Test.genMonster()
+  --Test.test_effect()
+  --Test.magic_circle()
   --Test.grow_attr()
 
   -- ui.ynAskWin:Open(callb,"什么问题什么问题什么问题什么问题什么问题什？")

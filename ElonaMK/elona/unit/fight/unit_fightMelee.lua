@@ -82,7 +82,7 @@ local melee_msg = {
 
 
 function Unit:melee_attack_message(target,hit_effect)
-  if not(self:isInPlayerFaction() or target:isInPlayerFaction() ) then return end --无关信息不显示
+  if not(self:isInPlayerTeam() or target:isInPlayerTeam() ) then return end --无关信息不显示
   
   local selfname = self:getShortName()
   local targetname = target:getShortName()
@@ -93,9 +93,9 @@ function Unit:melee_attack_message(target,hit_effect)
 end
 
 function Unit:melee_miss_message(target)
-  if self:isInPlayerFaction() then
+  if self:isInPlayerTeam() then
     addmsg("(miss)","hit")
-  elseif target:isInPlayerFaction() then
+  elseif target:isInPlayerTeam() then
     addmsg("(miss)","enemy_hit")
   end
 end
