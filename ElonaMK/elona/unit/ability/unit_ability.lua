@@ -20,3 +20,13 @@ function Unit:learnAbility(abi_id,showmsg)
   
   return abi
 end
+
+function Unit:useAbility(abi)
+  --使用前要检查状态，可能死亡或不能动
+  if self.delay>0 then
+    addmsg("二次使用了ability"..abi:getName())
+  else
+    addmsg("使用了ability"..abi:getName())
+     p.mc:bar_delay(4,"useA","useA")
+  end
+end

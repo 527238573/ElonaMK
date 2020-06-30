@@ -136,9 +136,7 @@ local function oneItem(curItem,num,id,x,y,w,h)
       love.graphics.setFont(c.font_c18)
       love.graphics.print(name, x+165, y+22)
     else
-      local item_img,item_quad,qw,qh = curItem:getImgAndQuad()
-      love.graphics.setColor(curItem:getDrawColor())
-      love.graphics.draw(item_img,item_quad,x+140,y+h/2,0,0.75,0.75,qw/2,qh/2) --因为默认64×64
+      render.drawUIItem(curItem,x+140,y+h/2,0.75)
       love.graphics.setColor(curItem:getDisplayNameColor())
       love.graphics.setFont(c.font_c18)
       love.graphics.print(name, x+165, y+22)

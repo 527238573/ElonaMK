@@ -40,6 +40,15 @@ local keyMapping_Game =
   fire ={"f"},--开火
   reload ={"r"}, --装载
   esc = {"escape"},
+  action1 = {"1"},
+  action2 = {"2"},
+  action3 = {"3"},
+  action4 = {"4"},
+  action5 = {"5"},
+  action6 = {"6"},
+  action7 = {"7"},
+  action8 = {"8"},
+  ability = {"v"},
 }
 
 local reverseKey_Game
@@ -92,11 +101,18 @@ function ui.convertKey_Game(key)
   return reverseKey_Game[key] or key
 end
 
-
---key bounding
-function kb(key)
-  return key
+--如若是快捷键，返回index，否则返回nil
+function ui.keyToActionIndex(key)
+  local gkey = ui.convertKey_Game(key)
+  local action_id_t = c.key_action_id--table装了action1~8字符串
+  for i=1,8 do
+    if gkey ==action_id_t[i] then
+      return i
+    end
+  end
+  return nil
 end
+
 
 
 local loveKeyD = love.keyboard.isDown
@@ -131,6 +147,14 @@ function ui.mainGameKeyCheck(dt)
   if ui.isDown_Game("reload") then
     p:reload_action()
     return
+  end
+  
+  local action_id_t = c.key_action_id--table装了action1~8字符串
+  for i=1,8 do
+    if ui.isDown_Game(action_id_t[i]) then
+      p:useActionBar(i)
+      return
+    end
   end
   
   

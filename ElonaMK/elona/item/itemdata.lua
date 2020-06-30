@@ -4,7 +4,8 @@ data.item ={}
 
 data.itemImgs = {}
 data.itemImgs["item1"] = love.graphics.newImage("data/item/item1.png")
-
+local itemScale = 1 --使用64*64格子的图 不能缩小到32*32，因为在1.5缩放效果看上去不佳。
+--data.itemImgs["item1"]:setFilter("linear","linear")
 
 local strToBoolean =data.strToBoolean
 local colorTable =data.colorTable
@@ -124,7 +125,19 @@ local function loadMaterial()
 end
 
 
-
+local function dataTLoadQuad(dataT)
+  dataT.scaleFactor = itemScale
+  local function loadQuad(x,y,w,h,tt)
+    table.insert(tt,love.graphics.newQuad(x*64/itemScale,y*64/itemScale,w,h,tt.img:getWidth(),tt.img:getHeight()))
+  end
+  if dataT.useAnim then
+    for i=1,dataT.frameNum do
+      loadQuad(dataT.quadX+(i-1)*dataT.w/(64/itemScale),dataT.quadY,dataT.w,dataT.h,dataT)
+    end
+  else
+    loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
+  end
+end
 
 
 
@@ -160,9 +173,9 @@ local function loadItemType()
       elseif  key=="quadY" then
         dataT.quadY = assert(tonumber(val))
       elseif  key=="w" then
-        dataT[key] = tonumber(val) or 64
+        dataT[key] = (tonumber(val) or 32)*2/itemScale
       elseif  key=="h" then
-        dataT[key] = tonumber(val) or 64
+        dataT[key] = (tonumber(val) or 32)*2/itemScale
       elseif  key=="hanging" then
         dataT.hanging = strToBoolean(val,false)
       elseif  key=="frameNum" then
@@ -186,16 +199,7 @@ local function loadItemType()
       end
     end
     --quad
-    local function loadQuad(x,y,w,h,tt)
-      table.insert(tt,love.graphics.newQuad(x*64,y*64,w,h,tt.img:getWidth(),tt.img:getHeight()))
-    end
-    if dataT.useAnim then
-      for i=1,dataT.frameNum do
-        loadQuad(dataT.quadX+(i-1)*dataT.w/64,dataT.quadY,dataT.w,dataT.h,dataT)
-      end
-    else
-      loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
-    end
+    dataTLoadQuad(dataT)
 
 
     if data.item[dataT.id]~=nil then
@@ -208,7 +212,7 @@ local function loadItemType()
   end
   debugmsg("load item Nubmer:"..(index-1))
   file:close()
-  
+
   --loadname
   file = assert(io.open(c.source_dir.."data/item/item_generic_name.csv","r"))
   line = file:read()
@@ -268,9 +272,9 @@ local function loadWeapon()
       elseif  key=="quadY" then
         dataT.quadY = assert(tonumber(val))
       elseif  key=="w" then
-        dataT[key] = tonumber(val) or 64
+        dataT[key] = (tonumber(val) or 32)*2/itemScale
       elseif  key=="h" then
-        dataT[key] = tonumber(val) or 64
+        dataT[key] = (tonumber(val) or 32)*2/itemScale
       elseif  key=="frameNum" then
         dataT.frameNum = tonumber(val) or 1
         dataT.useAnim = dataT.frameNum>1 
@@ -337,16 +341,7 @@ local function loadWeapon()
     end
 
     --quad
-    local function loadQuad(x,y,w,h,tt)
-      table.insert(tt,love.graphics.newQuad(x*64,y*64,w,h,tt.img:getWidth(),tt.img:getHeight()))
-    end
-    if dataT.useAnim then
-      for i=1,dataT.frameNum do
-        loadQuad(dataT.quadX+(i-1)*dataT.w/64,dataT.quadY,dataT.w,dataT.h,dataT)
-      end
-    else
-      loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
-    end
+    dataTLoadQuad(dataT)
 
 
     if data.item[dataT.id]~=nil then
@@ -359,7 +354,7 @@ local function loadWeapon()
   end
   debugmsg("load weapon Nubmer:"..(index-1))
   file:close()
-  
+
   --loadname
   file = assert(io.open(c.source_dir.."data/item/item_weapon_name.csv","r"))
   line = file:read()
@@ -383,11 +378,11 @@ local function loadWeapon()
     line = file:read()
   end    
   file:close()
-  
+
 end
 
 local function loadRangeWeapon()
-  
+
   local file = assert(io.open(c.source_dir.."data/item/item_rangeWeapon.csv","r"))
   local index = 1
   local line = file:read()
@@ -463,7 +458,7 @@ local function loadRangeWeapon()
         error("error rangeweapon key:"..key.." i:"..i)
       end
     end
-    
+
     setmetatable(dataT,data.dataMeta) --重设
     line = file:read()
     index = index+1
@@ -475,7 +470,7 @@ end
 
 
 local function loadEquipment()
-  
+
   local file = assert(io.open(c.source_dir.."data/item/item_equipment.csv","r"))
   local index = 1
   local line = file:read()
@@ -506,9 +501,9 @@ local function loadEquipment()
       elseif  key=="quadY" then
         dataT.quadY = assert(tonumber(val))
       elseif  key=="w" then
-        dataT[key] = tonumber(val) or 64
+        dataT[key] = (tonumber(val) or 32)*2/itemScale
       elseif  key=="h" then
-        dataT[key] = tonumber(val) or 64
+        dataT[key] = (tonumber(val) or 32)*2/itemScale
       elseif  key=="frameNum" then
         dataT.frameNum = tonumber(val) or 1
         dataT.useAnim = dataT.frameNum>1 
@@ -549,16 +544,7 @@ local function loadEquipment()
     end
 
     --quad
-    local function loadQuad(x,y,w,h,tt)
-      table.insert(tt,love.graphics.newQuad(x*64,y*64,w,h,tt.img:getWidth(),tt.img:getHeight()))
-    end
-    if dataT.useAnim then
-      for i=1,dataT.frameNum do
-        loadQuad(dataT.quadX+(i-1)*dataT.w/64,dataT.quadY,dataT.w,dataT.h,dataT)
-      end
-    else
-      loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
-    end
+    dataTLoadQuad(dataT)
 
 
     if data.item[dataT.id]~=nil then
@@ -571,7 +557,7 @@ local function loadEquipment()
   end
   debugmsg("load equipment Nubmer:"..(index-1))
   file:close()
-  
+
   --loadname
   file = assert(io.open(c.source_dir.."data/item/item_equipment_name.csv","r"))
   line = file:read()
@@ -595,7 +581,7 @@ local function loadEquipment()
     line = file:read()
   end    
   file:close()
-  
+
 end
 
 

@@ -2,17 +2,35 @@ local suit = require "ui/suit"
 
 
 local frameimg = love.graphics.newImage("assets/ui/abilityBar.png")
+local coverimg = love.graphics.newImage("assets/ui/actionIconCover.png")
 
+
+local key_action_id = {}
+for idi =1,8 do key_action_id[idi] = string.format("action%d",idi) end
+c.key_action_id = key_action_id
 --默认48*48
-local function OneEntry(entry,x,y)
-  local img,quad
+local function OneEntry(index,entry,x,y)
   if entry ==nil then return end
+  entry.state = suit:registerHitbox(entry,entry,x,y,48,48)
+  local keydown =ui.isDown_Game(key_action_id[index]) and ui.isKeyfocusMainGame()
+  
   if entry.etype =="ability" then
-    img,quad = entry.val:getImgAndQuad()
+    local img = entry.val:getAbilityIcon()
     suit:registerDraw(function() 
         love.graphics.setColor(1,1,1)
         love.graphics.draw(img,x,y,0,2,2)
+        if entry.state =="active" or keydown then
+          love.graphics.setColor(0.9,0.7,0.3,0.8)
+          love.graphics.draw(coverimg,x,y,0,2,2)
+        elseif entry.state =="hovered" then
+          love.graphics.setColor(0.6,0.6,1,0.8)
+          love.graphics.draw(coverimg,x,y,0,2,2)
+        end
       end)
+  end
+  
+  if suit:mouseReleasedOn(entry) then
+    p:useActionBar(index)
   end
 
 end
@@ -30,7 +48,7 @@ return function(x,y)
     end)
 
   for i=1,8 do
-    OneEntry(mc_bar[i],startX+(i-1)*next_w,startY)
+    OneEntry(i,mc_bar[i],startX+(i-1)*next_w,startY)
   end
 
   suit:registerDraw(function() --框

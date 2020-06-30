@@ -1,4 +1,4 @@
-
+local suit = require "ui/suit"
 function ui.drawFix(x,y,w,h)
   
   local mc = p.mc
@@ -67,4 +67,16 @@ function ui.drawFix(x,y,w,h)
   love.graphics.printf(string.format(tl("闪避等级:%d","Dodge Level:%d"),dodgeLevel), x+543, y+480+lineH*0,200,"right") 
   love.graphics.printf(string.format(tl("护甲:%d","Armor:%d"),ar), x+543, y+480+lineH*1,200,"right") 
   love.graphics.printf(string.format(tl("魔抗:%d","Magic Resist:%d"),mr), x+543, y+480+lineH*2,200,"right") 
+end
+
+
+function ui.drawBar(value,style,x,y,w,h,border)
+  local pb = c.pic.progressBar
+  local xb, yb, wb, hb -- size of the progress bar
+  xb, yb, wb, hb = x+border,y+ border, (w-2*border)*value, h-2*border
+  love.graphics.setColor(1,1,1)
+  suit.theme.drawScale9Quad(pb[1],x,y,w,h)
+  if value>0 then
+    suit.theme.drawScale9Quad(pb[style],xb,yb,wb,hb) 
+  end
 end

@@ -10,14 +10,7 @@ local selectInfo=  require"ui/mainGame/bottom/selectInfo"
 local actionBar=  require"ui/mainGame/bottom/actionBar"
 local effectList=  require"ui/mainGame/bottom/effectList"
 
-local function drawBar(value,style,x,y,w,h,border)
-  local pb = c.pic.progressBar
-	local xb, yb, wb, hb -- size of the progress bar
-  xb, yb, wb, hb = x+border,y+ border, (w-2*border)*value, h-2*border
-  love.graphics.setColor(1,1,1)
-  suit.theme.drawScale9Quad(pb[1],x,y,w,h)
-  if value>0 then suit.theme.drawScale9Quad(pb[style],xb,yb,wb,hb) end
-end
+local drawBar = ui.drawBar
 
 
 local function drawLifeMana(x,y)

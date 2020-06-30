@@ -64,7 +64,7 @@ local function h_disabled_scroll(core,info,opt,x,y,w,h)
   
   info.sc_left_opt.img = left_img
   info.sc_right_opt.img = right_img
-  local s1=core:Image(back_img,info.sc_hback_opt,x+fang,y,midw,h)
+  local s1=core:Image(back2_img,info.sc_hback_opt,x+fang,y,midw,h)
   local s2=core:Image(left_quads.normal,info.sc_left_opt,x,y,fang,h)
   local s3=core:Image(right_quads.normal,info.sc_right_opt,x+fang+midw,y,fang,h)
   
@@ -186,7 +186,7 @@ local function v_disabled_scroll(core,info,opt,x,y,w,h)
   info.sc_up_opt.img= up_img
   info.sc_down_opt.img = down_img
   
-  local s1=core:Image(back_img,info.sc_vback_opt,x,y+fang,w,midh)
+  local s1=core:Image(back2_img,info.sc_vback_opt,x,y+fang,w,midh)
   local s2=core:Image(up_quads.normal,info.sc_up_opt,x,y,w,fang)
   local s3=core:Image(down_quads.normal,info.sc_down_opt,x,y+fang+midh,w,fang)
   

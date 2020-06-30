@@ -163,9 +163,7 @@ local function one_item(num,x,y,w,h)
     local useWk = y>=swy and y<=swy+swh 
     local sc_x,sc_y,scw,sch = love.graphics.getScissor()
     if useWk then love.graphics.setScissor(sc_x,sc_y-20,scw,sch+20) end
-    local  item_img,item_quad,qw,qh = curItem:getImgAndQuad()
-    love.graphics.setColor(curItem:getDrawColor())
-    love.graphics.draw(item_img,item_quad,x+20,y+h/2,0,0.75,0.75,qw/2,qh/2) --因为默认64×64
+    render.drawUIItem(curItem,x+20,y+h/2,0.75)
     if useWk then love.graphics.setScissor(sc_x,sc_y,scw,sch) end
     --hotkey
     --love.graphics.setColor(1,1,1)

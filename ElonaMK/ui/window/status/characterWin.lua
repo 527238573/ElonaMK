@@ -25,16 +25,7 @@ local function potenrial_str(p)
 end
 
 
-
-local function drawBar(value,style,x,y,w,h,border)
-  local pb = c.pic.progressBar
-	local xb, yb, wb, hb -- size of the progress bar
-  xb, yb, wb, hb = x+border,y+ border, (w-2*border)*value, h-2*border
-  love.graphics.setColor(1,1,1)
-  suit.theme.drawScale9Quad(pb[1],x,y,w,h)
-  suit.theme.drawScale9Quad(pb[style],xb,yb,wb,hb)
-end
-
+local drawBar = ui.drawBar
 
 local lineH = 24
 local function drawBack(x,y,w,h)
@@ -112,10 +103,10 @@ local function drawBack(x,y,w,h)
   love.graphics.draw(icons.img,icons[8],x+40,y+185+iconlength*7,0,2,2)
   
   
-  love.graphics.draw(icons.img,icons[16],x+400,y+185+iconlength*0,0,2,2)
-  love.graphics.draw(icons.img,icons[30],x+400,y+185+iconlength*1,0,2,2)
-  love.graphics.draw(icons.img,icons[9], x+400,y+185+iconlength*2,0,2,2)
-  love.graphics.draw(icons.img,icons[10],x+400,y+185+iconlength*3,0,2,2)
+  love.graphics.draw(icons.img,icons[9],x+400,y+185+iconlength*0,0,2,2)
+  love.graphics.draw(icons.img,icons[10],x+400,y+185+iconlength*1,0,2,2)
+  love.graphics.draw(icons.img,icons[16], x+400,y+185+iconlength*2,0,2,2)
+  love.graphics.draw(icons.img,icons[30],x+400,y+185+iconlength*3,0,2,2)
   love.graphics.draw(icons.img,icons[11],x+400,y+185+iconlength*4,0,2,2)
   love.graphics.draw(icons.img,icons[13],x+400,y+185+iconlength*5,0,2,2)
   love.graphics.draw(icons.img,icons[12],x+400,y+185+iconlength*6,0,2,2)

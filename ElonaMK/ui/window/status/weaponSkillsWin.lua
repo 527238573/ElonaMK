@@ -7,12 +7,7 @@ local select_skill_index = 1
 
 local icons = c.pic.uiAttr
 
-local function drawBar(value,style,x,y,w,h,border)
-  local pb = c.pic.progressBar
-  love.graphics.setColor(1,1,1)
-  suit.theme.drawScale9Quad(pb[1],x,y,w,h)
-  if value>0 then suit.theme.drawScale9Quad(pb[style],x+border,y+ border,(w-2*border)*value, h-2*border)end
-end
+local drawBar = ui.drawBar
 
 
 local function drawBack(x,y)

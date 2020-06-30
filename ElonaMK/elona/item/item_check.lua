@@ -35,8 +35,9 @@ end
 --绘制固定形态所用。
 function Item:getImgAndQuad()
   local itype = self.type
-  return itype.img,itype[1],itype.w,itype.h
+  return itype.img,itype[1],itype.w,itype.h,itype.scaleFactor
 end
+
 
 function Item:getDrawColor()
   return 1,1,1,1

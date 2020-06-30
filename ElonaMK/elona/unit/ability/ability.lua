@@ -27,7 +27,19 @@ function Ability:getName()
   return self.type.name
 end
 
-local default_quad = love.graphics.newQuad(0,0,24,24,24,24)
-function Ability:getImgAndQuad()
-  return self.type.icon,default_quad
+function Ability:getAbilityIcon()
+  return self.type.icon
+end
+
+function Ability:isMagic() return self.type.isMagic end
+function Ability:getMainAttr() return self.type.main_attr end
+function Ability:getLevel() return math.floor(self.level) end
+function Ability:getExp() return self.level - math.floor(self.level) end
+
+function Ability:getCostMana()
+  return self.type.costMana
+end
+
+function Ability:getCooldown()
+  return self.type.cooldown
 end

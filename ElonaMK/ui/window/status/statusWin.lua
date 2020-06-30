@@ -89,7 +89,10 @@ end
 
 
 function statusWin:win_close()
-  
+  subWins[1].win_close()
+  subWins[2].win_close()
+  subWins[3].win_close()
+  subWins[4].win_close()
 end
 
 
