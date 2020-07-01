@@ -14,7 +14,7 @@ c.pic["editor_btn_quads"] = {
 }
 
 
-local closeImg = love.graphics.newImage("assets/ui/closeBtn.png")
+local closeImg = love.graphics.newImage("assets/ui/closeBtn.png")--editor用
 c.pic["close_quads"] = 
 {
   normal = love.graphics.newQuad(0,0,30,24,30,72),
@@ -48,8 +48,6 @@ c.pic["btn2_quads"] = {
 }
 
 
-local msg_panel_img = love.graphics.newImage("assets/ui/messageWin.png")
-c.pic["msg_panel_quads"] =  c.createS9Table(msg_panel_img,0,0,32,32,6,6,6,6)
 
 local msg_img = love.graphics.newImage("assets/ui/message2.png")
 c.pic["msg_quads"] =  c.createS9Table(msg_img,0,0,msg_img:getWidth(),msg_img:getHeight(),4,4,4,4)

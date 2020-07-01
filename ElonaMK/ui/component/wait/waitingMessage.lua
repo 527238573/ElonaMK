@@ -1,7 +1,9 @@
 
 local suit = require"ui/suit"
+--old
+local wait_panel_img = love.graphics.newImage("assets/ui/waiting.png")
+local quads =  suit.createS9Table(wait_panel_img,0,0,28,32,6,10,6,6)
 
-local quads =  ui.res.wait_quads 
 function ui.waitingMessage(message)
   --message = "测试waring中..."
   love.graphics.present()

@@ -168,6 +168,7 @@ function Unit:updateRL(dt)
   self:update_damage(dt)
   if self.dead then return end
   self:updateEffectsRL(dt)
+  self:updateAbilities(dt)
   
   --计算delay
   if self.delay_bar>0 then self.delay_bar = self.delay_bar -dt end --跟新delaybar。

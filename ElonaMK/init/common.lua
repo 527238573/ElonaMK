@@ -53,7 +53,7 @@ end
 
 
 function tl(str,str2)
-  return str2
+  return str
 end
 
 local xid = 0
@@ -294,7 +294,14 @@ c.shader_grey = love.graphics.newShader[[
       return vec4(luminosity,luminosity,luminosity,cp.a);
     }]]
     
-
+c.shader_cooldown = love.graphics.newShader[[
+    extern number c_rad;
+    vec4 effect(vec4 color, Image texture, vec2 tc, vec2 _) {
+      vec4 cp = Texel(texture, tc) * color;
+      number rad = atan(tc.x-0.5,tc.y-0.5);
+      if (rad>c_rad)return cp;
+      else return vec4(cp.r*0.3,cp.g*0.3,cp.b*0.3,cp.a);
+    }]]
 
 function c.damageIns(dmg,dtype,subtype,resist_pen,resist_mul)
   dmg = dmg or 0--伤害值

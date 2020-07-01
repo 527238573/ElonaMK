@@ -1,5 +1,11 @@
 
 
+function Unit:updateAbilities(dt)
+  local list = self.abilities
+  for i=1,#list do list[i]:updateRL(dt) end
+end
+
+
 --学会指定的技能。不会重复。
 function Unit:learnAbility(abi_id,showmsg)
   local list = self.abilities
@@ -21,12 +27,17 @@ function Unit:learnAbility(abi_id,showmsg)
   return abi
 end
 
-function Unit:useAbility(abi)
+--尝试使用技能。返回true，如果使用成功。，showmsg为true会显示不能释放时的信息。
+function Unit:useAbility(abi,showmsg)
   --使用前要检查状态，可能死亡或不能动
   if self.delay>0 then
     addmsg("二次使用了ability"..abi:getName())
+    return false
   else
+    abi.cooling = abi:getCooldown()
     addmsg("使用了ability"..abi:getName())
-     p.mc:bar_delay(4,"useA","useA")
+     p.mc:bar_delay(1,"useA","useA")
   end
+  
+  return true
 end

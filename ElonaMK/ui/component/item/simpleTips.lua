@@ -1,7 +1,7 @@
 local suit = require"ui/suit"
 
 
-
+--old,未经改过
 
 local default_width = 200
 local function defaultDraw(str)
@@ -20,9 +20,6 @@ local function defaultDraw(str)
     love.graphics.print(warpt[i], x+2, y+(i-1)*lineHeight+2)
   end
 end
-
-
-
 
 
 

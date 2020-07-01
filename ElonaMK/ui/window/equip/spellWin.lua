@@ -3,8 +3,7 @@ local suit = require"ui/suit"
 local spellWin = {name = tl("招式/魔法","Skills/Spells"),icon = 15,opt = {id= newid()}}
 
 local icons = c.pic.uiAttr
-local picButton = require"ui/component/picButton"
-local default_quad = love.graphics.newQuad(0,0,24,24,24,24)
+local abiButton = require"ui/component/abilityBtn"
 local cur_unit
 local cur_list
 local selectIndex = 1
@@ -95,7 +94,7 @@ local function oneSpell(index,x,y,w,h,dark)
     love.graphics.print(tostring(c_spell:getCooldown()), x+325, y+69)
   end
   suit:registerDraw(draw_entry2)
-  local state_character = picButton(default_quad,img,optinfo.opt1,x+5,y+5,60,64)
+  local state_abi = abiButton(img,c_spell:getCoolRate(),optinfo.opt1,x+5,y+5,60,64)
   local state_key = suit:S9Button(keystr,optinfo.opt2,x+5,y+70,60,26)
   local entry_st = suit:standardState(opt3.id)
   if entry_st.hit then 
@@ -104,12 +103,23 @@ local function oneSpell(index,x,y,w,h,dark)
       g.playSound("click1")
     end
   end
+  if state_abi.hit then 
+    if selectIndex~=index then
+      selectIndex=index
+    end
+    local suc = cur_unit:useAbility(c_spell,true)
+    if suc then
+      ui.equipWin:Close()
+    else
+      g.playSound("click1")
+    end
+  end
 
   if state_key.hit then
     selectIndex=index
     ui.equipWin:OpenChild(ui.shortCutWin,shortCutCall)
   end
-  local combineState = suit:combineState(opt3.id,state_character,state_key,entry_st)
+  local combineState = suit:combineState(opt3.id,state_abi,state_key,entry_st)
   return combineState
 end
 
@@ -177,6 +187,14 @@ local function pressRight()
 end
 local function pressComfirm()
   --ui.equipWin:Close()
+  local c_spell = cur_list[selectIndex]
+  if c_spell ==nil then return end
+  local suc = cur_unit:useAbility(c_spell,true)
+  if suc then
+    ui.equipWin:Close()
+  else
+    g.playSound("click1")
+  end
 end
 
 function spellWin.keyinput(key)

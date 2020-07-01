@@ -3,9 +3,6 @@ local suit = require "ui/suit"
 
 
 local fragpaper = love.graphics.newImage("assets/ui/fragpaper.png")
-local backimg = love.graphics.newImage("assets/ui/bulletBar.png")
---top,bottom,left,right
-local panelquad = c.createS9Table(backimg,0,0,backimg:getWidth(),backimg:getHeight(),8,10,8,8)
 local bulletIconImg = love.graphics.newImage("assets/ui/bulletIcon.png")
 
 local type2index = {
@@ -32,7 +29,6 @@ local function oneRangeWeapon(oneWeapon,x,y)
   suit:registerDraw(function() 
       love.graphics.setColor(1,1,1)
       love.graphics.draw(fragpaper,x,y,0,2,2)
-      --suit.theme.drawScale9Quad(panelquad,x,y,130,45)
       love.graphics.draw(iconlist.img,iconlist[iconIndex],x,y,0,2,2)
       
       love.graphics.setColor(0.1,0.1,0.1)

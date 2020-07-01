@@ -100,11 +100,6 @@ local function skill_info(x,y,w,h)
     local level,exprate = p.mc:getSkillLevelAndExp(skillid)
     love.graphics.print(string.format("Lv%d",level), x+16, y+32)
     love.graphics.setColor(1,1,1)
-    --suit.theme.drawScale9Quad(ui.res.common_pbackS9,x+65,y+32,200,18)
-    --if entry.p_info.exp>0 then
-    --  local length = entry.p_info.exp/100*200
-    --  suit.theme.drawScale9Quad(ui.res.common_pfrontS9,x+65,y+32,length,18)
-    --end
     drawBar(exprate,2,x+65,y+32,200,20,4)
     love.graphics.setFont(c.font_c16)
     love.graphics.print(string.format("%.02f%%",exprate*100), x+145, y+33)

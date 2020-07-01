@@ -1,6 +1,6 @@
 local BASE = (...):match('(.-)[^%.]+$')
 local s9util = require(BASE.."s9util")
-local panel_img = love.graphics.newImage(BASE.."/assets/border.png")
+local panel_img = love.graphics.newImage(BASE.."/assets/border.png")--editor
 local s9table = s9util.createS9Table(panel_img,0,0,50,14,3,3,3,3)
 
 
@@ -9,7 +9,7 @@ local function defaultDraw(x,y,w,h,theme)
   theme.drawScale9Quad(s9table,x,y,w,h)
 end
 
-local panel_img2 = love.graphics.newImage("assets/ui/border2.png")
+local panel_img2 = love.graphics.newImage("assets/ui/border2.png")--主游戏
 local quad1 = love.graphics.newQuad(0,0,4,28,panel_img2:getDimensions())
 local quad2 = love.graphics.newQuad(4,0,12,28,panel_img2:getDimensions())
 
@@ -23,9 +23,9 @@ end
 return function(core, id, x,y,w,h)
 	core:registerHitbox(nil,id, x,y,w,h)
   if id.mg then 
-    core:registerDraw(defaultDraw2,x,y,w,h,core.theme)
+    core:registerDraw(defaultDraw2,x,y,w,h,core.theme)--主游戏
   else
-    core:registerDraw(defaultDraw,x,y,w,h,core.theme)
+    core:registerDraw(defaultDraw,x,y,w,h,core.theme)--editor
   end
 	return {
 		id = id,

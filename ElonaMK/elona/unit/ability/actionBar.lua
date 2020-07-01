@@ -35,7 +35,7 @@ function Unit:useActionBar(index)
   local action = self.actionBar[index]
   if action ==nil then return end
   if action.etype == "ability" then
-    self:useAbility(action.val)
+    self:useAbility(action.val,true)
   end
   --addmsg("使用了actionbar"..index)
 end

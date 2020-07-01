@@ -104,4 +104,6 @@ end
 return function ()
   loadAbilityIcons()
   loadAbilities()
+  local aloadfunc = assert(loadfile(c.source_dir.."elona/unit/ability_call/ability1.lua"))
+  aloadfunc()
 end

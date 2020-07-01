@@ -5,6 +5,9 @@ local frameimg = love.graphics.newImage("assets/ui/abilityBar.png")
 local coverimg = love.graphics.newImage("assets/ui/actionIconCover.png")
 
 
+
+local shader_cooldown = c.shader_cooldown
+
 local key_action_id = {}
 for idi =1,8 do key_action_id[idi] = string.format("action%d",idi) end
 c.key_action_id = key_action_id
@@ -16,9 +19,17 @@ local function OneEntry(index,entry,x,y)
   
   if entry.etype =="ability" then
     local img = entry.val:getAbilityIcon()
+    local coolrate = entry.val:getCoolRate()
     suit:registerDraw(function() 
         love.graphics.setColor(1,1,1)
-        love.graphics.draw(img,x,y,0,2,2)
+        if coolrate>0 then 
+          love.graphics.setShader(shader_cooldown)
+          shader_cooldown:send('c_rad', 2*math.pi*(coolrate-0.5))
+          love.graphics.draw(img,x,y,0,2,2)
+          love.graphics.setShader()
+        else
+          love.graphics.draw(img,x,y,0,2,2)
+        end
         if entry.state =="active" or keydown then
           love.graphics.setColor(0.9,0.7,0.3,0.8)
           love.graphics.draw(coverimg,x,y,0,2,2)
@@ -28,7 +39,7 @@ local function OneEntry(index,entry,x,y)
         end
       end)
   end
-  
+
   if suit:mouseReleasedOn(entry) then
     p:useActionBar(index)
   end
