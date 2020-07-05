@@ -163,6 +163,7 @@ function Unit:check_range_hit(projectile)
   local hit_probability = hitRate(dam_ins.hitLevel,selfDodgeLevel)
   local hit = rnd()<hit_probability--经过数值运算的结果。
   
+  
   local source = projectile.source_unit
   if hit or projectile.dest_unit == self then --只有命中或想要命中的子弹才显示，无意并擦过的子弹不显示。
     local con1 = self:isInPlayerTeam() 
@@ -173,14 +174,22 @@ function Unit:check_range_hit(projectile)
       if hit then
         if source then
           local sourcename = source:getShortName()
-          addmsg(string.format(tl("%s射中了%s。","%s's shot hit %s."),sourcename,selfname),"info")
+          if projectile.name then
+            addmsg(string.format(tl("%s的%s命中了%s。","%s's %s hit %s."),sourcename,projectile.name,selfname),"info")
+          else
+            addmsg(string.format(tl("%s射中了%s。","%s's shot hit %s."),sourcename,selfname),"info")
+          end
         else
           addmsg(string.format(tl("%s被射中了.","%s have been shot."),selfname),"info")
         end
       else
         if source then
           local sourcename = source:getShortName()
-          addmsg(string.format(tl("%s躲开了%s的射击。","%s dodged %s's shot."),selfname,sourcename),"info")
+          if projectile.name then
+            addmsg(string.format(tl("%s躲开了%s的%s。","%s dodged %s's %s."),selfname,sourcename,projectile.name),"info")
+          else
+            addmsg(string.format(tl("%s躲开了%s的射击。","%s dodged %s's shot."),selfname,sourcename),"info")
+          end
         else
           addmsg(string.format(tl("%s躲开了射击。","%s dodged the shot."),selfname),"info")
         end
@@ -192,6 +201,9 @@ function Unit:check_range_hit(projectile)
   self:train_attr("dex",rnd(4,6),dam_ins.hitLevel)--训练敏捷，无论是否击中。
   if hit then
     self:deal_damage(source,dam_ins,0)
+    if projectile.impact then
+      self:hitImpact(projectile.rotation,projectile.impact)
+    end
   else
     self:train_attr("dex",rnd(5,7),dam_ins.hitLevel)--训练敏捷，躲闪成功。
   end

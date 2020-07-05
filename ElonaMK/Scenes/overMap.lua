@@ -17,6 +17,7 @@ end
 function overMap.update(dt)
   g.updateOvermap(dt)
   ui.overmapUILayer(dt)
+  g.updateSound(dt)
 end
 
 function overMap.draw()

@@ -47,6 +47,8 @@ local function loadAbilities()
       elseif key == "main_attr" then
         if g.main_attr[val]==nil then error("error mainattr:"..val) end
         dataT[key] = val
+      elseif key == "baseLevel" then
+        dataT[key] = tonumber(val) or 0
       elseif key == "difficulty" then
         dataT[key] = tonumber(val) or 1
       elseif key == "costMana" then

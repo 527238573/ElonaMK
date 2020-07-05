@@ -38,7 +38,7 @@ function g.initCamera()
 end
 
 g.curFrame = 1
-
+g.dt_rl = 0--标记RL的dt。
 function g.update(dt)
   if p.mc.delay<=0 then
     --检查操作。
@@ -47,6 +47,9 @@ function g.update(dt)
   g.curFrame = g.curFrame+1
   if p.mc.delay>0 then
     g.updateRL(dt)
+    g.dt_rl = dt
+  else
+    g.dt_rl = 0
   end
   g.updateAnim(dt)
   
@@ -60,7 +63,7 @@ end
 
 function g.updateAnim(dt)
   cmap:updateAnim(dt)
-  g.updateDelaySound(dt)
+  --g.updateSound(dt) --转移到scene最后
 end
 
 --overmap模式更新入口
@@ -72,4 +75,5 @@ function g.updateOvermap(dt)
   if p.delay>0 then
     p:updateOM(dt)
   end
+
 end

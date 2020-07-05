@@ -4,16 +4,13 @@ function Unit:attack_animation(destunit,costtime)
   costtime = math.max(0.2,costtime)--不能小于0.2秒，因为伤害生效时间为0.2秒，时间太短动画也没有意义
   local interval_time = 0.2*((math.min(costtime,0.5)-0.2)/0.3)--间隔停顿，0-0.2秒，取决于costtime
   local anim_time = math.min(0.6,costtime-interval_time)--动画时常不能超过0.6秒，暂定，太长为完全慢动作？
-  local time1 = anim_time*0.33 --一阶段时长
-  local delay1 = math.min(0,time1-0.1)--小于0.1无delay
-
+  local midRate = 0.33 --冲锋时间占比33%
 
   local dx,dy =  destunit.x -self.x ,destunit.y - self.y
-
-  local clip  = AnimClip.new("moveAndBack",anim_time,time1,dx*28,dy*28)
+  local clip  = AnimClip.new("moveAndBack",anim_time,midRate,dx*28,dy*28)
   self:addClip(clip)
-  self:add_delay(costtime,"melee_attack")
-  return time1
+  self:short_delay(costtime,"melee_attack")
+  return anim_time*midRate --返回冲锋时间
 end
 
 
@@ -494,7 +491,7 @@ function Unit:melee_hit_animation(source_u,delay,hit_effect)
   if dx~=0 and dy~=0 then impact_xishu = 0.8 end
   local impact_rnd = (rnd()-0.5)*4 *impact_xishu    
   local tdx,tdy = 8*dx*impact_xishu+impact_rnd*dy,8*dy*impact_xishu+4*impact_rnd*dx
-  local clip  = AnimClip.new("impact",0.2,tdx,tdy,delay)
+  local clip  = AnimClip.new("impact",0.2,0.25,tdx,tdy,delay)
   self:addClip(clip)
 end
 

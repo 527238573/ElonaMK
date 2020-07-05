@@ -9,6 +9,7 @@ Projectile = {
   speed = 1000,
   flying = false,--飞行中，还是爆炸中。
   pierce = 0,--穿透能力
+  name = nil,--如果有名字，射中后的说明会改变。
 }
 --在unit_fightrange里有额外大量初始化成员。
 Projectile.__index = Projectile
@@ -40,7 +41,15 @@ function Projectile:getImgQuad()
 end
 
 --dest_unit可以为nil，向地面射击  map不能为nil
-function Projectile:attack(source_unit,sx,sy,dest_unit,dx,dy,map)
+function Projectile:attack(source_unit,sx,sy,target,map)
+  local dest_unit = target.unit
+  local dx,dy
+  if dest_unit then --射击单位
+    dx,dy = dest_unit.x,dest_unit.y --取得当前单位坐标，需要在此时才取得
+  else
+    dx,dy = target.x,target.y --设定为地面坐标。
+  end
+  
   sx = sx or source_unit.x+source_unit.status.dx/64
   sy = sy or source_unit.y+source_unit.status.dy/64
   map =map or source_unit.map --map为nil会出错，
@@ -100,6 +109,9 @@ function Projectile:attack(source_unit,sx,sy,dest_unit,dx,dy,map)
   --加入地图
   
   map:addProjectile(self)
+  if self.shot_sound then
+    g.playSound(self.shot_sound,math.floor(self.source_x+0.5),math.floor(self.source_y+0.5))
+  end
 end
 
 
@@ -146,9 +158,11 @@ function Projectile:updateAnim(dt,map)
     if self:checkHit(ndx,ndy,map)then
       if self.pierce>0 then
         map:addBulletPierceFrame(self,nx,ny,ndx,ndy) --加入击中特效，继续飞行
+        --中途射穿
       else
         self:updatePos(nx,ny)--成功碰撞，停在碰撞点
-        self.flying = false
+        self:endHit(ndx,ndy)
+        --
         return 
       end
     end
@@ -166,12 +180,18 @@ function Projectile:updateAnim(dt,map)
   end
   self:updatePos(nx,ny)
   if self.life>self.timeFlying then 
-    self.flying = false 
+    self:endHit(math.floor(nx+0.5),math.floor(ny+0.5))
     --debugmsg("selfxselfy:"..self.x.." "..self.y)
   end --飞行超过最大限度，停止飞行
 end
 
-
+--传入大方格坐标
+function Projectile:endHit(ndx,ndy)
+  self.flying = false 
+  if self.hit_sound then
+    g.playSound(self.hit_sound,ndx,ndy)
+  end
+end
 
 
 function Projectile:isFinish()

@@ -1,6 +1,6 @@
 function love.conf(c)
-  --必须0.10.0以上
-  c.title = "Elona Mercenary Kings"
+  
+  c.title = "Elona: Mercenary King"
   local window = c.window
   window.width = 1600
   window.height = 1000

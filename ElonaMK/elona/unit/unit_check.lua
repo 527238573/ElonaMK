@@ -98,29 +98,3 @@ end
 function Unit:hasFlag(flag)
   return self.type.flags[flag]
 end
-
---检查target是否合法，不合法就清楚target返回false，合法返回true。 可能更新允许版。
-function Unit:checkTarget(banHostile,banFriend,banGound)
-  if self.target==nil then return false end
-  if self.target.unit then
-    local tu = self.target.unit
-    if self:seesUnit(tu) then
-      if banHostile and self:isHostile(tu) then
-        self.target = nil
-        return false
-      end
-      if banFriend and self:isFriendly(tu) then
-        self.target = nil
-        return false
-      end
-      --hostile等
-      return true
-    end
-  elseif self.target.x then
-    if (not banGound )and self:seesXY(self.target.x,self.target.y) then
-      return true
-    end
-  end
-  self.target = nil
-  return false
-end

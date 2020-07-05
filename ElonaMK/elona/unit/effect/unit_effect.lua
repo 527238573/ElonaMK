@@ -47,7 +47,7 @@ end
 
 
 function Unit:updateEffectsAnim(dt)
-  for _,effect in ipairs(self.effects) do effect:updateAnim(dt) end
+  for _,effect in ipairs(self.effects) do effect:updateAnim(dt,self) end
 end
 
 --根据id移除

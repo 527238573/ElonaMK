@@ -74,7 +74,7 @@ function Unit:getHitLevel(weapon)
   end
   local hitLevel = skill_level--基本
   --todo，算上装备和buff的
-  return math.max(1,skill_level+2)
+  return math.max(1,hitLevel+2)
 end
 
 function Unit:getWeaponRandomHitEffect(weapon)

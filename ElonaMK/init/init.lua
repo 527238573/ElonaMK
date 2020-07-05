@@ -57,6 +57,8 @@ require"elona/unit/fight/unit_fightMelee"
 require"elona/unit/fight/unit_fightMeleeAnim"
 require"elona/unit/fight/unit_fightRange"
 require"elona/unit/fight/unit_weapon"
+require"elona/unit/brain/unit_brain"
+require"elona/unit/brain/unit_target"
 require"elona/unit/ability/ability"
 require"elona/unit/ability/actionBar"
 require"elona/unit/ability/unit_ability"
@@ -108,6 +110,7 @@ function data.init()
   loadAbilitydata()
   loadEffectdata()
   loadTraitdata()
+  data.loadComplete = true
   
   render.init()
   Item.initItemFactory()

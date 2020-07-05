@@ -95,5 +95,6 @@ function Unit:train_skill(skill_id,exp,explv)
   end
   --提升技能等级有益于相应属性等级提升。
   self:train_attr(skill_data.main_attr,realexp/3,cur_lv)
+  self:train_attr("ler",realexp/4,cur_lv)
 end
 

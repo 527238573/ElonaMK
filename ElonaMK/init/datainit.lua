@@ -7,7 +7,7 @@ data.dataMeta = dataMeta
 
 dataMeta.__index = dataMeta
 dataMeta.__newindex = function(o,k,v)
-  if dataMeta[k]==nil then error("修改data的意料之外的值。") else rawset(o,k,v) end
+  if data.loadComplete and dataMeta[k]==nil then error("修改data的意料之外的值。") else rawset(o,k,v) end
 end
 
 

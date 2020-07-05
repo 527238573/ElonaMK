@@ -17,7 +17,7 @@ end
 function mainGame.update(dt)
   g.update(dt)
   ui.uiLayer(dt)
-  
+  g.updateSound(dt)
 end
 
 function mainGame.draw()

@@ -29,10 +29,22 @@ local function loadSound()
     load1sound(v)
   end
   fs:cd("..")
+  fs:cd("ability")
+  dir = "data/sound/ability/"
+  for _, v in ipairs(fs.files) do --
+    load1sound(v)
+  end
+  fs:cd("..")
   fs:cd("gun")
   dir = "data/sound/gun/"
   for _, v in ipairs(fs.files) do --
     load1sound(v,0.1)
+  end
+  fs:cd("..")
+  fs:cd("ui")
+  dir = "data/sound/ui/"
+  for _, v in ipairs(fs.files) do --
+    load1sound(v)
   end
   debugmsg("load sound Nubmer:"..(soundNum))
 end

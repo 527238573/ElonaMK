@@ -4,6 +4,7 @@ Effect = {
   level = 1,--等级(可能有部分)
   life = 0, --持续存在的时间。
   remain = 0, --剩余寿命时间。 
+  loopSound = nil, --循环的声音id。设置后自动循环该声音。
 }
 
 saveMetaType("Effect",Effect)--注册保存类型
@@ -38,7 +39,7 @@ function Effect:getDescription()
   return self.type.description
 end
 
-----返回true，如果强化变动。
+----返回true，如果强化变动。（注意可能在角色已经死亡的情况下调用。）
 function Effect:updateRL(dt,unit)
   self.life = self.life+dt
   self.remain = self.remain-dt
@@ -46,20 +47,27 @@ function Effect:updateRL(dt,unit)
 end
 
 --刷新所掌管的frames的持续时间。
-function Effect:updateAnim(dt)
+function Effect:updateAnim(dt,unit)
   local frames = self.frames
   if frames then
     for i=1,#frames do
       frames[i].remaining_life = self.remain
     end
   end
+  if self.loopSound then
+    g.loopSound(self,self.loopSound,unit.x,unit.y)
+  end
 end
 
 function Effect:addFrame(frame)
   self.frames = self.frames or {}
   table.insert(self.frames,frame)
-  --rame.remaining_life = self.remain
 end
+function Effect:addClip(clip)
+  self.clips = self.clips or {}
+  table.insert(self.clips,clip)
+end
+
 
 --一种effect不能重复获得。两个相同id的effect合并。
 --自动更新bonus数值。
@@ -88,18 +96,28 @@ function Effect:onRemove(unit)
       frames[i].finished = true --结束。
     end
   end
+  local clips = self.clips
+  if clips then
+    for i=1,#clips do
+      clips[i].finished = true --结束。
+    end
+  end
 end
 
 
 --从队列里移出之后被调用。正常时间到的调用，意外移除不调用。
+--有可能在角色已经死亡的情况下调用
 function Effect:onLifeEnd(unit)
   self:onRemove(unit)
+  if unit.dead then--角色已死亡的，不执行后续，视作半途中断。
+    return 
+  end
   --播放消息
   if unit:isInPlayerTeam() then 
     local msg = self.type.end_message or self.end_message
     if msg then addmsg(string.format(msg,unit:getShortName()),self.type.rating or "info") end
   end
-  if self.end_call then
+  if self.end_call  then
     self.end_call.f(unpack(self.end_call.args))
   end
 end
@@ -112,7 +130,6 @@ function Effect:calculate_bonus(bonus)
     bonus[k] = bonus[k] + v
   end
 end
-
 function Effect:setEndCall(func,...)
   checkSaveFunc(func)
   self.end_call = {args = {...},f= func}

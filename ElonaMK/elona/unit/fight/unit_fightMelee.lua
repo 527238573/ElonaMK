@@ -18,13 +18,13 @@ function Unit:melee_attack(target)
   self:melee_attack_message(target,hit_effect)
 
   local tlevel = target:getDodgeLevel()
-  local exp_fix = attack_cost_time/#meleeList --武器经验修正。 获取经验的速度，与攻速无关。
+  local single_exp = attack_cost_time/#meleeList --受训时间。武器经验修正。 获取经验的速度，与攻速无关。
   
   for i=1,#meleeList do
     local oneWeapon = meleeList[i]
     self:melee_weapon_attack(target,oneWeapon,fhit+(i-1)*atk_intv)--2武器间隔0.2，4武器间隔0.1
     
-    self:train_weapon_skill(oneWeapon,exp_fix,tlevel)
+    self:train_weapon_skill(oneWeapon,single_exp,tlevel)
   end
   
   --获得技能的训练。

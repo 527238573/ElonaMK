@@ -77,9 +77,14 @@ function Test.test_effect()
   p.mc:addEffect(effect)
 end
 
+function Test.refuel_mana()
+  p.mc.mp =p.mc.max_mp
+end
+
 
 function g.test1()
   Test.genMonster()
+  Test.refuel_mana()
   --Test.test_effect()
   --Test.magic_circle()
   --Test.grow_attr()

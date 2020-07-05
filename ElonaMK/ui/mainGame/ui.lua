@@ -15,7 +15,6 @@ require"ui/window/item/itemUseWin"
 require"ui/window/test/testWin"
 require"ui/mainGame/cameraMove"
 function ui.uiInit()
-  --g.popwindow = nil--弹出窗口
   ui.initKeyMapping()
   
 end
@@ -30,27 +29,27 @@ local touch = require"ui/mainGame/touch"
 --主界面ui
 function ui.uiLayer(dt)
   ui.updateTurboKey(dt) --UI界面按键连发
-  p.mc:camera_Focus()--先定位镜头到位置
+  p.mc:camera_Focus()--先定位镜头到主角位置
   ui.cameraMove(dt) --移动镜头渐变 
   
-  touch()--鼠标控制。--受镜头影响，放在镜头后
+  touch()--鼠标控制。--受镜头影响，放在镜头移动后
   clock() --时钟UI
   rightPanel() --右侧面板UI
-  bottomPanel()
+  bottomPanel() --底部数个ui组件
   Window.windowRoot(dt) --窗口UI
 end
 
 --大地图模式下ui
 function ui.overmapUILayer(dt)
   ui.updateTurboKey(dt) --UI界面按键连发
-  p:camera_Focus()
-  ui.overmapCameraMove(dt)
-  rightPanel()
+  p:camera_Focus() --定位镜头
+  ui.overmapCameraMove(dt) --镜头渐变
+  rightPanel() --右侧UI
   Window.windowRoot(dt) --窗口UI
 end
 
 
-
+--操作焦点在主界面（没有弹出窗口）
 function ui.isKeyfocusMainGame()
   return Window.getRoot()==nil
 end

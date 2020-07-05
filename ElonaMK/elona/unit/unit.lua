@@ -47,7 +47,7 @@ local niltable = { --默认值为nil的成员变量
   
   animdelay_list = true,--延迟动画调用。里面是function，所以不能保存。里面有东西会在保存时直接丢失掉，但不重要
   map=true,--父地图的状态。
-  target = true,--目标。mc的目标用蓝色的框标注
+  target = true,--目标。mc的目标用蓝色的框标注。 切换目标时必须创建新的table，而不是给旧的赋值。
   
   abilities_level = true, --技能等级列表。删除后的技能，会保留技能等级。技能次数用完或装备移除等，都会保留技能等级。
   abilities = true,--技能列表，数组。
@@ -69,7 +69,6 @@ function Unit:loadfinish()
   --如果新版增加字段，则需要补充。
   self.anim = assert(data.unitAnim[self.anim_id])
   self.class = assert(data.class[self.class_id])
-  
 end
 
 function Unit.new(typeid,level)
@@ -114,7 +113,7 @@ function Unit.new(typeid,level)
   return o
 end
 
--- zanding
+-- 基本没用，一般是直接访问dead ，例如 if unit.dead then ... 这样
 function Unit:is_dead()
   return self.dead
 end
@@ -137,10 +136,10 @@ function Unit:face_position(x,y)
   self:set_face(dx,dy)
 end
 
-
-function Unit:add_delay(time,delay_id)
-  self.delay = self.delay+time
-  self.delay_id = delay_id
+--必须是有效的target
+function Unit:face_target(target)
+  local tXY = target.unit or target
+  self:face_position(tXY.x,tXY.y)
 end
 
 
@@ -166,8 +165,8 @@ end
 
 function Unit:updateRL(dt)
   self:update_damage(dt)
-  if self.dead then return end
   self:updateEffectsRL(dt)
+  if self.dead then return end
   self:updateAbilities(dt)
   
   --计算delay
@@ -189,8 +188,6 @@ function Unit:updateRL(dt)
 end
 
 
-
-
 function Unit:updateAnim(dt)
   self:updateEffectsAnim(dt)
   self:clips_update(dt)
@@ -198,8 +195,31 @@ function Unit:updateAnim(dt)
   self:updateAnimDelayFunc(dt)
 end
 
-function Unit:planAndMove()
-  
-  
+
+
+-- update延迟调用。。。。
+function Unit:updateAnimDelayFunc(dt)
+  local list = self.animdelay_list
+  for i= #list,1,-1 do
+    local onet = list[i]
+    onet.delay = onet.delay-dt
+    if onet.delay <=0 then
+      onet.f(unpack(onet.args))
+      table.remove(list,i)
+    end
+  end
 end
+-- 新 延迟调用。。。。
+function Unit:insertAnimDelayFunc(delay,func,...)
+  checkSaveFunc(func) --检查function 必须是可保存的。
+  local onet = {delay = delay, args = {...},f= func}
+  local list = self.animdelay_list
+  list[#list+1] = onet
+end
+--清理 延迟调用。。。。
+function Unit:clearAnimDelayFunc()
+  self.animdelay_list = {}
+end
+
+
 

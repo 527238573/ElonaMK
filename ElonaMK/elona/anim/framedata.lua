@@ -69,6 +69,8 @@ local function loadFrames()
   load1f("magic_circle",32,32,0.15)
   load1f("small_magic",32,32,0.10)
   load1f("single_circle",64,64,0.3)
+  
+  load1f("fire_ball",32,32,0.065)
 end
 
 

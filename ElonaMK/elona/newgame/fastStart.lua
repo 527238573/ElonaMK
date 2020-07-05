@@ -14,7 +14,7 @@ function g.fastStart()
   --大地图位置
   p:setPosition(26,31)
   
-  local mc = Unit.createMC("Nilo","thief")
+  local mc = Unit.createMC("Nilo","wizard")
   p.mc = mc
   p.team[1] = mc
   cmap:unitSpawn(mc,38,20,true)

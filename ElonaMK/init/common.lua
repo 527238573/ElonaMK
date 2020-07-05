@@ -325,4 +325,10 @@ c.damageType =
   light = 2, --光
 }
 
-  
+function c.baseGrow(grow,costTime,level)
+  return math.floor(level*grow*costTime*2.25)
+end
+
+function c.faceGrow(grow,costTime,level)
+  return math.floor(level*grow*costTime*2.25)*2
+end

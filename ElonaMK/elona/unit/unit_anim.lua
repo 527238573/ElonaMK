@@ -41,8 +41,9 @@ end
 
 
 function Unit:addClip(clip)
+  local p = clip:getPriority()
   for i=1,#self.clips do
-    if self.clips[i].priority>clip.priority then--按优先级插入，同优先级后来的排在后
+    if self.clips[i]:getPriority()>p then--按优先级插入，同优先级后来的排在后
       table.insert(self.clips,i,clip)
       return
     end
@@ -62,13 +63,10 @@ function Unit:clips_update(dt)
   local i=1
   while i<=#clips_list do
     local clip = clips_list[i]
-    if clip.createFrame ~= g.curFrame  then --当前帧创建的对象不会时间经过。
-      clip.time = clip.time+dt
-    end
-    if clip.time> clip.totalTime then
+    clip:updateAnim(dt,status,self)
+    if clip:isFinished() then
       table.remove(clips_list,i)
     else
-      clip.type.updateStatus(dt,clip,status,self)
       i = i+1
     end
   end
@@ -160,27 +158,22 @@ function Unit:drop_frames_to_map()
   end
 end
 
--- update延迟调用。。。。
-function Unit:updateAnimDelayFunc(dt)
-  local list = self.animdelay_list
-  for i= #list,1,-1 do
-    local onet = list[i]
-    onet.delay = onet.delay-dt
-    if onet.delay <=0 then
-      onet.f(unpack(onet.args))
-      table.remove(list,i)
-    end
-  end
+
+function Unit:hitImpact(hit_rotation,dis)
+  hit_rotation = hit_rotation+rnd()-0.5
+  local tTime =  0.2
+  if dis>8 then tTime = tTime*dis/8 end
+  local dx = dis *math.cos(hit_rotation)
+  local dy = -dis *math.sin(hit_rotation) 
+  local clip  = AnimClip.new("impact",tTime,0.25,dx,dy,0)
+  self:addClip(clip)
 end
 
--- 新 延迟调用。。。。
-function Unit:insertAnimDelayFunc(delay,func,...)
-  checkSaveFunc(func) --检查function 必须是可保存的。
-  local onet = {delay = delay, args = {...},f= func}
-  local list = self.animdelay_list
-  list[#list+1] = onet
-end
---清理 延迟调用。。。。
-function Unit:clearAnimDelayFunc()
-  self.animdelay_list = {}
+function Unit:recoilImpact(shot_rotation,dis)
+  local tTime =  0.2
+  if dis>8 then tTime = tTime*dis/8 end
+  local dx = -dis *math.cos(shot_rotation)
+  local dy = dis *math.sin(shot_rotation) 
+  local clip  = AnimClip.new("impact",tTime,0.25,dx,dy,0)
+  self:addClip(clip)
 end

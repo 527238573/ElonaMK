@@ -8,7 +8,7 @@ local cur_unit
 local cur_list
 local selectIndex = 1
 
---按钮的opt，可无限延长。
+--条目的opt，按需增多。
 local optList = {}
 local function getOptInfo(index)
   local info = optList[index]

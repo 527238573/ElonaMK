@@ -52,7 +52,7 @@ function Unit:walk_to(dest_x,dest_y)
   --local dy = self.y-dest_y
   local clip  = AnimClip.new("move",costtime,dx*64,dy*64,self:get_unitAnim_playSpeed())
   self:addClip(clip)
-  self:add_delay(costtime,"walk")
+  self:short_delay(costtime,"walk")
   return true
 end
 

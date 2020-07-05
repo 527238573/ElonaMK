@@ -16,12 +16,14 @@ function Unit:addEffect_chanting(magic_style,time)
     frame.rotation_speed = -1
     self:addFrameClip(frame)
     effect:addFrame(frame)
+    effect.loopSound = "chantingLoop1"
   elseif magic_style ==2 then
     local frame = FrameClip.createUnitFrame("small_magic")
     frame:setLoopPeriod(time)
     frame.rotation_speed = -0.5
     self:addFrameClip(frame)
     effect:addFrame(frame)
+    effect.loopSound = "chantingLoop1"
   else -- ==3
     local frame = FrameClip.createUnitFrame("single_circle")
     frame:setLoopPeriod(time)
@@ -32,6 +34,7 @@ function Unit:addEffect_chanting(magic_style,time)
     frame.rot_uv_speed = 1
     self:addFrameClip(frame)
     effect:addFrame(frame)
+    effect.loopSound = "chantingLoop1"
   end
   self:addEffect(effect)
   self:bar_delay(time,"chant","chant")--启用行动占用。
