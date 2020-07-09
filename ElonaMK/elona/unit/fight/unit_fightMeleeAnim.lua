@@ -499,6 +499,13 @@ end
 
 local function missFrameMoveUp(self,dt)self.dy = self.dy +dt*64 end
 saveFunction(missFrameMoveUp)
+function Unit:fly_miss_word(delay)
+  local frame = FrameClip.createUnitFrame("miss",0,-16,delay)
+  frame.drop_to_map = true
+  self:addFrameClip(frame)
+  frame.updateFunc = missFrameMoveUp
+end
+
 --未击中的动画
 function Unit:melee_miss_animation(source_u,delay,hit_effect)
   local sound = "swing_mid"
@@ -507,9 +514,6 @@ function Unit:melee_miss_animation(source_u,delay,hit_effect)
   g.playSound_delay(sound,self.x,self.y,delay)
    --当源头是自己时弹出miss字样
   if source_u ==p.mc then
-    local frame = FrameClip.createUnitFrame("miss",0,-16,delay)
-    frame.drop_to_map = true
-    self:addFrameClip(frame)
-    frame.updateFunc = missFrameMoveUp
+    self:fly_miss_word(delay)
   end
 end

@@ -1,4 +1,13 @@
 
+-- 基本没用，一般是直接访问dead ，例如 if unit.dead then ... 这样
+function Unit:is_dead()
+  return self.dead
+end
+
+--只有被标记为死亡才真正死亡，HP降为0暂不代表死亡。
+function Unit:is_alive()
+  return not self.dead
+end
 
 
 

@@ -61,12 +61,11 @@ function ui.drawFix(x,y,w,h)
   end
   
   
-  local dodgeLevel = mc:getDodgeLevel()
-  local ar = mc:getAR()
-  local mr = mc:getMR()
-  love.graphics.printf(string.format(tl("闪避等级:%d","Dodge Level:%d"),dodgeLevel), x+543, y+480+lineH*0,200,"right") 
-  love.graphics.printf(string.format(tl("护甲:%d","Armor:%d"),ar), x+543, y+480+lineH*1,200,"right") 
-  love.graphics.printf(string.format(tl("魔抗:%d","Magic Resist:%d"),mr), x+543, y+480+lineH*2,200,"right") 
+  love.graphics.printf(string.format(tl("闪避等级:%d","Dodge Level:%d"),mc:getDodgeLevel()), x+543, y+480+lineH*0,200,"right") 
+  love.graphics.printf(string.format(tl("护甲:%d x%.1f","Armor:%d x%.1f"),mc:getAR(),mc:getAR_mod()), x+543, y+480+lineH*1,200,"right") 
+  love.graphics.printf(string.format(tl("魔抗:%d x%.1f","Magic Resist:%d x%.1f"),mc:getMR(),mc:getMR_mod()), x+543, y+480+lineH*2,200,"right") 
+  love.graphics.printf(string.format(tl("生命回复每秒:%.1f","HP regeneration:%.1f"),mc.hp_regen), x+543, y+480+lineH*3,200,"right") 
+  love.graphics.printf(string.format(tl("魔法回复每秒:%.1f","MP regeneration:%.1f"),mc.mp_regen), x+543, y+480+lineH*4,200,"right") 
 end
 
 

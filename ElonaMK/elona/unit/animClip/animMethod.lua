@@ -74,7 +74,7 @@ end
 function clip.updateStatus(dt,clip,status,unit)
   if clip.time<clip.delay then return end
   local ctime = clip.time - clip.delay
-  
+
   local rate = ctime/(clip.totalTime-clip.delay)
   if rate<clip.midRate then
     rate = rate/clip.midRate--中间值
@@ -86,6 +86,72 @@ function clip.updateStatus(dt,clip,status,unit)
   status.dy =status.dy+clip.tdy*rate;
 end
 
+clip =  {id ="turnFlat",priority = 4,}--默认priority，可以覆写
+addClip(clip)
+function clip.init(clip,midRate,t_scaleY,delay) 
+  clip.delay = delay or 0
+  clip.midRate = midRate
+  clip.totalTime = clip.delay+clip.totalTime
+  clip.t_scaleY = t_scaleY
+end
+
+
+function clip.updateStatus(dt,clip,status,unit)
+  if clip.time<clip.delay then return end
+  local ctime = clip.time - clip.delay
+
+  local rate = ctime/(clip.totalTime-clip.delay)
+  if rate<clip.midRate then
+    rate = rate/clip.midRate--中间值
+  else
+    rate =1- (rate-clip.midRate)/(1 - clip.midRate)
+  end
+  rate = c.clamp(rate,0,1)
+  local nscale = 1+ rate*(clip.t_scaleY-1)
+  status.scaleY =nscale *status.scaleY
+  --status.dz =status.dz - 16*(1-clip.t_scaleY)*rate
+end
+
+clip =  {id ="jump_slash",priority = 2,}--默认priority，可以覆写
+addClip(clip)
+function clip.init(clip,midRate,tdx,tdy,tdz,backTime) 
+  clip.stage1t = clip.totalTime
+  clip.totalTime = clip.totalTime +backTime
+  clip.midRate = midRate
+  clip.tdx = tdx
+  clip.tdy = tdy
+  clip.tdz = tdz
+  if tdx>0 then tdx=1 elseif tdx<0 then tdx =-1 end --标准化为1
+  if tdy>0 then tdy=1 elseif tdy<0 then tdy =-1 end
+  clip.turn_face = c.face(tdx,tdy)
+  local isRight = clip.turn_face>2 and clip.turn_face<7--左或右
+  clip.rot = isRight and -0.2 or 0.2
+end
+
+
+function clip.updateStatus(dt,clip,status,unit)
+  status.face = clip.turn_face
+  if clip.time<clip.stage1t then
+    local rate = clip.time/clip.stage1t
+    rate = c.clamp(rate,0,1)
+    local zrate
+    if rate<clip.midRate then
+      zrate = rate/clip.midRate--中间值
+    else
+      zrate =1- (rate-clip.midRate)/(1 - clip.midRate)
+    end
+    zrate = 1-(zrate-1)*(zrate-1)
+    status.dz = zrate*clip.tdz
+    status.dx =status.dx+clip.tdx*rate;
+    status.dy =status.dy+clip.tdy*rate;
+    status.rot = clip.rot*rate
+  else
+    local rate = 1-(clip.time-clip.stage1t)/(clip.totalTime-clip.stage1t)
+    status.dx =status.dx+clip.tdx*rate;
+    status.dy =status.dy+clip.tdy*rate;
+    status.rate = rate/2
+  end
+end
 
 return function ()
   for k,v in pairs(data.animClip) do

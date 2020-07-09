@@ -103,7 +103,7 @@ function Unit:getImgQuad(status)
       flip = true
     end
   else --"oneside"
-    if face>=2 and face<=5 then flip = true end
+    if face>2 and face<=6 then flip = true end
   end
   local quad = anim[useframe]
   

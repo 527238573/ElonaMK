@@ -147,8 +147,12 @@ end
 function Unit:train_ability(abi,trainTime,trainlv)
   trainlv = trainlv or abi:getLearningLevel() --没有等级，就按技能等级来算。
   trainTime = trainTime or 1 --默认按训练1秒。或许会修改。
-  
-  self:train_attr("mag",rnd(8,12)*trainTime,trainlv) -- 施法主属性
+  if abi:isMagic() then
+    self:train_attr("mag",rnd(8,12)*trainTime,trainlv) -- 施法主属性
+  else
+    self:train_attr("mag",rnd(3,5)*trainTime,trainlv) -- 施法主属性
+    self:train_attr("con",rnd(5,7)*trainTime,trainlv) -- 施法主属性
+  end
   self:train_attr(abi:getMainAttr(),rnd(8,12)*trainTime,trainlv)--次要属性
   abi:train(rnd(8,12)*trainTime,trainlv,self)
 end

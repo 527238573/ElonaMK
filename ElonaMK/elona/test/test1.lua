@@ -84,7 +84,6 @@ end
 
 function g.test1()
   Test.genMonster()
-  Test.refuel_mana()
   --Test.test_effect()
   --Test.magic_circle()
   --Test.grow_attr()

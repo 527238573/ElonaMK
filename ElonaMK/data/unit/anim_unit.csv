@@ -1,4 +1,4 @@
-﻿id,file,type,stillframe,autoWH,w,h,anchorX,anchorY,num,scalefactor,pingpong,playSpeed,shadowSize
+id,file,type,stillframe,autoWH,w,h,anchorX,anchorY,num,scalefactor,pingpong,playSpeed,shadowSize
 Nilo,Nilo.png,twoside,,,,,,,,,,,
 Kavina,Kavina.png,twoside,,,,,,,,,,0.4,
 Heston,Heston.png,twoside,2,,,,,,,,,,

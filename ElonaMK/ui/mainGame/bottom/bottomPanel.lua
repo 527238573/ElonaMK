@@ -21,8 +21,9 @@ local function drawLifeMana(x,y)
   drawBar(mc:getMPRate(),4,x+188, y,180,22,4)
   drawBar(exp,2,x-178, y,180,22,4)
   love.graphics.setColor(1,1,1)
-  love.graphics.printf(string.format("%d/%d",mc.hp,mc.max_hp), x+6, y+1,180,"center")
-  love.graphics.printf(string.format("%d/%d",mc.mp,mc.max_mp), x+188, y+1,180,"center")
+  love.graphics.setFont(c.font_c18)
+  love.graphics.printf(string.format("%d/%d",math.floor(mc.hp),mc.max_hp), x+6, y+1,180,"center")
+  love.graphics.printf(string.format("%d/%d",math.floor(mc.mp),mc.max_mp), x+188, y+1,180,"center")
   love.graphics.printf(string.format("%.2f%%",exp*100), x-178, y+2,180,"center")
 end
 

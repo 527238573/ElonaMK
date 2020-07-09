@@ -74,17 +74,9 @@ end
 
 --状态
 
--- zanding
-function Unit:is_dead()
-  return self.hp<=0 
-end
-
-function Unit:is_alive()
-  return self.hp>0 
-end
 --是否能被F1-F4切换操控到
 function Unit:canOperate()
-  return self.hp>0  
+  return not self.dead
 end
 
 

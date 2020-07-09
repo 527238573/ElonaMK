@@ -13,6 +13,9 @@ function Unit:resetMaxHPMP() --最大hpmp 很常用。采用刷新制。任何�
   local ler  = self:cur_ler()
   local mana = self:cur_mana()
   self.max_mp = math.min(math.max(math.floor(1+mana/100*((level/25+0.2)*( 1.5 * mag + 1.25*ler + 1.25*wil)+mag/2)),5),4000000)
+  
+  self.hp_regen = math.max(0.3,(1+level/25)*( 2 * wil + 1.2*con)/100)
+  self.mp_regen = math.max(0.3,0.3+(1+level/25)*( 2 * wil + 1.2*mag)/100)
 end
 
 

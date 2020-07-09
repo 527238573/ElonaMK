@@ -72,7 +72,7 @@ return function()
   data.sound["bash_hit1"].volume = 0.1
   data.sound["bash_hit2"].volume = 0.1
   data.sound["cut_hit1"].volume = 0.1
-  data.sound["cut_hit2"].volume = 0.1
+  data.sound["cut_hit2"].volume = 0.2
   data.sound["cut_hit3"].volume = 0.1
   data.sound["cut_hit4"].volume = 0.1
   data.sound["cut_hit5"].volume = 0.1
@@ -128,8 +128,10 @@ return function()
   data.sound["fire_shotgun2"].volume = 0.5
   --声音组
   addSoundGroup("bash_hit",{"bash_hit1","bash_hit2"})
-  addSoundGroup("cut_hit",{"cut_hit1","cut_hit2","cut_hit3"})
+  addSoundGroup("cut1_hit",{"cut_hit1","cut_hit2","cut_hit3"})
   addSoundGroup("cut2_hit",{"cut_hit4","cut_hit5","cut_hit6"})
+  addSoundGroup("cut_bighit",{"cut_bighit_1","cut_bighit_2",})
+  addSoundGroup("axe_hit",{"axe_hit_1","axe_hit_2","axe_hit_3",})
   addSoundGroup("stab_hit",{"stab_hit_flesh_1","stab_hit_flesh_2","stab_hit_flesh_3","stab_hit_flesh_4"})
   addSoundGroup("spear_hit",{"spear_hit_flesh_1","spear_hit_flesh_2","spear_hit_flesh_3","spear_hit_flesh_4","spear_hit_flesh_5","spear_hit_flesh_6"})
   addSoundGroup("bite_hit",{"bite_hit1","bite_hit2","bite_hit3"})

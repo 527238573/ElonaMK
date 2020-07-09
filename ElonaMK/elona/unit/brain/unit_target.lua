@@ -1,8 +1,15 @@
-
+Target = {
+}
+saveMetaType("Target",Target)--注册保存类型
+--target可能被重复引用，所以注册成类型
+function Target:new(unit,x,y)
+  assert(unit~=nil or x~=nil)
+  return setmetatable({unit=unit,x=x,y=y},Target)
+end
 --获得目标的等级，用于训练，
-function c.getTargetLv(target)
-  if target and target.unit then 
-    return target.unit.level
+function Target:getTargetLv()
+  if self.unit then 
+    return self.unit.level
   end
   return 0
 end
@@ -102,7 +109,56 @@ function Unit:findSeeRangeEnemyOrSquare(showmsg,aiTarget,clearTarget)
   --第三优先级，搜索附近,视野内
   local near_enemy  = self:findNearestEnemy()
   if near_enemy then
-    return {unit = near_enemy}
+    return Target:new(near_enemy)
+  end
+  --找不到目标：
+  if showmsg then addmsg(tl("找不到目标!","You cant find a target.")) end
+  return nil
+end
+
+
+function Unit:findCloseRangeEnemy(showmsg,aiTarget,clearTarget)
+  --第一优先级，ai触发的
+  if aiTarget then --aiTarget默认为视野内可见的
+    local tunit = aiTarget.unit
+    if tunit then
+      if self:isHostile(tunit) and  c.dist_2d(tunit.x,tunit.y,self.x,self.y)<1.7 then--在近身范围内
+        return aiTarget
+      end
+    end
+  end
+  --第二优先级，所手选的目标。
+  if self:checkTarget() then 
+    local tunit = self.target.unit
+    if tunit then -- 单位目标
+      if self:isHostile(tunit) and  c.dist_2d(tunit.x,tunit.y,self.x,self.y)<1.7 then--在近身范围内
+        return self.target
+      end
+    end
+    --未能成功选择手动目标
+    if clearTarget then
+      self.target = nil
+    end
+  end
+  --第三优先级，搜索附近, 按优先级搜索
+  local map = self.map
+  local sx,sy = self:getFace_dxdy()
+  local cdis = 10
+  local c_unit
+  for dx = -1,1 do
+    for dy = -1,1 do
+      local dis = math.abs(dx -sx) +math.abs(dy-sy)
+      local unit =map:unit_at(self.x+dx,self.y+dy)
+      if unit and self:isHostile(unit) and self:seesUnit(unit) then
+        if dis<cdis then --更近的单位才够好
+          cdis = dis
+          c_unit = unit
+        end
+      end
+    end
+  end
+  if c_unit then
+    return Target:new(c_unit)
   end
   --找不到目标：
   if showmsg then addmsg(tl("找不到目标!","You cant find a target.")) end

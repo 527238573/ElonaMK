@@ -31,11 +31,17 @@ c.null_t = {}
 c.timeSpeed = 2.25 /0.7 --行动点数，速度 和实际时间的换算  （行动点数/速度/tiemspeed = 实际时间）（回合数 = 实际时间秒*timeSpeed）1回合 = 0.444
 c.one_turn = 1/c.timeSpeed
 c.face_table = {7,6,5,8,8,4,1,2,3}
+local reverse_face_x = {-1, 0, 1, 1, 1, 0,-1,-1}
+local reverse_face_y = { 1, 1, 1, 0,-1,-1,-1, 0}
 --face方向 face： 123
   --              884
   --              765
 function c.face(dx,dy)
   return c.face_table[(dy+1)*3 +dx+2]
+end
+
+function c.face_dir(face)
+  return reverse_face_x[face],reverse_face_y[face]
 end
 
 function c.clamp(x,min,max)

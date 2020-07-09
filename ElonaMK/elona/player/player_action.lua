@@ -74,9 +74,9 @@ function Player:esc_action()
   end
   
 end
-
+--返回使用成功与否。成功就中断按键检测
 function Player:useActionBar(index)
-  if p.mc:is_dead() then return end
+  if p.mc:is_dead() then return true end
     --if p.mc.delay>0 then return end --某些技能可以delay中使用
-  p.mc:useActionBar(index)
+  return p.mc:useActionBar(index)
 end

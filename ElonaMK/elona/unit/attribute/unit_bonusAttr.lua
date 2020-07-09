@@ -92,14 +92,30 @@ function Unit:getBonus(bonusName)
 end
 
 --护甲值 即时
-function Unit:getAR()
+function Unit:getAR() 
   return  self.basis["AR"] +self.bonus["AR"] --后续可能会有百分比的加成
+end
+function Unit:getAR_mod()
+  local m_attr = self:cur_wil()
+  if m_attr<30 then
+    return 1+math.max((m_attr-20)*0.02,0)
+  else
+    return m_attr*0.04
+  end
 end
 
 function Unit:getMR()
   return  self.basis["MR"] +self.bonus["MR"] --后续可能会有百分比的加成
 end
 
+function Unit:getMR_mod()
+  local m_attr = self:cur_ler()
+  if m_attr<30 then
+    return 1+math.max((m_attr-20)*0.02,0)
+  else
+    return m_attr*0.04
+  end
+end
 --单一属性的抗性，-8到8之间。
 function Unit:getResistance(atktype)
   local res_str = "res_bash"

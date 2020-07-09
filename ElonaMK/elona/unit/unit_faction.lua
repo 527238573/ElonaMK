@@ -34,11 +34,13 @@ end
 
 --是否盟友。中立的不算盟友，只是不攻击
 function Unit:isFriendly(unit)
+  if unit ==self then return true end --自己是友
   local selftype = factionList[self.faction]
   return selftype[unit.faction]>0
 end
 --是否是敌人。
 function Unit:isHostile(unit)
+   if unit ==self then return false end --自己判断
   local selftype = factionList[self.faction]
   return selftype[unit.faction]<0
 end

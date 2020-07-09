@@ -33,9 +33,9 @@ end
 function Unit:useActionBar(index)
   --self:bar_delay(1,"action","actionbar")
   local action = self.actionBar[index]
-  if action ==nil then return end
+  if action ==nil then return false end
   if action.etype == "ability" then
-    self:useAbility(action.val,true)
+    return self:useAbility(action.val,true)
   end
   --addmsg("使用了actionbar"..index)
 end

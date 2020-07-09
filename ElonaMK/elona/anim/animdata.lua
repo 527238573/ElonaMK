@@ -51,7 +51,7 @@ local function loadUnitAnim()
         if dataT.autoWH then
           dataT[key] = tonumber(val) --如未空后面再计算
         else
-          dataT[key] = tonumber(val) or dataT.h/2
+          dataT[key] = tonumber(val) or dataT.h-16
         end
       elseif key == "num" then
         dataT[key] = tonumber(val) or 4
@@ -86,7 +86,7 @@ local function loadUnitAnim()
          error("error unitAnim wh:"..dataT.id)
       end
       dataT.anchorX = dataT.anchorX  or dataT.w/2
-      dataT.anchorY = dataT.anchorY  or dataT.h/2
+      dataT.anchorY = dataT.anchorY  or dataT.h-16
     end
     --图片quad。
     for i= 1,w do

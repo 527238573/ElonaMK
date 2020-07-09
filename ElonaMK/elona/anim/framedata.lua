@@ -71,6 +71,7 @@ local function loadFrames()
   load1f("single_circle",64,64,0.3)
   
   load1f("fire_ball",32,32,0.065)
+  load1f("jump_cut",64,64,0.05,2,24,40)
 end
 
 

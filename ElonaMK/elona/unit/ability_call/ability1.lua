@@ -1,4 +1,4 @@
-debugmsg("runing ab1")
+debugmsg("loading ability1")
 
 local abi_type
 
@@ -11,7 +11,7 @@ local function fire_proj(source_unit,target,proj)
   if target.unit and target.unit.dead then
     local near_enemy  = source_unit:findNearestEnemy()--简单重选目标
     if near_enemy then
-      target = {unit = near_enemy}
+      target = Target:new(near_enemy)
       source_unit:face_target(target)--朝向目标
     end
   end
@@ -64,7 +64,7 @@ function abi_type.func(abi,source_unit,showmsg,target)
   proj.shot_sound = "fire_proj1"
   proj.name = tl("火球","fire ball")
   proj.impact = 12
-  proj.shot_dispersion = rnd()
+  proj.shot_dispersion = 110
   proj.max_range = 10
   --proj.speed = 750
   local dam_ins = setmetatable({},Damage)
@@ -80,5 +80,5 @@ function abi_type.func(abi,source_unit,showmsg,target)
   dam_ins.dam,dam_ins.crital =source_unit:RandomAbilityDmg(abi,dice,face,base)
   chant_eff:setEndCall(fire_proj,source_unit,target,proj)
   chant_eff:addClip(stepback_anim(source_unit,target,chant_eff.remain)) --添加后撤动作
-  return true,chant_time,c.getTargetLv(target)
+  return true,chant_time,target:getTargetLv()
 end

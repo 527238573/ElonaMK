@@ -28,14 +28,15 @@ local function getVolume(x,y)
 end
 
 
-function g.playSound(id,x,y)
+function g.playSound(id,x,y,volume)
+  volume =volume or 1
   local sound = getSound(id)
   if sound == nil then return end
   local vl =getVolume(x,y)
   if vl<=0 then return end
   
   local dataplay = sound.data:clone()
-  dataplay:setVolume( sound.volume*vl)
+  dataplay:setVolume( sound.volume*vl*volume)
   love.audio.play(dataplay)
 end
 

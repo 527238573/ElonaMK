@@ -119,13 +119,13 @@ local loveKeyD = love.keyboard.isDown
 
 local function keyD(key)
   if key =="up" then
-    return loveKeyD("up") or loveKeyD("w")
+    return loveKeyD("up") or loveKeyD("w") or loveKeyD("kp8")
   elseif key =="down" then
-    return loveKeyD("down") or loveKeyD("s")
+    return loveKeyD("down") or loveKeyD("s") or loveKeyD("kp2")
   elseif key =="right" then
-    return loveKeyD("right") or loveKeyD("d")
+    return loveKeyD("right") or loveKeyD("d") or loveKeyD("kp6")
   elseif key =="left" then
-    return loveKeyD("left") or loveKeyD("a")
+    return loveKeyD("left") or loveKeyD("a") or loveKeyD("kp4")
   end
 end
 
@@ -152,8 +152,9 @@ function ui.mainGameKeyCheck(dt)
   local action_id_t = c.key_action_id--table装了action1~8字符串
   for i=1,8 do
     if ui.isDown_Game(action_id_t[i]) then
-      p:useActionBar(i)
-      return
+      if p:useActionBar(i) then
+        return
+      end
     end
   end
   
@@ -197,6 +198,16 @@ function ui.mainGameKeyCheck(dt)
       return
     end
   end
+  if loveKeyD("kp1") then
+    mc:moveAction(-1,-1)
+  elseif  loveKeyD("kp3") then
+    mc:moveAction(1,-1)
+  elseif  loveKeyD("kp7") then
+    mc:moveAction(-1,1)
+  elseif  loveKeyD("kp9") then
+    mc:moveAction(1,1)
+  end
+  
 end
 
 

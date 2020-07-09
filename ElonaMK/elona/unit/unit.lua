@@ -12,6 +12,10 @@ Unit = {
     mp = 0,--魔法
     max_hp =1,--因为计算复杂，所以不是实时更新的。
     max_mp = 1,--因为计算复杂，所以不是实时更新。
+    hp_regen = 0,--当前生命恢复，--生命每帧都在恢复，回复速度 计算和maxhp等同步
+    mp_regen = 0,--当前法力恢复
+    hp_rcount =0,--累计自动回复的生命值，达到一定数值后清空并转化为经验
+    mp_rcount =0,--累计自动回复的法力值
     karma = 0,--善恶值
     fame = 0,--名声
     sex_male = true, --male为true， female为false
@@ -20,11 +24,11 @@ Unit = {
     delay_bar = 0, --可视化的delay时间
     delay_barmax = 0.1,--可视化delay的总时间。
     delay_barname = "noname",--可视化delay的可见名称。
-    protrait = 0,
+    protrait = 0,--头像id？
     weapon_list= {AR=0,MR =0,totalWeight = 0,melee ={{unarmed = true}},range={}},--临时数据结构
     faction = 5,--所属势力，默认wild，（敌对的）
     dead = false,--死亡状态，
-    
+    turn_past =0,--turn检查时间计数。（RL时间）
     
   }
 saveMetaType("Unit",Unit) --注册保存类型
@@ -45,7 +49,8 @@ local niltable = { --默认值为nil的成员变量
   equipment = true, --装备列表--内涵1-5位置
   damage_queue = true,-- --延迟伤害队列
   
-  animdelay_list = true,--延迟动画调用。里面是function，所以不能保存。里面有东西会在保存时直接丢失掉，但不重要
+  animdelay_list = true,--延迟动画调用。里面是function 。 
+  RLdelay_list = true,--延迟RL调用
   map=true,--父地图的状态。
   target = true,--目标。mc的目标用蓝色的框标注。 切换目标时必须创建新的table，而不是给旧的赋值。
   
@@ -104,7 +109,7 @@ function Unit.new(typeid,level)
   
   o.damage_queue={} --延迟伤害队列
   o.animdelay_list = {} --延迟动画调用。里面是function，可以保存。
-  
+  o.RLdelay_list = {} --延迟RL调用
   o.abilities_level = {}
   o.abilities = {}
   o.effects = {}
@@ -113,21 +118,12 @@ function Unit.new(typeid,level)
   return o
 end
 
--- 基本没用，一般是直接访问dead ，例如 if unit.dead then ... 这样
-function Unit:is_dead()
-  return self.dead
-end
-
---只有被标记为死亡才真正死亡，HP降为0暂不代表死亡。
-function Unit:is_alive()
-  return not self.dead
-end
-
 
 
 function Unit:set_face(dx,dy)
   self.status.face = c.face(dx,dy)
 end
+
 
 function Unit:face_position(x,y)
   local dx,dy = x-self.x,y-self.y
@@ -140,6 +136,10 @@ end
 function Unit:face_target(target)
   local tXY = target.unit or target
   self:face_position(tXY.x,tXY.y)
+end
+
+function Unit:getFace_dxdy()
+  return c.face_dir(self.status.face)
 end
 
 
@@ -166,7 +166,10 @@ end
 function Unit:updateRL(dt)
   self:update_damage(dt)
   self:updateEffectsRL(dt)
+  self:updateRLDelayFunc(dt)
   if self.dead then return end
+  self:regenerateHPMP(dt)
+  self:turnCheck(dt)
   self:updateAbilities(dt)
   
   --计算delay
@@ -216,10 +219,29 @@ function Unit:insertAnimDelayFunc(delay,func,...)
   local list = self.animdelay_list
   list[#list+1] = onet
 end
---清理 延迟调用。。。。
-function Unit:clearAnimDelayFunc()
-  self.animdelay_list = {}
+
+
+function Unit:updateRLDelayFunc(dt)
+  local list = self.RLdelay_list
+  for i= #list,1,-1 do
+    local onet = list[i]
+    onet.delay = onet.delay-dt
+    if onet.delay <=0 then
+      onet.f(unpack(onet.args))
+      table.remove(list,i)
+    end
+  end
 end
 
+function Unit:insertRLDelayFunc(delay,func,...)
+  checkSaveFunc(func) --检查function 必须是可保存的。
+  local onet = {delay = delay, args = {...},f= func}
+  local list = self.RLdelay_list
+  list[#list+1] = onet
+end
 
-
+--清理 延迟调用。。。。
+function Unit:clearDelayFunc()
+  self.animdelay_list = {}
+  self.RLdelay_list = {}
+end

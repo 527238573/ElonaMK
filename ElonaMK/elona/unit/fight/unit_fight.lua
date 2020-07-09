@@ -4,10 +4,12 @@ function Unit:deal_damage(source,dam_ins,delay)
   delay = delay or 0 
   local deal_dam = math.max(0,dam_ins.dam)
   local resist = 0
+  local attr1 = "wil"
   if dam_ins.dtype ==1 then --物理伤害
-    resist = self:getAR()
+    resist = self:getAR()*self:getAR_mod()
   elseif dam_ins.dtype ==2 then --魔法伤害
-    resist = self:getMR()
+    resist = self:getMR()*self:getAR_mod()
+    attr1 = "ler"
   end
   resist = math.max(0,resist*(1-dam_ins.resist_mul)-dam_ins.resist_pen) --护甲穿透计算
   if resist<=0.5*deal_dam then
@@ -30,7 +32,16 @@ function Unit:deal_damage(source,dam_ins,delay)
   --apply damage
   
   --apply damage
-  if deal_dam<=0 then return end
+  if deal_dam<=0 then 
+    local train_base = 10
+    self:train_attr(attr1,train_base,dam_ins.hitLevel)
+    self:train_attr("con",train_base,dam_ins.hitLevel)
+    return 
+  else
+    local train_base = deal_dam/self.max_hp*50+10
+    self:train_attr(attr1,train_base,dam_ins.hitLevel)
+    self:train_attr("con",train_base,dam_ins.hitLevel)
+  end
   --挨揍的
   if source and source:isInPlayerTeam() then
     if dam_ins.crital then
@@ -70,6 +81,7 @@ function Unit:update_damage(dt)
   end
 end
 
+--仅能使用此函数扣除hp。
 function Unit:take_damage(source,dam_ins)
   debugmsg("takedam:"..dam_ins.dam)
   if self:is_dead() then return end

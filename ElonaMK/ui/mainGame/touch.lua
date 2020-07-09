@@ -21,7 +21,7 @@ return function()
     local sx = bit.arshift(mx,6)
     local sy1 = bit.arshift(my-32,6)
     local sy2 = bit.arshift(my,6)
-    p.mc.target = {unit= cmap:unit_at(sx,sy1),x=sx,y=sy2}
+    p.mc.target = Target:new(cmap:unit_at(sx,sy1),sx,sy2)
     p.mc:checkTarget()
     
     

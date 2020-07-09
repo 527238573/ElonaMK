@@ -108,4 +108,6 @@ return function ()
   loadAbilities()
   local aloadfunc = assert(loadfile(c.source_dir.."elona/unit/ability_call/ability1.lua"))
   aloadfunc()
+  aloadfunc = assert(loadfile(c.source_dir.."elona/unit/ability_call/ability2.lua"))
+  aloadfunc()
 end
