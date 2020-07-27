@@ -153,6 +153,39 @@ function clip.updateStatus(dt,clip,status,unit)
   end
 end
 
+clip =  {id ="round_slash",priority = 2,}--默认priority，可以覆写
+addClip(clip)
+function clip.init(clip,turnTime,backTime,r,startRot,face) 
+  clip.stage1t = clip.totalTime
+  clip.stage2t = turnTime
+  clip.stage3t = backTime
+  clip.totalTime = clip.totalTime +backTime +turnTime
+  clip.r = r
+  clip.startRot= startRot
+  clip.turn_face = face
+end
+
+
+function clip.updateStatus(dt,clip,status,unit)
+  if clip.time<clip.stage1t then
+     status.face = clip.turn_face
+    local rate = clip.time/clip.stage1t
+    status.dx =status.dx+math.cos(clip.startRot)*rate*clip.r;
+    status.dy =status.dy+math.sin(clip.startRot)*rate*clip.r;
+  elseif clip.time<(clip.stage1t+clip.stage2t) then
+    local rate = (clip.time - clip.stage1t)/clip.stage2t
+    local rot = clip.startRot+2*math.pi*rate
+    status.dx =status.dx+math.cos(rot)*clip.r;
+    status.dy =status.dy+math.sin(rot)*clip.r;
+    status.face = (clip.turn_face-1 -math.floor(rate*8+0.5))%8+1
+  else
+     status.face = clip.turn_face
+    local rate = 1-(clip.time - clip.stage1t-clip.stage2t)/clip.stage3t
+    status.dx =status.dx+math.cos(clip.startRot)*rate*clip.r;
+    status.dy =status.dy+math.sin(clip.startRot)*rate*clip.r;
+  end
+end
+
 return function ()
   for k,v in pairs(data.animClip) do
     v.id = k

@@ -4,7 +4,7 @@ local wmapCache ={}--储存wmap坐标到map的映射。
 local mapBuffer ={}--mapid到map的映射。
 
 
-function Map.initMapBuffer()
+function MapFactory.initMapBuffer()
   
   
 end
@@ -48,24 +48,24 @@ end
 
 
 
-function Map.getrOrCreateWmapSquare(x,y)
+function MapFactory.getrOrCreateWmapSquare(x,y)
   local map,id = get_existing_wmap(x,y)
   if map~=nil then return map end
   local isField = wmap:getTargetMap(x,y)==nil
   if isField then
-    map = Map.createWmapField(x,y,id)
+    map = MapFactory.createWmapField(x,y,id)
   else
-    map = Map.createFromTemplateId(id)
+    map = MapFactory.createFromTemplateId(id)
   end
   wmapCache[y*wmap.w+x+1] = map
   mapBuffer[id] = map
   return map
 end
 
-function Map.getOrCreateIdmap(id)
+function MapFactory.getOrCreateIdmap(id)
   local map = get_existing_idmap(id)
   if map~=nil then return map end
-  map = Map.createFromTemplateId(id)
+  map = MapFactory.createFromTemplateId(id)
   mapBuffer[id] = map
   return map
 end

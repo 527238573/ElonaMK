@@ -3,6 +3,7 @@ local mapEditor  = Scene.new()
 local suit = require"ui/suit"
 require"editor/editor"
 require"ui/editor/eui"
+require"editor/captureAPI"
 
 function mapEditor.enter()
   editor.init()

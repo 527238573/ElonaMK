@@ -477,11 +477,11 @@ function generateMonster(newmap,ovmap,x,y)
   local maxlevel = 5
   local monlist = {}
   rawset(newmap,"monlist",monlist) --保存列表
-  local gentype = Unit.randomUnitTypeByLevel(maxlevel)
+  local gentype = UnitFactory.randomUnitTypeByLevel(maxlevel)
   
   for i=1,mon_num do
     local utype = gentype()
-    local unit = Unit.create(utype.id,nil,"wild")
+    local unit = UnitFactory.create(utype.id,nil,"wild")
     table.insert(monlist,unit)
     newmap:monsterSpawn(unit,rnd(0,newmap.w-1),rnd(0,newmap.h-1),false)
   end

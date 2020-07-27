@@ -9,7 +9,7 @@ local shader_rotUV = love.graphics.newShader[[
       c.x = (tc.x-0.5)*cos_r - (tc.y-0.5)*sin_r +0.5;
       c.y = (tc.x-0.5)*sin_r + (tc.y-0.5)*cos_r +0.5;
       
-      return Texel(texture, c);
+      return Texel(texture, c)*color;
     }]]
 
 --c.y = (tc.x-0.5)*sin_r + (tc.y-0.5)*cos_r +0.5;
@@ -33,7 +33,7 @@ function render.drawOneFrame(frame,acx,acy,camera)
     shader_rotUV:send('cos_r', math.cos(frame.rot_uv))
     shader_rotUV:send('sin_r', math.sin(frame.rot_uv))
   end
-  
+  love.graphics.setColor(1,1,1,frame.alpha)
   love.graphics.draw(img,quad,screenx,screeny,rot,scaleX,scaleY,ox,oy,frame.shearX,frame.shearY)--绘制
   
   if useRotUv then
@@ -44,7 +44,7 @@ end
 
 
 function render.drawFrames(camera,map)
-  love.graphics.setColor(1,1,1)
+  
   local list = map.frames
   for _,frame in ipairs(list) do
     if frame.time>=0 then

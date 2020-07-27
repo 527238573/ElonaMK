@@ -161,8 +161,6 @@ local function equipmentlList(x,y,w)
   local mc = p.mc
   local equipl = mc.equipment
 
-  --Item.getTestEquipment()
-  --oneItem(Item.getTestEquipment(),1,button_1_id,x+30,y+64+lineh*0,w-60,lineh)
   oneItem(equipl[1],1,button_1_id,x+30,y+64+lineh*0,w-60,lineh)
   oneItem(equipl[2],2,button_2_id,x+30,y+64+lineh*1,w-60,lineh)
   oneItem(equipl[3],3,button_3_id,x+30,y+64+lineh*2,w-60,lineh)

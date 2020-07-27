@@ -503,7 +503,7 @@ function Unit:fly_miss_word(delay)
   local frame = FrameClip.createUnitFrame("miss",0,-16,delay)
   frame.drop_to_map = true
   self:addFrameClip(frame)
-  frame.updateFunc = missFrameMoveUp
+  frame:setFrameUpdateFunc(missFrameMoveUp)
 end
 
 --未击中的动画

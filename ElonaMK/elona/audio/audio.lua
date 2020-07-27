@@ -44,12 +44,13 @@ end
 local delayList = {}
 
 
-function g.playSound_delay(id,x,y,delay)
+function g.playSound_delay(id,x,y,delay,volume)
+  volume =volume or 1
   if delay<=0 then
-    g.playSound(id,x,y)
+    g.playSound(id,x,y,volume)
     return 
   end
-  local delaySound = {id =id,x=x,y=y,delay = delay}
+  local delaySound = {id =id,x=x,y=y,delay = delay,volume =volume}
   table.insert(delayList,delaySound)
 end
 
@@ -86,7 +87,7 @@ function g.updateSound(dt)
   while i<=#delayList do
     local delaySound = delayList[i]
     if delaySound.delay<=0 then
-      g.playSound(delaySound.id,delaySound.x,delaySound.y)
+      g.playSound(delaySound.id,delaySound.x,delaySound.y,delaySound.volume)
       table.remove(delayList,i)
     else
       delaySound.delay =delaySound.delay -dt

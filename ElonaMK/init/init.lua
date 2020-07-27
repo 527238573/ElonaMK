@@ -3,6 +3,7 @@
 require"init/common"
 require"init/pic"
 require"ui/suit"
+require"file/saveT"
 require"file/saveTAdv"
 
 --数据
@@ -25,7 +26,7 @@ require"Scenes/mainGame"
 require"Scenes/overMap"
 --game部分
 require"elona/game"
-Map = require"elona/map/map"
+require"elona/map/map"
 require"elona/map/map_terrain"
 require"elona/map/map_cache"
 require"elona/map/map_items"
@@ -33,9 +34,9 @@ require"elona/map/map_field"
 require"elona/map/map_unit"
 require"elona/map/map_enter"
 require"elona/map/map_frames"
-require"elona/map/mapBuffer"
 require"elona/map/mapFactory"
-Overmap = require"elona/map/overmap"
+require"elona/map/mapBuffer"
+require"elona/map/overmap"
 require"elona/map/overmap_ter"
 require"elona/unit/unit"
 require"elona/unit/unit_check"
@@ -114,9 +115,9 @@ function data.init()
   data.loadComplete = true
   
   render.init()
-  Item.initItemFactory()
-  Map.initMapBuffer()
+  ItemFactory.initItemFactory()
+  MapFactory.initMapBuffer()
   Unit.initUnitFactions()
-  Unit.initUnitFactory()
+  UnitFactory.initUnitFactory()
   ui.uiInit()--虽然还未进入主游戏，但需要一次载入。
 end

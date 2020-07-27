@@ -65,6 +65,18 @@ local function w2u(wstr, code)
 	return ffi.string(buf)
 end
 
+c.u2w = u2w
+c.w2u = w2u
+local CP_UTF8 = 65001
+local CP_ACP =936
+function c.gbk2utf8(str)
+  str = u2w(str, CP_ACP)
+  return w2u(str, CP_UTF8)
+end
+
+
+
+
 local function join(tb1, tb2)
 	local tb = {}
 	for _,v in ipairs(tb1) do table.insert(tb, v) end

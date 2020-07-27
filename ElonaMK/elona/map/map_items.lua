@@ -35,7 +35,7 @@ end
 
 function Map:spawnItemById(itemid,x,y)
   local list = self:getItemList(x,y,true)
-  local item = Item.create(itemid)
+  local item = ItemFactory.create(itemid)
   list:addItem(item)
 end
 

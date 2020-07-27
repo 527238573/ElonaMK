@@ -91,7 +91,7 @@ local function loadAbilities()
       if key=="id" then
         dataT = data_type_t[val]
       elseif  key=="name" then
-        --debugmsg(string.format("orgin:%s utf8:%s convert:%s",dataT[key],val,convert2))
+        --debugmsg(dataT[key].." "..val.." "..c.gbk2utf8(dataT[key]))
         dataT[key] = val
       elseif  key=="description" then
         dataT[key] = val

@@ -1,4 +1,4 @@
-local Overmap = {
+Overmap = {
     w = 10,--宽
     h = 10, --高默认值，
     id = "null",
@@ -83,5 +83,3 @@ function Overmap:setLayer2(index,x,y)
   assert(x>=0 and x<=self.w-1 and y>=0 and y<=self.h-1)
   self.layer2[y*self.w+x+1] = index
 end
-
-return Overmap

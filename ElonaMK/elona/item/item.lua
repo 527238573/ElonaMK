@@ -96,7 +96,7 @@ end
 function Item:slice(num)
   if not self:canStack() or num ==0 then return nil end
   if num >= self.num then return self end
-  local newitem = Item.create(self.type.id)
+  local newitem = ItemFactory.create(self.type.id)
   self:set_num(self.num-num)
   newitem:set_num(num)
   return newitem

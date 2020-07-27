@@ -5,10 +5,9 @@ Ability = {
   cooling = 0,--正在冷却的剩余时间。
   coolTime = 0,--当前冷却过程的总时间。
 }
-saveMetaType("Ability",Ability)--注册保存类型
 local niltable = { --默认值为nil的成员变量
   }
-
+saveMetaType("Ability",Ability,niltable)--注册保存类型
 Ability.__newindex = function(o,k,v)
   if Ability[k]==nil and niltable[k]==nil then error("使用了Ability的意料之外的值。") else rawset(o,k,v) end
 end
@@ -31,6 +30,21 @@ end
 
 function Ability:getAbilityIcon()
   return self.type.icon
+end
+
+--用单位描述
+function Ability:getDescription(unit)
+  local des = self.type.description
+  if type(des) =="function" then
+    des = des(self,unit)
+  end
+  if des=="" then 
+    des = "测试描述。技能大段问字技能大段问字技能大段问字技能大段问字，伤害212-323，很多的伤害很多的伤害很多的伤害很多的伤害。"
+  end
+  if type(des) =="string" then
+    return {{0.9,0.9,0.9},des}--必须要返回table类型
+  end
+  return des --table类型
 end
 
 function Ability:isMagic() return self.type.isMagic end

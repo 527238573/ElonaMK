@@ -1,7 +1,5 @@
 
-
-
-
+MapFactory = {}
 data.mapgen = {}
 require"elona/map/mapgen/Vernis"
 require"elona/map/mapgen/field"
@@ -10,7 +8,7 @@ require"elona/map/mapgen/field"
 local path =c.source_dir.."data/map/"
 
 --从地图文件模板创建地图。
-function Map.createFromTemplateId(id)
+function MapFactory.createFromTemplateId(id)
   local file  =  path..id..".lua"
   local template,err = table.loadAdv(file)
   print("load map Template:",template,err)
@@ -48,7 +46,7 @@ function Map.createFromTemplateId(id)
 end
 
 local overmapPath =c.source_dir.."data/overmap/"
-function  Map.createOverMapFromTemplateId(id)
+function  MapFactory.createOverMapFromTemplateId(id)
   local file  =  overmapPath..id..".lua"
   local template,err = table.loadAdv(file)
   print("load overmap Template:",template,err)
@@ -59,7 +57,7 @@ end
 
 
 --创建野外地图。
-function Map.createWmapField(x,y,id)
+function MapFactory.createWmapField(x,y,id)
   assert(x>=0 and x<=wmap.w-1 and y>=0 and y<=wmap.h-1)
   local newmap = Map.new(42,28,3) --野外固定大小。
   newmap.id = id

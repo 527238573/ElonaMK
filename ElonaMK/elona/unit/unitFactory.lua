@@ -1,8 +1,8 @@
 --多种多样的创建方式
 
 local levelList ={}
-
-function Unit.initUnitFactory()
+UnitFactory = {}
+function UnitFactory.initUnitFactory()
   --初始化levellist
   local function sort(utype1,utype2)
     return utype1.level < utype2.level
@@ -17,7 +17,7 @@ end
 
 
 
-function Unit.create(id,level,faction)
+function UnitFactory.create(id,level,faction)
   
   local unit = Unit.new(id)
   local unitType = unit.type
@@ -40,7 +40,7 @@ function Unit.create(id,level,faction)
 end
 
 
-function Unit.createMC(id,classid)
+function UnitFactory.createMC(id,classid)
   
   local unit = Unit.new(id)
   local unitType = unit.type
@@ -68,7 +68,7 @@ function Unit.createMC(id,classid)
 end
 
 
-function Unit.randomUnitTypeByLevel(maxLevel)
+function UnitFactory.randomUnitTypeByLevel(maxLevel)
   --先查找最大index
   local left = 1
   local right = #levelList

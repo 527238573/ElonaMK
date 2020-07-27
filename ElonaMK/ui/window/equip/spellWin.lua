@@ -4,6 +4,7 @@ local spellWin = {name = tl("招式/魔法","Skills/Spells"),icon = 15,opt = {id
 
 local icons = c.pic.uiAttr
 local abiButton = require"ui/component/abilityBtn"
+local abilityInfo = require"ui/component/info/abilityInfo"
 local cur_unit
 local cur_list
 local selectIndex = 1
@@ -225,6 +226,9 @@ function spellWin.window_do(dt,s_win)
   --suit:registerDraw(drawBack,s_win.x,s_win.y,s_win.w,s_win.h)
   suit:registerDraw(drawBack,s_win.x,s_win.y,s_win.w,s_win.h)
   spellList(nil,s_win.x+20,s_win.y+45)
+  if cur_list[selectIndex] then
+    abilityInfo(cur_list[selectIndex],cur_unit,s_win.x+s_win.w,s_win.y,260,true,500)
+  end
 end
 
 return spellWin

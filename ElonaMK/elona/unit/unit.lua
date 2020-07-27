@@ -31,8 +31,6 @@ Unit = {
     turn_past =0,--turn检查时间计数。（RL时间）
     
   }
-saveMetaType("Unit",Unit) --注册保存类型
-
 local niltable = { --默认值为nil的成员变量
   class = true,--职业类型
   class_id = true, --职业id --classid。因为可能更换职业，所以需要登记
@@ -49,8 +47,8 @@ local niltable = { --默认值为nil的成员变量
   equipment = true, --装备列表--内涵1-5位置
   damage_queue = true,-- --延迟伤害队列
   
-  animdelay_list = true,--延迟动画调用。里面是function 。 
-  RLdelay_list = true,--延迟RL调用
+  delayAnim_list = true,--延迟动画调用。里面是function 。 
+  delayRL_list = true,--延迟RL调用
   map=true,--父地图的状态。
   target = true,--目标。mc的目标用蓝色的框标注。 切换目标时必须创建新的table，而不是给旧的赋值。
   
@@ -60,6 +58,7 @@ local niltable = { --默认值为nil的成员变量
   effects = true,--effect列表，数组。
   traits = true,--traits列表，数组。
 }
+saveMetaType("Unit",Unit,niltable) --注册保存类型
 Unit.__newindex = function(o,k,v)
   if Unit[k]==nil and niltable[k]==nil then error("使用了Unit的意料之外的值。") else rawset(o,k,v) end
 end
@@ -108,8 +107,8 @@ function Unit.new(typeid,level)
   o.equipment = {} --内涵1-5位置
   
   o.damage_queue={} --延迟伤害队列
-  o.animdelay_list = {} --延迟动画调用。里面是function，可以保存。
-  o.RLdelay_list = {} --延迟RL调用
+  o.delayAnim_list = {} --延迟动画调用。里面是function，可以保存。
+  o.delayRL_list = {} --延迟RL调用
   o.abilities_level = {}
   o.abilities = {}
   o.effects = {}
@@ -140,6 +139,10 @@ end
 
 function Unit:getFace_dxdy()
   return c.face_dir(self.status.face)
+end
+function Unit:getFace_Rotation()
+  local dx,dy = c.face_dir(self.status.face)
+  return math.atan2(dy,dx)
 end
 
 
@@ -202,7 +205,7 @@ end
 
 -- update延迟调用。。。。
 function Unit:updateAnimDelayFunc(dt)
-  local list = self.animdelay_list
+  local list = self.delayAnim_list
   for i= #list,1,-1 do
     local onet = list[i]
     onet.delay = onet.delay-dt
@@ -216,13 +219,13 @@ end
 function Unit:insertAnimDelayFunc(delay,func,...)
   checkSaveFunc(func) --检查function 必须是可保存的。
   local onet = {delay = delay, args = {...},f= func}
-  local list = self.animdelay_list
+  local list = self.delayAnim_list
   list[#list+1] = onet
 end
 
 
 function Unit:updateRLDelayFunc(dt)
-  local list = self.RLdelay_list
+  local list = self.delayRL_list
   for i= #list,1,-1 do
     local onet = list[i]
     onet.delay = onet.delay-dt
@@ -236,12 +239,12 @@ end
 function Unit:insertRLDelayFunc(delay,func,...)
   checkSaveFunc(func) --检查function 必须是可保存的。
   local onet = {delay = delay, args = {...},f= func}
-  local list = self.RLdelay_list
+  local list = self.delayRL_list
   list[#list+1] = onet
 end
 
 --清理 延迟调用。。。。
 function Unit:clearDelayFunc()
-  self.animdelay_list = {}
-  self.RLdelay_list = {}
+  self.delayAnim_list = {}
+  self.delayRL_list = {}
 end

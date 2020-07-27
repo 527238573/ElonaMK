@@ -1,19 +1,19 @@
 
+ItemFactory = {}
 
-
-function Item.initItemFactory()
-  Item.manyItems= Item.create("many_items")
+function ItemFactory.initItemFactory()
+  Item.manyItems= ItemFactory.create("many_items")
   
 end
 
 
 
 --标准创建。
-function Item.create(id)
+function ItemFactory.create(id)
   local itype = data.item[id]
   if itype==nil then error("使用了不存在的itemid:"..id) end
   if itype.type == "equipment" then
-    return Item.createEquipment(id,itype.sLevel,1)
+    return ItemFactory.createEquipment(id,itype.sLevel,1)
   end
   
   
@@ -23,7 +23,7 @@ function Item.create(id)
 end
 
 
-function Item.createEquipment(id,level,quality)
+function ItemFactory.createEquipment(id,level,quality)
   local itype = data.item[id]
   if itype==nil then error("使用了不存在的itemid:"..id) end
   if itype.type ~= "equipment" then error("使用了非equipment id:"..id) end
@@ -41,7 +41,7 @@ end
 
 
 --根据等级差值随机选取材质。
-function Item.getRandomMaterial(dlevel)
+function ItemFactory.getRandomMaterial(dlevel)
   local mat_list = {val = {},weight={}}
   local maxweight = 0
   
@@ -67,10 +67,3 @@ function Item.getRandomMaterial(dlevel)
   end
 end
 
-local testEquip
-function Item.getTestEquipment()
-  if testEquip ==nil then
-    testEquip = Item.create("spear")
-  end
-  return testEquip
-end

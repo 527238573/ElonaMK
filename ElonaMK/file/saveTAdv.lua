@@ -14,13 +14,17 @@ function checkSaveFunc(func)
   if func_to_id[func]==nil then error("check save func failed!!") end --已经存过。
 end
 
-local saveClass= {}--各种class类型  
-function saveMetaType(name,metaT)
+local saveClass= {}--各种class类型 
+local ClassNil = {}
+function saveMetaType(name,metaT,nilT)
   saveClass[name] = metaT
   metaT.saveType = name
   metaT.__index = metaT
+  if nilT then ClassNil[name] = nilT end
 end
-
+function GetSavedClass()
+  return saveClass,ClassNil
+end
 
 local tableLookup--防止循环引用,查找table
 local subtables

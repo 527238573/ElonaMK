@@ -72,6 +72,8 @@ local function loadFrames()
   
   load1f("fire_ball",32,32,0.065)
   load1f("jump_cut",64,64,0.05,2,24,40)
+  load1f("round_slash",64,32,0.05,2,32,32)
+  load1f("hitSplash",32,32,0.05)
 end
 
 

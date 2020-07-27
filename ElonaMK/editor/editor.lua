@@ -1,7 +1,7 @@
 editor={}
 require"file/saveTAdv"
-local MapClass = require"elona/map/map"
-local OvermapClass = require"elona/map/overmap"
+local MapClass = Map
+local OvermapClass = Overmap
 local CameraClass = require"elona/camera/camera"
 
 editor.home = love.filesystem.getSourceBaseDirectory().."/map"
@@ -159,7 +159,7 @@ local function brushItem(x,y)
   end
   if editor.selctItemInfo ==nil then return end
   if(editor.map:inbounds(x,y)) then
-    local item = Item.create(editor.selctItemInfo.id)
+    local item = ItemFactory.create(editor.selctItemInfo.id)
     editor.map:spawnItem(item,x,y)
   end
 end

@@ -24,7 +24,7 @@ c.font_x18 = love.graphics.newFont("assets/fzfs.ttf",18);
 c.font_x16 = love.graphics.newFont("assets/fzfs.ttf",16);
 c.font_x14 = love.graphics.newFont("assets/fzfs.ttf",14);
 --c.font_x12 = love.graphics.newFont("assets/fzfs.ttf",12);
-
+--c.font_c16:setLineHeight(1.5)--字体行间距，整段使用 不改为秒
 
 c.source_dir = love.filesystem.getSource().."/"
 c.null_t = {}
@@ -41,6 +41,7 @@ function c.face(dx,dy)
 end
 
 function c.face_dir(face)
+  --debugmsg(tostring(face))
   return reverse_face_x[face],reverse_face_y[face]
 end
 
@@ -59,7 +60,7 @@ end
 
 
 function tl(str,str2)
-  return str
+  return str2
 end
 
 local xid = 0
@@ -337,4 +338,14 @@ end
 
 function c.faceGrow(grow,costTime,level)
   return math.floor(level*grow*costTime*2.25)*2
+end
+
+c.DES_WHITE = {0.9,0.9,0.9}
+c.DES_GREY = {0.7,0.7,0.7}
+c.DES_MAG = {0.5,0.5,0.9}
+c.DES_SKI = {0.9,0.6,0.3}
+
+function c.addDesLine(t,str,color)
+  table.insert(t,color)
+  table.insert(t,str)
 end

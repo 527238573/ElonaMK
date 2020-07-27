@@ -78,7 +78,7 @@ return function()
   
   --eui.Panel(panel_opt,x,y,w,h)
   
-  local tests = suit:S9Button("test",test_opt,1200,2,60,26)
+  local tests = suit:S9Button("captureAPI",test_opt,1200,2,60,26)
   
   local  mx,my = love.mouse.getX(),love.mouse.getY()
   mx,my = editor.camera:screenToModel(mx,my)
@@ -99,7 +99,8 @@ return function()
   if s_copyOvbtn and s_copyOvbtn.hit then editor.popwindow = copyOvermap_dlg end 
   
   if tests.hit then
-    print(love.math.random(0,-17.43))
-    io.flush()
+    --print(love.math.random(0,-17.43))
+    --io.flush()
+    editor.captureAPI()
   end
 end

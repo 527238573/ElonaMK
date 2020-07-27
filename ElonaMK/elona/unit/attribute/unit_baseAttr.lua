@@ -1,12 +1,12 @@
 g.main_attr = {
-  str = {name = tl("力量","Strength"),icon = 1,},
-  con = {name = tl("体质","Constitution"),icon = 2,},
-  dex = {name = tl("灵巧","Dexterity"),icon = 3,},
-  per = {name = tl("感知","Perception"),icon = 4,},
-  ler = {name = tl("学习","Learning"),icon = 5,},
-  wil = {name = tl("意志","Will"),icon = 6,},
-  mag = {name = tl("魔力","Magic"),icon = 7,},
-  chr = {name = tl("魅力","Charisma"),icon = 8,},
+  str = {name = tl("力量","Strength"),icon = 1,color ={1,1,1}},
+  con = {name = tl("体质","Constitution"),icon = 2,color ={1,1,1}},
+  dex = {name = tl("灵巧","Dexterity"),icon = 3,color ={1,1,1}},
+  per = {name = tl("感知","Perception"),icon = 4,color ={1,1,1}},
+  ler = {name = tl("学习","Learning"),icon = 5,color ={1,1,1}},
+  wil = {name = tl("意志","Will"),icon = 6,color ={1,1,1}},
+  mag = {name = tl("魔力","Magic"),icon = 7,color ={1,1,1}},
+  chr = {name = tl("魅力","Charisma"),icon = 8,color ={1,1,1}},
 }
 g.attr = { --attr 已有的成员：
   life = 100,

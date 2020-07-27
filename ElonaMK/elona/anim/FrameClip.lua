@@ -18,6 +18,9 @@ FrameClip = {
   rotation_speed = 0,--转速。
   rot_uv = 0,--
   rot_uv_speed = 0,--
+  ahlpa = 1,--透明度
+  
+  
 }
  saveMetaType("FrameClip",FrameClip)--注册保存类型
 --frameClip可以保存。
@@ -60,26 +63,29 @@ end
 function FrameClip:isFinish()
   if self.finished then return true end
   if self.loop then
-    
     return self.remaining_life<0
   else
     local frameT = self.type
     return self.time>frameT.secPerFrame*frameT.frameNum
   end
+  
 end
 
 function FrameClip:getImgQuad()
   local frameT = self.type
-  local frameIndex = math.floor(self.time/frameT.secPerFrame)+1
-  if frameIndex>frameT.frameNum then
-    if self.loop then
-      frameIndex = (frameIndex-1)%frameT.frameNum+1
-      self.time = self.time%(frameT.frameNum*frameT.secPerFrame)
+  local firstFrame = 1
+  local frameNum = frameT.frameNum
+  local isLoop = self.loop
+  local curTime = self.time
+  local frameIndex = math.floor(curTime/frameT.secPerFrame)
+  if frameIndex>=frameNum then
+    if isLoop then
+      frameIndex = (frameIndex)%frameNum
     else
-      frameIndex = frameT.frameNum--不循环就是最后一帧。
+      frameIndex = frameNum-1--不循环就是最后一帧。
     end
   end
-  return frameT.img,frameT[frameIndex]
+  return frameT.img,frameT[frameIndex+firstFrame]
 end
 
 function FrameClip:setTimeToFrame(frameindex)
@@ -90,4 +96,9 @@ end
 function FrameClip:setLoopPeriod(remaining_life)
   self.loop = true
   self.remaining_life = remaining_life
+end
+
+function FrameClip:setFrameUpdateFunc(func)
+  checkSaveFunc(func)
+  self.updateFunc = func
 end

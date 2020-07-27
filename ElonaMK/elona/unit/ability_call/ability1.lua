@@ -82,3 +82,18 @@ function abi_type.func(abi,source_unit,showmsg,target)
   chant_eff:addClip(stepback_anim(source_unit,target,chant_eff.remain)) --添加后撤动作
   return true,chant_time,target:getTargetLv()
 end
+--技能描述
+function abi_type.description(abi,unit)
+  local t = {}
+  --复制上面的，上面的伤害要改这里也要改
+  local clevel = abi:getCombinedLevel()
+  local chant_time = 1.2 --吟唱1.2
+  local dice =2
+  local base =10+c.baseGrow(0.5,chant_time,clevel)
+  local face =20+c.faceGrow(0.7,chant_time,clevel)
+  local mod = unit:getAbilityModifier(abi)
+  c.addDesLine(t,string.format(tl("吟唱%.1f秒，发射一枚火球，造成","Chant %.1f seconds and shoot a fireball, dealing "),chant_time),c.DES_WHITE)
+  c.addDesLine(t,string.format("(%dr%d%+d)x%.1f",dice,face,base,mod),c.DES_MAG)
+  c.addDesLine(t,tl("魔法火焰伤害。可能点燃地面。"," magic fire damage.May ignite the ground."),c.DES_WHITE)
+  return t
+end

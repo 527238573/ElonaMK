@@ -13,7 +13,7 @@ local niltable = { --默认值为nil的成员变量
   deal_dam = true,--造成伤害的结果。
 }
 
-saveMetaType("Damage",Damage)--注册保存类型
+saveMetaType("Damage",Damage,niltable)--注册保存类型
 Damage.__newindex = function(o,k,v)
   if Damage[k]==nil and niltable[k]==nil then error("使用了Damage的意料之外的值:"..k) else rawset(o,k,v) end
 end

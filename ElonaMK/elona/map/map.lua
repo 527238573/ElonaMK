@@ -1,4 +1,4 @@
-local Map = {
+Map = {
     --一些默认值
     w = 10,--宽
     h = 10, --高默认值，
@@ -134,5 +134,3 @@ function Map:updateAnim(dt)
 end
 
 
-
-return Map

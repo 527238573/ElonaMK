@@ -68,7 +68,7 @@ end
 function Player:enterMap()
   if self.delay>0.1 then return end
   if not wmap:can_enter(self.x,self.y,true) then return end
-  local map = Map.getrOrCreateWmapSquare(self.x,self.y)
+  local map = MapFactory.getrOrCreateWmapSquare(self.x,self.y)
   local face = self.status.face
   self.mc.status.face = face--朝向变化
   

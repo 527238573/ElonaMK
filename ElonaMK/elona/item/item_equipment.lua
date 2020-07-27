@@ -32,7 +32,7 @@ end
 
 function Item:randomMaterial(level)
   local dlevel = level - self.type.sLevel
-  local material = Item.getRandomMaterial(dlevel)
+  local material = ItemFactory.getRandomMaterial(dlevel)
   self.material_id = material.id
   rawset(self,"material",assert(material))
 end

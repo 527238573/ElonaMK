@@ -19,11 +19,11 @@ function Test.attackMember2()
 end
 
 function Test.genMonster()
-  local gentype = Unit.randomUnitTypeByLevel(10)
+  local gentype = UnitFactory.randomUnitTypeByLevel(10)
 
   for i=1,1 do
     local utype = gentype()
-    local unit = Unit.create(utype.id,nil,"wild")
+    local unit = UnitFactory.create(utype.id,nil,"wild")
     cmap:monsterSpawn(unit,p.mc.x,p.mc.y+3,false)
     unit:setFaction("wild")
   end

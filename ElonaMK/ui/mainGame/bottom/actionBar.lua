@@ -5,6 +5,9 @@ local frameimg = love.graphics.newImage("assets/ui/abilityBar.png")
 local coverimg = love.graphics.newImage("assets/ui/actionIconCover.png")
 
 
+local hoverdIndex
+local hoverdTime =0
+local abilityInfo = require"ui/component/info/abilityInfo"
 
 local shader_cooldown = c.shader_cooldown
 
@@ -43,12 +46,30 @@ local function OneEntry(index,entry,x,y)
   if suit:mouseReleasedOn(entry) then
     p:useActionBar(index)
   end
-
+  if suit:isHovered(entry) and suit:wasHovered(entry) then
+    hoverdIndex = index
+  end
 end
 
+local function showActionInfo(entry)
+  if entry ==nil then return end
+  if entry.etype =="ability" then
+    abilityInfo(entry.val,p.mc,love.mouse.getX(),love.mouse.getY(),300,false)
+  end
+end
 
 return function(x,y)
+  
+  --悬浮计数
+  if hoverdIndex then
+    hoverdTime = hoverdTime+love.timer.getDelta()
+    hoverdIndex = nil
+  else
+    hoverdTime =0
+  end
+  
   local mc_bar = p.mc.actionBar
+  
 
   local startX = x+8
   local startY = y+8
@@ -66,4 +87,6 @@ return function(x,y)
       love.graphics.setColor(1,1,1)
       love.graphics.draw(frameimg,x,y,0,2,2)
     end)
+  --悬浮大约0.5秒显示，不同帧率效果不同。
+  if hoverdIndex and hoverdTime>0.5 then showActionInfo(mc_bar[hoverdIndex]) end
 end
