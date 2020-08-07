@@ -60,7 +60,7 @@ end
 
 
 function tl(str,str2)
-  return str2
+  return str
 end
 
 local xid = 0

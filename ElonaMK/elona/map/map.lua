@@ -13,6 +13,7 @@ Map = {
     lastTurn = 0,--最后次更新的游戏内时间。载入新cmap时使用
     gen_id ="",--map生成及刷新相关函数的id。data.mapgen[gen_id] 
     can_exit = false,--能否在边缘退出。
+    unit_skewing = {},--超出本身1格范围的单位。
   }
   
 saveMetaType("Map",Map)--注册保存类型
@@ -26,6 +27,7 @@ function Map:preSave()
   self.transparent = nil
   self.transparent_dirty = true
   self.seen_dirty = true
+  self.unit_skewing =nil 
 end
 function Map:postSave()
   
@@ -131,6 +133,12 @@ function Map:updateAnim(dt)
   self.seen.time = self.seen.time+dt
   self:updateFrames(dt)
   self:updateProjectiles(dt)
+  
+  local unit_skewing = {}
+  for unit,_ in pairs(self.activeUnits) do
+    unit:check_skewing(unit_skewing)
+  end
+  self.unit_skewing = unit_skewing--记录每帧有偏移的单位
 end
 
 

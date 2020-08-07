@@ -180,8 +180,8 @@ saveFunction(apply_dam_round_slash)
 
 
 abi_type = data.ability["round_slash"]
-abi_type.cooldown = 0
-abi_type.costMana = 0
+abi_type.cooldown = 2
+abi_type.costMana = 3
 function abi_type.func(abi,source_unit,showmsg,target)
 
   local req_d = source_unit:requestDelay(1,"round_slash") 
@@ -226,4 +226,19 @@ function abi_type.func(abi,source_unit,showmsg,target)
   end
 
   return true,1.8,source_unit.level
+end
+
+
+function abi_type.description(abi,unit)
+  local t = {}
+  --复制上面的，上面的伤害要改这里也要改
+  local clevel = abi:getCombinedLevel()
+  local dice =2
+  local base =5+c.baseGrow(0.3,1,clevel)
+  local face =10+c.faceGrow(0.6,1,clevel)
+  local mod = unit:getAbilityModifier(abi)
+  c.addDesLine(t,tl("环形挥斩武器，造成","Slash weapon around a circle, dealing "),c.DES_WHITE)
+  c.addDesLine(t,string.format("(%dr%d%+d)x%.1f",dice,face,base,mod),c.DES_SKI)
+  c.addDesLine(t,tl("物理劈砍伤害。正面的目标会受到两次伤害。"," physical cut damage.The target directly in front will take damage twice."),c.DES_WHITE)
+  return t
 end

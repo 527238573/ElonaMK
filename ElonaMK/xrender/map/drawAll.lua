@@ -27,12 +27,13 @@ function render.drawSolid(camera,map)
   local endy = math.floor(camera.seen_maxY/squareL)+1 
   
   --从后向前，从左向右，
+  local queue =render.generateUnitQueue(camera,map)
   
   for y = endy,starty,-1 do
     render.drawLineSolidBlock(startx,endx,y,camera,map)
     render.drawLineItem(startx,endx,y,camera,map)
     render.drawLineFieldWithType(startx,endx,y,camera,map,"solid")
-    render.drawLineUnit(startx,endx,y,camera,map)
+    render.drawLineUnit(queue,y,camera,map)
     render.drawLineFieldWithType(startx,endx,y,camera,map,"air")
   end
 end

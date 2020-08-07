@@ -20,6 +20,14 @@ function Unit:get_anim_dxdy()
   return dx,dy
 end
 
+--检查是否存在偏移过大的情况。 如果超出1单位格，插入list中。
+function Unit:check_skewing(list)
+  local dx,dy= self.status.dx,self.status.dy
+  if math.abs(dx)>=64 or math.abs(dy)>=64 then
+    table.insert(list,self)
+  end
+end
+
 --对于挂在身上中心点的frame，获得脚根位置的偏移。
 function Unit:get_foot_offset()
   local anim = self:get_unitAnim() --anim数据
