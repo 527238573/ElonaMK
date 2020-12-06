@@ -65,6 +65,8 @@ local function w2u(wstr, code)
 	return ffi.string(buf)
 end
 
+
+--转化windows下的汉字
 c.u2w = u2w
 c.w2u = w2u
 local CP_UTF8 = 65001

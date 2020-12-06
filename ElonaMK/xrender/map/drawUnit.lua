@@ -109,7 +109,6 @@ function render.generateUnitQueue(camera,map)
   for y = endy,starty,-1 do
     table.insert(queue,{lastDy = -999999})
   end
-
   --获得数据，插入
   local function insertUnit(unit,status,dy,liney)
     if not (liney<= endy and liney>= starty) then return end
@@ -128,39 +127,20 @@ function render.generateUnitQueue(camera,map)
       table.insert(drawSequence,todraw)--罕见的没找到的情况。
     end
   end
-
   
-  local function insertSquare(x,y,map)
-    if not map:inbounds(x,y) then return end 
-    local unit = map:unit_at(x,y)
-    if unit ==nil then return end
-    local status = unit:get_anim_status()--包含rate,dx ,dy ,face ,rot ,scaleX,scaleY,
-    local dy = status.dy
-    local liney = unit.y +math.floor((dy+32)/64)
-    local linex= unit.x + math.floor((status.dx+32)/64)
+  --改为搜索单位列表。、、activeUnits内已经清理deadunit
+  --搜索单位列表对可见性判断准确且逻辑结构不复杂，原来的废弃。
+  for unit,_ in pairs(map.activeUnits) do
+    local status = unit.status--包含rate,dx ,dy ,face ,rot ,scaleX,scaleY,
+    local x,y = unit.x,unit.y
+    local dx,dy = status.dx,status.dy
+    local liney = y + math.floor((dy+32)/64)
+    local linex = x + math.floor((dx+32)/64)
     if  map:isMCSeen(x,y) or map:isMCSeen(linex,liney) then --逻辑处于可见区域或实际处于可见
       insertUnit(unit,status,dy,liney)
     end
   end
-
-  for y = endy,starty,-1 do
-    for x = startx,endx do
-      insertSquare(x,y,map)
-    end
-  end
   
-  local skewing_list = map.unit_skewing
-  for _,unit in ipairs(skewing_list) do
-    if unit.x<startx or unit.x>endx or unit.y<starty or unit.y >endy then
-      local status = unit:get_anim_status()--包含rate,dx ,dy ,face ,rot ,scaleX,scaleY,
-      local dy = status.dy
-      local liney = unit.y +math.floor((dy+32)/64)
-      local linex= unit.x + math.floor((status.dx+32)/64)
-      if map:isMCSeen(linex,liney) then --位移地点
-        insertUnit(unit,status,dy,liney) --尝试插入
-      end
-    end
-  end
   
   return queue
 end

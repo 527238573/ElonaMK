@@ -13,7 +13,6 @@ Map = {
     lastTurn = 0,--最后次更新的游戏内时间。载入新cmap时使用
     gen_id ="",--map生成及刷新相关函数的id。data.mapgen[gen_id] 
     can_exit = false,--能否在边缘退出。
-    unit_skewing = {},--超出本身1格范围的单位。
   }
   
 saveMetaType("Map",Map)--注册保存类型
@@ -27,7 +26,6 @@ function Map:preSave()
   self.transparent = nil
   self.transparent_dirty = true
   self.seen_dirty = true
-  self.unit_skewing =nil 
 end
 function Map:postSave()
   
@@ -101,18 +99,8 @@ function Map:updateRL(dt)
   end
   
   
-  --清理死去或离开地图的unit。 activeUnits的unit只能由这里清理。
-  local leaveUnits = {}
-  for unit,_ in pairs(self.activeUnits) do
-    if unit:is_dead() or not self:inbounds(unit.x,unit.y) or unit.map~=self  then 
-      table.insert(leaveUnits,unit)
-    end
-  end
-  for _,unit in ipairs(leaveUnits) do
-    self.activeUnits[unit]=nil
-    self.activeUnit_num = self.activeUnit_num-1
-  end
-  
+  --清理field。updateAnim里清理更保险，但这里会少清理几次。
+  --绝大多数情况都是由Feild时间到了被清理。
   local leaveFields = {}
   for field,_ in pairs(self.activeFields) do
     if field:is_end() or field.map~=self  then 
@@ -134,11 +122,22 @@ function Map:updateAnim(dt)
   self:updateFrames(dt)
   self:updateProjectiles(dt)
   
-  local unit_skewing = {}
+  
+  --清理死去或离开地图的unit。 activeUnits的unit只能由这里清理。
+  --在这里清理最保险。updateProjectiles可能会杀死一些unit，updateRL不更新就无法清理。
+  --清理完成后进入render环节，这里清理了activeUnits里不该绘制的死unit
+  local leaveUnits = {}
   for unit,_ in pairs(self.activeUnits) do
-    unit:check_skewing(unit_skewing)
+    if unit:is_dead() or not self:inbounds(unit.x,unit.y) or unit.map~=self  then 
+      table.insert(leaveUnits,unit)
+    end
   end
-  self.unit_skewing = unit_skewing--记录每帧有偏移的单位
+  for _,unit in ipairs(leaveUnits) do
+    self.activeUnits[unit]=nil
+    self.activeUnit_num = self.activeUnit_num-1
+  end
+  
+  
 end
 
 
