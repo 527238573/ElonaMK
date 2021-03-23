@@ -27,17 +27,34 @@ function Unit:initTraits(race,class)
   --三大基础数值
   local list = self.traits
   local utype = self.type
-  local function baseTrait(baseid)
-    if race[baseid]~=0 then
-      local tra = Trait.new(baseid)
-      tra.mod_t = {[baseid] = race[baseid]}
-      tra.level = race[baseid]>0 and 1 or 2
-      table.insert(list,tra)
+  
+  --初始化种族天赋trait
+  local tra = Trait.new("native_trait")
+  local findnum = 0
+  local good=0
+  local nativeList ={}
+  tra.mod_t = {}
+  local function addModAndName(mod_id,name)
+    local val = race[mod_id]
+    if val~=0 then
+      table.insert(nativeList,string.format("%s%+d",name,val))
+      findnum = findnum+1
+      tra.mod_t[mod_id] = val
+      good = good +val
     end
   end
-  baseTrait("dodge_mod")
-  baseTrait("melee_mod")
-  baseTrait("range_mod")
+  addModAndName("DEF",tl("护甲","Armor"))
+  addModAndName("MGR",tl("魔抗","Magic Resist"))
+  addModAndName("atk_lv",tl("攻击","Attack"))
+  addModAndName("dodge_lv",tl("闪避","Dodge"))
+  addModAndName("block_lv",tl("格挡","Block"))
+  addModAndName("hit_lv",tl("命中","Hit"))
+  addModAndName("crit_lv",tl("暴击","Crital"))
+  if findnum>0 then
+    tra.description = table.concat(nativeList,";")
+    table.insert(list,tra)
+    tra.good = good>0
+  end
   local all_tra = {}
   for tra_id,_ in pairs(utype.traits) do
     all_tra[tra_id] = true

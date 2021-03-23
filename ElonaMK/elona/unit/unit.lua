@@ -4,8 +4,8 @@ Unit = {
     type = nil,--unit的类型。
     id = "null", --type的id
     name = "noname",
-    x=0, --位置。
-    y=0,
+    x=0, --位置。--只能在map_unit 修改，其他情况只读
+    y=0, --位置。--只能在map_unit 修改，其他情况只读
     level = 1,--等级
     exp = 0,--经验。
     hp = 0,--生命
@@ -25,7 +25,7 @@ Unit = {
     delay_barmax = 0.1,--可视化delay的总时间。
     delay_barname = "noname",--可视化delay的可见名称。
     protrait = 0,--头像id？
-    weapon_list= {AR=0,MR =0,totalWeight = 0,melee ={{unarmed = true}},range={}},--临时数据结构
+    weapon_list= {DEF=0,MGR =0,totalWeight = 0,melee ={{unarmed = true}},range={}},--临时数据结构
     faction = 5,--所属势力，默认wild，（敌对的）
     dead = false,--死亡状态，
     turn_past =0,--turn检查时间计数。（RL时间）
@@ -49,7 +49,8 @@ local niltable = { --默认值为nil的成员变量
   
   delayAnim_list = true,--延迟动画调用。里面是function 。 
   delayRL_list = true,--延迟RL调用
-  map=true,--父地图的状态。
+  map=true,--父地图的状态。--只能在map_unit 修改，其他情况只读
+  next_unit = true, -- 同一格的单位串联链表 --只能在map_unit 修改，其他情况只读
   target = true,--目标。mc的目标用蓝色的框标注。 切换目标时必须创建新的table，而不是给旧的赋值。
   
   abilities_level = true, --技能等级列表。删除后的技能，会保留技能等级。技能次数用完或装备移除等，都会保留技能等级。
@@ -65,6 +66,7 @@ end
 
 function Unit:preSave()
   self.target= nil --清除引用，
+  
 end
 
 --读取完成后自动调用。不再使用index。id是字符串，永不变化。
@@ -243,7 +245,7 @@ function Unit:insertRLDelayFunc(delay,func,...)
   list[#list+1] = onet
 end
 
---清理 延迟调用。。。。
+--清理 延迟调用。。。。这个需要注意。里面携带引用。需要适时清理
 function Unit:clearDelayFunc()
   self.delayAnim_list = {}
   self.delayRL_list = {}

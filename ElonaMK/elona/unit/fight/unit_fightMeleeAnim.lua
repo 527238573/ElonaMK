@@ -155,6 +155,83 @@ local function bashingEffect(unit,dx,dy,hit_dx,hit_dy,frame_delay)
   unit:addFrameClip(frame)
 end
 
+local function heavyBashingEffect(unit,dx,dy,hit_dx,hit_dy,frame_delay)
+  g.playSound_delay("bash_heavy",unit.x,unit.y,frame_delay) 
+  local frame = FrameClip.createUnitFrame("bash_heavy",hit_dx,hit_dy,frame_delay)
+  frame.drop_to_map = true
+  if dx<0 then 
+    --frame.flipX = true 
+    if dy<0 then
+      if rnd()>0.6 then 
+        frame.flipY = true 
+        frame.rotation = rnd_float(-math.pi*0.4,-math.pi*0.2)
+      else
+        frame.rotation = rnd_float(0,-math.pi*0.3)
+      end
+    elseif dy==0 then
+      if rnd()>0.6 then 
+        frame.flipY= true  
+        frame.rotation = rnd_float(-math.pi*0.1,math.pi*0.15)
+      else
+        frame.rotation = rnd_float(-math.pi*0.1,math.pi*0.3)
+      end
+    else
+      if rnd()>0.6 then 
+        frame.flipY = true
+        frame.rotation = rnd_float(math.pi*0.1,math.pi*0.3)
+      else
+        frame.rotation = rnd_float(math.pi*0.1,math.pi*0.4)
+      end
+    end
+
+  elseif dx==0 then
+    if dy<0 then
+      
+      if rnd()>0.5 then 
+        frame.flipX = true 
+        frame.rotation = rnd_float(math.pi*0.3,math.pi*0.6)
+      else
+        frame.rotation = rnd_float(-math.pi*0.36,-math.pi*0.6)
+      end
+    else
+        frame.flipY = true 
+        if rnd()>0.5 then 
+          frame.rotation = rnd_float(math.pi*0.37,math.pi*0.6)
+        else
+          frame.flipX = true 
+          frame.rotation = rnd_float(-math.pi*0.3,-math.pi*0.6)
+        end
+    end
+
+  else
+    frame.flipX = true 
+    if dy<0 then
+      if rnd()>0.6 then 
+        frame.flipY = true 
+        frame.rotation = rnd_float(math.pi*0.4,math.pi*0.2)
+      else
+        frame.rotation = rnd_float(0,math.pi*0.3)
+      end
+    elseif dy==0 then
+      if rnd()>0.6 then 
+        frame.flipY= true  
+        frame.rotation = rnd_float(math.pi*0.1,-math.pi*0.15)
+      else
+        frame.rotation = rnd_float(math.pi*0.1,-math.pi*0.3)
+      end
+    else
+      if rnd()>0.6 then 
+        frame.flipY = true
+        frame.rotation = rnd_float(-math.pi*0.1,-math.pi*0.3)
+      else
+        frame.rotation = rnd_float(math.pi*-0.5,-math.pi*0.15)
+      end
+    end
+  end
+  unit:addFrameClip(frame)
+end
+
+
 local function cuttingEffect(unit,dx,dy,hit_dx,hit_dy,frame_delay)
   g.playSound_delay("cut2_hit",unit.x,unit.y,frame_delay) 
   local frame = FrameClip.createUnitFrame("cut_hit3",hit_dx,hit_dy,frame_delay)
@@ -232,6 +309,77 @@ local function cuttingEffect(unit,dx,dy,hit_dx,hit_dy,frame_delay)
   unit:addFrameClip(frame)
 end
 
+
+local function heavyCuttingEffect(unit,dx,dy,hit_dx,hit_dy,frame_delay)
+  g.playSound_delay("cut2_hit",unit.x,unit.y,frame_delay) 
+  local frame = FrameClip.createUnitFrame("cut_heavy2",hit_dx,hit_dy,frame_delay)
+  frame.drop_to_map = true
+  if dx<0 then 
+    if dy<0 then
+      if rnd()>0.5 then 
+        frame.flipY = true 
+        frame.rotation = rnd_float(-math.pi*0.9,-math.pi*0.5)
+      else
+        frame.rotation = rnd_float(math.pi*0.0,math.pi*0.3)
+      end
+    elseif dy==0 then
+      if 
+        rnd()>0.5 then frame.flipY = true  
+        frame.rotation = rnd_float(-math.pi*0.6,-math.pi*0.3)
+      else
+        frame.rotation = rnd_float(math.pi*0.2,math.pi*0.6)
+      end
+    else
+      if rnd()>0.5 then 
+        frame.flipY = true
+        frame.rotation = rnd_float(math.pi*0.1,-math.pi*0.25)
+      else
+        frame.rotation = rnd_float(math.pi*0.5,math.pi*0.8)
+      end
+    end
+  elseif dx==0 then
+    if dy<0 then
+      if rnd()>0.5 then 
+        frame.flipX = true 
+        frame.rotation = rnd_float(-math.pi*0.1,math.pi*0.2)
+      else
+        frame.rotation = rnd_float(math.pi*0.1,-math.pi*0.2)
+      end
+    else
+      
+        frame.flipY = true 
+        frame.rotation = rnd_float(-math.pi*0.25,math.pi*0.25)
+        if rnd()>0.5 then 
+          frame.flipX = true  
+        end
+    end
+  else
+    frame.flipX = true 
+    if dy<0 then
+      if rnd()>0.5 then 
+        frame.flipY = true 
+        frame.rotation = rnd_float(math.pi*0.9,math.pi*0.5)
+      else
+        frame.rotation = rnd_float(math.pi*0.0,-math.pi*0.3)
+      end
+    elseif dy==0 then
+      if 
+        rnd()>0.5 then frame.flipY = true  
+        frame.rotation = rnd_float(math.pi*0.6,math.pi*0.3)
+      else
+        frame.rotation = rnd_float(-math.pi*0.2,-math.pi*0.6)
+      end
+    else
+      if rnd()>0.5 then 
+        frame.flipY = true
+        frame.rotation = rnd_float(-math.pi*0.05,math.pi*0.25)
+      else
+        frame.rotation = rnd_float(-math.pi*0.5,-math.pi*0.8)
+      end
+    end
+  end
+  unit:addFrameClip(frame)
+end
 
 
 local function stabbingEffect(unit,dx,dy,hit_dx,hit_dy,frame_delay)
@@ -463,15 +611,20 @@ function Unit:melee_hit_animation(source_u,delay,hit_effect)
   local dx,dy =  self.x -source_u.x ,self.y - source_u.y
   local frame_delay =  math.max(0,delay-0.1)--小于0.1无delay
   local hit_dx,hit_dy = (rnd()-0.5)*(8+12*math.abs(dy))-12*dx,(rnd()-0.5)*(8+12*math.abs(dx))-12*dy
-
+  
+  
   if hit_effect =="unarmed" then
     unarmedEffect(self,dx,dy,hit_dx,hit_dy,frame_delay)
   elseif hit_effect =="light_bash" then
     lightbashEffect(self,dx,dy,hit_dx,hit_dy,frame_delay)
   elseif hit_effect =="bash" then
     bashingEffect(self,dx,dy,hit_dx,hit_dy,frame_delay)
+  elseif hit_effect =="heavy_bash" then
+    heavyBashingEffect(self,dx,dy,hit_dx,hit_dy,frame_delay)
   elseif hit_effect =="cut" then
     cuttingEffect(self,dx,dy,hit_dx,hit_dy,frame_delay)
+  elseif hit_effect =="heavy_cut" then
+    heavyCuttingEffect(self,dx,dy,hit_dx,hit_dy,frame_delay)
   elseif hit_effect =="stab" then
     stabbingEffect(self,dx,dy,hit_dx,hit_dy,frame_delay)
   elseif hit_effect =="spear" then

@@ -24,6 +24,7 @@ function Unit:seesUnit(unit)
   end
 end
 
+
 --用于 展示的短名。如 少女
 function Unit:getShortName()
   return self.type.name

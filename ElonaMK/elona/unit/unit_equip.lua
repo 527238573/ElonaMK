@@ -8,9 +8,9 @@ function Unit:canWearItem(toEquip,slot,interactive)
   end
   local equiptype = toEquip:getEquipType()
   if slot ==1 then
-    return equiptype == "mainhand" or equiptype == "hand"
+    return equiptype == "mainhand" or equiptype == "hand" or equiptype == "shield"
   elseif slot ==2 then
-    return equiptype == "offhand" or equiptype == "hand"
+    return equiptype == "offhand" or equiptype == "hand" or equiptype == "shield"
   elseif slot ==3 then
     return equiptype == "body"
   elseif slot ==4 or slot ==5 then
@@ -72,28 +72,21 @@ function Unit:takeoffEquipment(slot,interactive)
   end
 end
 
---更换装备之后。直接调用此函数。
-function Unit:on_equip_change()
-  self:buildWeaponList()
-  --重读固有加成属性。（装备和基本属性和特性）
-  self:reloadBasisBonus()
-end
 
-
-
-function Unit:buildWeaponList()
+--做成local function
+local function buildWeaponList(unit)
   local weapon_list = {melee={},range = {}}
-  --统计ar，mr，重量 武器
-  local ar =0
-  local mr = 0
+  --统计def,mgr，重量 武器
+  local DEF =0
+  local MGR =0
   local totalWeight = 0
   
   for i=1,5 do
-    local eq = self.equipment[i]
+    local eq = unit.equipment[i]
     if eq  then--有装备
       totalWeight = totalWeight+eq:getWeight()
-      ar = ar+eq:getAR()
-      mr = mr+eq:getMR()
+      DEF = DEF + eq:getDEF()
+      MGR = MGR + eq:getMGR()
       if eq:isWeapon() then
         if eq:isMeleeWeapon() then
           local weapon = {item = eq,isMelee = true}
@@ -106,50 +99,75 @@ function Unit:buildWeaponList()
       end
     end
   end
-  if #(weapon_list.melee) ==0 then --当没有可用的近战武器，以徒手攻击为武器。
-    local weapon = {unarmed = true,isMelee = true} --代表。徒手格斗。具体数据实时计算
-    table.insert(weapon_list.melee,weapon)
-  end
   
-  weapon_list.AR =ar
-  weapon_list.MR = mr
-  weapon_list.totalWeight=totalWeight
-  self.weapon_list = weapon_list
-end
-
---刷新一下weapon的相关数据，用于显示。实际战斗不会用这些，而是取实时值。
---[[
-function Unit:loadWeaponListData()
-  local meleeList = self.weapon_list.melee
+  local meleeList = weapon_list.melee
+  
+  --标示出有没有装备shield
+  weapon_list.use_shield =false
   for i=1,#meleeList do
-    local oneWeapon = meleeList[i]
-    if oneWeapon.unarmed then
-      local dice_num,dice_face,base_atk = self:getUnarmedAtkData()
-      oneWeapon.dice = dice_num
-      oneWeapon.face = dice_face
-      oneWeapon.base = base_atk +self:getWeaponBaseBonus(oneWeapon)
-      oneWeapon.modifier = self:getWeaponModifier(oneWeapon)
-    else
-      local weaponItem = oneWeapon.item
-      oneWeapon.dice = weaponItem.diceNum
-      oneWeapon.face = weaponItem.diceFace
-      oneWeapon.base = weaponItem.baseAtk +self:getWeaponBaseBonus(oneWeapon)
-      oneWeapon.modifier = self:getWeaponModifier(oneWeapon)
+    if meleeList[i].item:hasFlag("SHIELD") then
+      weapon_list.use_shield = true
+      break
     end
   end
   
-  local rangeList = self.weapon_list.range
-  for i=1,#rangeList do
-    local oneWeapon = rangeList[i]
-    local weaponItem = oneWeapon.item
-    oneWeapon.dice = weaponItem.diceNum_range
-    oneWeapon.face = weaponItem.diceFace_range
-    oneWeapon.base = weaponItem.baseAtk_range +self:getWeaponBaseBonus(oneWeapon)
-    oneWeapon.modifier = self:getWeaponModifier(oneWeapon)
-    oneWeapon.pellet = weaponItem:getPellet()
+  if #(meleeList) ==0 then --当没有可用的近战武器，以徒手攻击为武器。
+    local weapon = {unarmed = true,isMelee = true} --代表。徒手格斗。具体数据实时计算
+    table.insert(meleeList,weapon)
+  elseif meleeList[1].item:hasFlag("SHIELD") then--首位是shield
+    --shield不会优先作为首位武器，除非没有其他武器选择
+    for i=2,#meleeList do
+      local curW = meleeList[i]
+      if not curW.item:hasFlag("SHIELD") then --后续找到一个不是shield的武器
+        table.remove(meleeList,i)
+        table.insert(meleeList,1,curW)--插入首位
+        --debugmsg("change melee weapon pos")
+        break
+      end
+    end
   end
   
+  
+  --计算防御等级
+  local body_def = 0
+  local eq = unit.equipment[3] --body
+  if eq  then
+    body_def =  eq.level
+  end
+  body_def = unit:getBaseRoundLevel(body_def)
+  weapon_list.DEF = body_def+DEF
+  weapon_list.MGR = body_def+MGR
+  weapon_list.totalWeight=totalWeight
+  unit.weapon_list = weapon_list
 end
---]]
+
+
+--更换装备之后。直接调用此函数。
+function Unit:on_equip_change()
+  buildWeaponList(self)
+  --重读固有加成属性。（装备和基本属性和特性）
+  self:reloadBasisBonus()
+end
+
+--是否装备了shield
+function Unit:isUsingShield()
+  return self.weapon_list.use_shield
+end
+
+
+function Unit:getBaseRoundLevel(eq_level)
+  local cha = math.abs(eq_level-self.level)
+  
+  if cha<=20 then
+    return eq_level
+  end
+  
+  local newcha = math.floor(math.sqrt(cha-20))+20
+  
+  debugmsg("eq outrange!"..cha.."new"..newcha)
+  return eq_level>self.level and self.level+newcha or self.level- newcha
+end
+
+
 
 

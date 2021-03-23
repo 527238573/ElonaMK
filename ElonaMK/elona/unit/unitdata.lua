@@ -26,7 +26,7 @@ local function loadClass()
       if key=="id" then
         dataT.id = val
       elseif  key=="name" then
-        dataT.name = val
+        dataT.name = c.gbk2utf8(val)
       elseif  key=="str" or key=="con" or key=="dex" or key=="per" or key=="ler"or key=="wil" or key=="mag"or key=="chr"then
         val = tonumber(val) or 0
         assert(val>=0 and val<=15)
@@ -76,19 +76,27 @@ local function loadRace()
       if key=="id" then
         dataT.id = val
       elseif  key=="name" then
-        dataT.name = val
+        dataT.name = c.gbk2utf8(val)
       elseif  key=="life" then
         dataT[key] = tonumber(val) or 100
       elseif  key=="mana" then
         dataT[key] = tonumber(val) or 100
       elseif  key=="speed" then
         dataT[key] = tonumber(val) or 100
-      elseif  key=="dodge_mod" then
-        dataT[key] = math.min(0.5,math.max(-0.5, tonumber(val) or 0))
-      elseif  key=="melee_mod" then
-        dataT[key] = math.min(0.5,math.max(-0.5, tonumber(val) or 0))
-      elseif  key=="range_mod" then
-        dataT[key] = math.min(0.5,math.max(-0.5, tonumber(val) or 0))
+      elseif  key=="DEF" then
+        dataT[key] = tonumber(val) or 0
+      elseif  key=="MGR" then
+        dataT[key] = tonumber(val) or 0
+      elseif  key=="atk_lv" then
+        dataT[key] = tonumber(val) or 0
+      elseif  key=="dodge_lv" then
+        dataT[key] = tonumber(val) or 0
+      elseif  key=="block_lv" then
+        dataT[key] = tonumber(val) or 0
+      elseif  key=="hit_lv" then
+        dataT[key] = tonumber(val) or 0
+      elseif  key=="crit_lv" then
+        dataT[key] = tonumber(val) or 0
       elseif  key=="height" then
         dataT[key] = tonumber(val) or 150
       elseif  key=="weight" then
@@ -122,28 +130,6 @@ local function loadRace()
   debugmsg("load race Nubmer:"..(index-1))
   file:close()
   
-  
-  --loadname
-  file = assert(io.open(c.source_dir.."data/unit/race_name.csv","r"))
-  line = file:read()
-  attrName = string.split(line,",") 
-  attrName[1] = "id" --utf8头，需要修正
-  line = file:read()
-  while(line) do
-    local strDH = string.split(line,",") 
-    local dataT = nil
-    for i=1,#strDH do
-      local val = strDH[i]
-      local key = attrName[i] 
-      if key=="id" then
-        dataT = datarace[val]
-      elseif  key=="name" then
-        dataT[key] = val
-      end
-    end
-    line = file:read()
-  end    
-  file:close()
 end
 
 local function checkSkillType(skills)
@@ -255,6 +241,6 @@ return function ()
   loadUnitType()
   loadUnitFace()
   
-  data.race["eulderna"].dodge_mod =0.1
-  data.race["eulderna"].melee_mod =-0.1
+  data.race["roran"].dodge_lv =5
+  data.race["roran"].atk_lv =-1
 end

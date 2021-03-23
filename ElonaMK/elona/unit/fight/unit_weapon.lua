@@ -1,145 +1,186 @@
 
+
+local function getAtkLevel(unit,weapon)
+  local weaponItem = weapon.item
+  local atkLevel = 0
+  if weapon.unarmed then
+    atkLevel = unit:getSkillLevel("martial_arts")
+  else
+    atkLevel = weaponItem:getAttackLevel()
+  end
+  --将装备与人物等级约近。
+  atkLevel = unit:getBaseRoundLevel(atkLevel)
+  --添加装备 buff效果
+  --允许使用 外来攻击加成   枪械等自动连发武器不允许。
+  if weapon.unarmed or (weaponItem and weaponItem:UseAttakLevelBonus()) then
+    atkLevel = atkLevel+unit:getBonus("atk_lv")
+  end
+  return atkLevel
+end
+
+local function getWeaponSkillLevel(unit,weapon)
+  --最多关联两个skill
+  local skill1,skill2 ="martial_arts",nil
+  local weaponItem = weapon.item--可能为空。
+  if weaponItem then
+    skill1,skill2 = weaponItem:getWeaponSkill(weapon.isMelee)
+  end
+  
+  local skill_level=unit:getSkillLevel(skill1)
+  if skill2 then
+    local l = unit:getSkillLevel(skill2)
+    skill_level = (skill_level+l)/2
+  end
+  return skill_level
+end
+
+local function getCritLevel(unit,weapon)
+  local weaponItem = weapon.item
+  local critLevel = getWeaponSkillLevel(unit,weapon)
+  if weaponItem then
+    critLevel = critLevel +weaponItem:getCritBonus()
+  end
+  critLevel = critLevel+ unit:getBonus("crit_lv")
+  
+  local ulevel = unit.level
+  local dex = unit:cur_dex()
+  local ler = unit:cur_ler()
+  local attrlv = (dex*0.5+ler*0.5)/c.averageAttrGrow --计算出属性的平均等级
+  local val = (attrlv-ulevel)/(ulevel+3) -- -1到2以上  常见-0.5 到1  
+  
+  critLevel = critLevel + val*10 -- (属性一般 -5到+10， 最大-10到+20以上)val*10的时候
+  
+  return critLevel
+end
+
+local function getHitLevel(unit,weapon)
+--获取命中等级。传输的是装备的武器条目。
+  --根据武器等级来决定命中等级。
+  local hitLevel = getWeaponSkillLevel(unit,weapon)--基本
+  --算上装备本身的加成。
+  if weapon.item then
+    hitLevel = hitLevel +weapon.item:getHitBonus()
+  end
+  --算上装备和buff的
+  hitLevel = hitLevel+ unit:getBonus("hit_lv")
+  --可能有其他
+  return hitLevel
+end
+
 --武器攻击倍乘系数。
-function Unit:getWeaponModifier(weapon)
+local function getWeaponModifier(unit,weapon)
   local m_attr = 0
   if weapon.unarmed then
-    m_attr = self:cur_str()
+    m_attr = unit:cur_str()
   else
-    local weaponItem  =weapon.item
-    local attr1 
-    local weaponskill
-    if weapon.isMelee  then
-      weaponskill = weaponItem.type.weapon_skill_a[1] or "martial_arts" --不能为空。
-      attr1 = self:cur_str()
-    else
-      weaponskill = weaponItem.type.weapon_skill_range_a[1] or "throw" --不能为空。
-      attr1 = self:cur_per()
-    end
-    local attr2 = self:cur_main_attr(g.skills[weaponskill].main_attr)
+    
+    local weaponskill = weapon.item:getWeaponSkill(weapon.isMelee)--只获取第一个skillid
+    local attr1 = weapon.isMelee and unit:cur_str() or unit:cur_per()
+    
+    local attr2 = unit:cur_main_attr(g.skills[weaponskill].main_attr)
     m_attr = attr1*0.6 +attr2*0.4 
   end
   if m_attr<20 then
-    return 0.95+m_attr*(m_attr+1)/2*0.005
+    return 0.53+m_attr*(m_attr+1)/2*0.007
   else
     return m_attr*0.1
   end
 end
-
-function Unit:getWeaponBaseBonus(weapon)
-  local skill1,skill2 --最多关联两个skill
-  local weaponItem --可能为空。
-  if weapon.unarmed then
-    skill1 = "martial_arts"--格斗技能
-  else
-    weaponItem = weapon.item
+--获得三项
+local function getWeaponDFB(unit,weapon)
+  if weapon.item then
     if weapon.isMelee then
-      skill1 = weaponItem.type.weapon_skill_a[1] or "martial_arts" --不能为空。
-      skill2 = weaponItem.type.weapon_skill_a[2] --最多两个。多了不算在内。
+      return weapon.item:getMeleeDFB()
     else
-      skill1 = weaponItem.type.weapon_skill_range_a[1] or "throw" --不能为空。
-      skill2 = weaponItem.type.weapon_skill_range_a[2] --最多两个。多了不算在内。
+      return weapon.item:getRangeDFB()
     end
   end
-  local skill_level=self:getSkillLevel(skill1)
-  if skill2 then
-    local l = self:getSkillLevel(skill2)
-    skill_level = (skill_level+l)/2
+  --空手格斗
+  return 2,6,3
+end
+
+--取得一个实用的damageins
+function Unit:getWeaponDamageInstance(weapon)
+  local dam_ins = setmetatable({},Damage)
+  dam_ins.hit_lv = getHitLevel(self,weapon)
+  dam_ins.atk_lv = getAtkLevel(self,weapon)
+  dam_ins.crit_lv = getCritLevel(self,weapon)
+     --计算伤害
+  local mod = getWeaponModifier(self,weapon)
+  local dice,face,base = getWeaponDFB(self,weapon)
+  local roll = 0
+  if dice>0 then
+    for i=1,dice do
+      roll = roll+rnd()
+    end
+    roll = roll/dice
   end
-  return math.floor(skill_level *0.2)
+  dam_ins.dam = (base + roll*face) *mod
+  return dam_ins
+end
+
+--用于UI显示 返回两个str， name dmgstr
+function Unit:getWeaponDamStr(weapon)
+  local oneWeapon = weapon
+  if weapon.isMelee then
+    local dice,face,base = getWeaponDFB(self,oneWeapon)
+    local modifier = getWeaponModifier(self,weapon)
+    local name = oneWeapon.unarmed and tl("格斗","Unarmed") or oneWeapon.item:getShortName()
+    local cost = self:melee_cost(oneWeapon)
+    local dps = (face/2 +base)*modifier /cost
+    local hitLevel = getHitLevel(self,oneWeapon)-self.level
+    local dmgstr
+    if base ==0 then 
+      dmgstr = string.format("%dr%d x%.1f (%.1f,%d)",dice,face,modifier,dps,hitLevel)
+    elseif base>0 then
+      dmgstr = string.format("%dr%d+%d x%.1f (%.1f,%d)",dice,face,base,modifier,dps,hitLevel)
+    elseif base<0 then
+      dmgstr = string.format("%dr%d%d x%.1f (%.1f,%d)",dice,face,base,modifier,dps,hitLevel)
+    end
+    return name,dmgstr
+  else
+    local weaponItem = oneWeapon.item
+    local dice,face,base = getWeaponDFB(self,oneWeapon)
+    local modifier = getWeaponModifier(self,weapon)
+    local pellet = weaponItem:getPellet()
+    local cost = self:shoot_cost(oneWeapon)
+    local dps = (face/2 +base)*modifier /cost *pellet
+    local hitLevel = getHitLevel(self,oneWeapon)-self.level
+    local name = weaponItem:getShortName()
+    local dmgstr
+    if base ==0 then 
+      dmgstr = string.format("%dr%d",dice,face)
+    elseif base>0 then
+      dmgstr = string.format("%dr%d+%d",dice,face,base)
+    elseif base<0 then
+      dmgstr = string.format("%dr%d%d",dice,face,base)
+    end
+    if pellet>1 then
+      dmgstr = string.format("%dx(%s) x%.1f (%.1f,%d)",pellet,dmgstr,modifier,dps,hitLevel)
+    else
+      dmgstr = string.format("%s x%.1f (%.1f,%d)",dmgstr,modifier,dps,hitLevel)
+    end
+    return name,dmgstr
+  end
 end
 
 
---获取命中等级。传输的是装备的武器条目。
-function Unit:getHitLevel(weapon)
-  --根据武器类型取得等级来决定命中等级。
-  local skill1,skill2 --最多关联两个skill
-  local weaponItem --可能为空。
-  if weapon.unarmed then
-    skill1 = "martial_arts"--格斗技能
-  else
-    weaponItem = weapon.item
-    if weapon.isMelee then
-      skill1 = weaponItem.type.weapon_skill_a[1] or "martial_arts" --不能为空。
-      skill2 = weaponItem.type.weapon_skill_a[2] --最多两个。多了不算在内。
-    else
-      skill1 = weaponItem.type.weapon_skill_range_a[1] or "throw" --不能为空。
-      skill2 = weaponItem.type.weapon_skill_range_a[2] --最多两个。多了不算在内。
-    end
-  end
-  
-  local skill_level,exp=self:getSkillLevel(skill1)
-  if skill2 then
-    local l = self:getSkillLevel(skill2)
-    skill_level = (skill_level+l)/2
-  end
-  local hitLevel = skill_level--基本
-  --todo，算上装备和buff的
-  return math.max(1,hitLevel+2)
-end
+
+
 
 function Unit:getWeaponRandomHitEffect(weapon)
-  if weapon.unarmed then 
-    return self:get_unarmed_hit_effect() 
-  else
+  if weapon.item then
     return weapon.item:getRandomHitEffect()
   end
-end
-
---当前单位的格斗攻击效果。一般是拳，可能是爪，咬。
-function Unit:get_unarmed_hit_effect()
+  --空手格斗
+  --当前单位的空手格斗攻击效果。一般是拳，可能是爪，咬。
   return "unarmed"
 end
 
-function Unit:getWeaponRandomDamage(weapon)
-  if weapon.unarmed then 
-    return self:randomUnarmedDamage()
-  else
-    return weapon.item:randomWeaponDamage(weapon.isMelee)
-  end
+--获得非主手武器攻击几率
+function Unit:getWeaponAttakRate(weapon)
+  return weapon.item.type.attackRate or 1
 end
-
-
-
-function Unit:randomUnarmedDamage()
-  local dice_num,dice_face,base_atk = self:getUnarmedAtkData()
-  local roll = 0
-  for i=1,dice_num do
-    roll = roll+rnd()
-  end
-  roll = roll/dice_num
-  return base_atk + roll*dice_face
-end
-
-function Unit:getUnarmedAtkData()
-  local str = self:base_str()
-  local skillLevel = self:getSkillLevel("martial_arts")
-  local dice_num =2
-  local dice_face = math.floor(3 +skillLevel*0.6*c.unarmed_cost*2.25*2)
-  local base_atk = math.floor(2+skillLevel*0.3*c.unarmed_cost*2.25)
-  return dice_num,dice_face,base_atk
-end
-
---显示的数据。
-function Unit:getWeaponDisplayData(weapon)
-  local dice,face,base
-  if weapon.unarmed then
-    dice,face,base = self:getUnarmedAtkData()
-    base = base +self:getWeaponBaseBonus(weapon)
-  else
-    local weaponItem = weapon.item
-    if weapon.isMelee then
-      dice = weaponItem.diceNum
-      face = weaponItem.diceFace
-      base = weaponItem.baseAtk +self:getWeaponBaseBonus(weapon)
-    else
-      dice = weaponItem.diceNum_range
-      face = weaponItem.diceFace_range
-      base = weaponItem.baseAtk_range +self:getWeaponBaseBonus(weapon)
-    end
-  end
-  return dice,face,base
-end
-
 
 
 c.unarmed_cost = 0.5 --定义为常数
@@ -170,19 +211,11 @@ end
 
 
 function Unit:train_weapon_skill(weapon,fix,level)
-  local skill1,skill2 --最多关联两个skill
-  if weapon.unarmed then
-    skill1 = "martial_arts"--格斗技能
-  else
-    local weaponItem = weapon.item
-    if weapon.isMelee then
-      skill1 = weaponItem.type.weapon_skill_a[1] or "martial_arts" --不能为空。
-      skill2 = weaponItem.type.weapon_skill_a[2] --最多两个。多了不算在内。
-    else
-      skill1 = weaponItem.type.weapon_skill_range_a[1] or "throw" --不能为空。
-      skill2 = weaponItem.type.weapon_skill_range_a[2] --最多两个。多了不算在内。
-    end
-  end
+  
+  local skill1,skill2 ="martial_arts",nil
+  local weaponItem = weapon.item--可能为空。
+  if weaponItem then skill1,skill2 = weaponItem:getWeaponSkill(weapon.isMelee) end
+  
   if skill2 then
     fix=fix/2
     self:train_skill(skill2,rnd(10,20)*fix,level)

@@ -4,21 +4,66 @@ function Unit:deal_damage(source,dam_ins,delay)
   delay = delay or 0 
   local deal_dam = math.max(0,dam_ins.dam)
   local resist = 0
-  local attr1 = "wil"
   if dam_ins.dtype ==1 then --物理伤害
-    resist = self:getAR()*self:getAR_mod()
+    resist = self:getDEF()
   elseif dam_ins.dtype ==2 then --魔法伤害
-    resist = self:getMR()*self:getAR_mod()
-    attr1 = "ler"
+    resist = self:getMGR()
   end
-  resist = math.max(0,resist*(1-dam_ins.resist_mul)-dam_ins.resist_pen) --护甲穿透计算
-  if resist<=0.5*deal_dam then
-    deal_dam = deal_dam -resist --加减法
+  --计算伤害加减成
+  local dam_Lv_mod =1 --等级影响的倍乘
+  local cha = dam_ins.atk_lv - resist
+  if cha>=0 then
+    dam_Lv_mod = (20+cha)/20 --相差20级伤害翻倍
   else
-    resist = resist - 0.5*deal_dam
-    deal_dam = 0.5*deal_dam--
-    deal_dam = deal_dam*deal_dam/(deal_dam+resist)
+    dam_Lv_mod = 20/(20-cha) --相差-20级 伤害减半 
   end
+  deal_dam = deal_dam *dam_Lv_mod
+
+  --检定是否暴击
+  --暴击几率最小5%，最大50%
+  --计算等级差cha
+  --CHA<=-40, 6%以下
+  --cha == 0   10%
+  local critRate = 0.05 --
+  local critMul = 2
+  do
+    local uncritLv = self:getDodgeLevel()
+    local crit_cha = dam_ins.crit_lv  -uncritLv
+    if crit_cha<0 then
+      critRate = 0.05 +0.5/(10-crit_cha)
+    else
+      critRate = math.min(0.1 + crit_cha*0.01,0.50)
+      critMul = math.min(2+0.01*crit_cha,3)
+    end
+  end
+  --检定是否格挡
+
+  local blockRate = 0.2  --  
+  local blockMul = 0.8  --最小20%免伤
+  do
+    local blockLv = self:getBlockLevel()
+    local block_cha = dam_ins.hit_lv  -blockLv
+    if block_cha<0 then
+      blockRate = 0.02 +1.8/(10-block_cha)
+    else
+      blockRate = math.min(0.2 + blockRate*0.01,0.5)
+      local x =math.min(0.11+0.01*block_cha,0.99)
+      blockMul = 1-2*x/(1+x)
+    end
+  end
+
+  local roll_crit_block = rnd()
+
+  local deal_crit = roll_crit_block<critRate
+  if deal_crit then 
+    deal_dam = deal_dam*critMul --暴击后伤害翻倍
+  end
+  local block_hit = (1-roll_crit_block)<blockRate
+  if block_hit then 
+    deal_dam = deal_dam*blockMul --暴击后伤害翻倍
+  end
+
+
   if dam_ins.subtype then --子类攻击类型。
     local subresist = self:getResistance(dam_ins.subtype)
     if subresist>=0 then
@@ -30,33 +75,45 @@ function Unit:deal_damage(source,dam_ins,delay)
   deal_dam = math.max(0,deal_dam) --最小为0，不能为负值。
   dam_ins.deal_dam = deal_dam --回传一个数值，实际攻击
   --apply damage
-  
+
+  debugmsg(string.format("takeDam:%.2f,atklv:%.1f, resist:%.1f,dam_Lv_mod:%.2f,critrate%.2f,critLv%d,blockrate%.2f",
+      deal_dam,dam_ins.atk_lv,resist,dam_Lv_mod,critRate,dam_ins.crit_lv,blockRate))
+
   --apply damage
   if deal_dam<=0 then 
     local train_base = 10
-    self:train_attr(attr1,train_base,dam_ins.hitLevel)
-    self:train_attr("con",train_base,dam_ins.hitLevel)
+    self:train_attr("con",train_base,dam_ins.atk_lv)
     return 
   else
     local train_base = deal_dam/self.max_hp*50+10
-    self:train_attr(attr1,train_base,dam_ins.hitLevel)
-    self:train_attr("con",train_base,dam_ins.hitLevel)
-  end
-  --挨揍的
-  if source and source:isInPlayerTeam() then
-    if dam_ins.crital then
-      addmsg(string.format("crit%d!",deal_dam),"hit")
-    else
-      addmsg(string.format("(%d)",deal_dam),"hit")
-    end
-  elseif self:isInPlayerTeam() then
-    if dam_ins.crital then
-      addmsg(string.format("crit%d!",deal_dam),"enemy_hit")
-    else
-      addmsg(string.format("(%d)",deal_dam),"enemy_hit")
-    end
+    self:train_attr("con",train_base,dam_ins.atk_lv)
   end
   
+  if block_hit then
+    self:train_attr("wil",30,dam_ins.hit_lv)
+    if self:isUsingShield() then
+      self:train_skill("shield",rnd(30,50),dam_ins.hit_lv)
+    end
+  end
+  --train block，train shield
+  --挨揍的
+  local displayType = nil
+  if source and source:isInPlayerTeam() then
+    displayType = "hit"
+  elseif self:isInPlayerTeam() then
+    displayType = "enemy_hit"
+  end
+
+  if displayType then
+    if deal_crit then
+      addmsg(string.format("(%d!)",deal_dam),displayType)
+    elseif block_hit then
+      addmsg(string.format("(%d-)",deal_dam),displayType)
+    else
+      addmsg(string.format("(%d)",deal_dam),displayType)
+    end
+  end
+
   if delay<=0 then 
     self:take_damage(source,dam_ins)
   else
@@ -83,7 +140,6 @@ end
 
 --仅能使用此函数扣除hp。
 function Unit:take_damage(source,dam_ins)
-  debugmsg("takedam:"..dam_ins.dam)
   if self:is_dead() then return end
   self.hp = self.hp-dam_ins.dam
   if self.hp<=0 then 
@@ -93,56 +149,70 @@ end
 
 
 --获取躲闪等级。是为
-function Unit:getDodgeLevel()
+function Unit:getDodgeLevel(showmsg)
+  local dodgeLevel = self.level
   local dex = self:cur_dex()
   local per = self:cur_per()
-  local val = dex*0.85+per*0.15
-  local dodgeLevel = math.max(1, val/c.averageAttrGrow-5)--低于一定属性就为1.属性起码8以上，才能开始闪避。
-  --还有其他装备buff附加的等级，todo
+  local attrlv = (dex*0.85+per*0.15)/c.averageAttrGrow --计算出属性的平均等级
+  local val = (attrlv-dodgeLevel)/(dodgeLevel+3) -- -1到2以上  常见-0.5 到1  
+
+
+  dodgeLevel = dodgeLevel + val*10 -- 属性一般 -5到+10， 最大-10到+20以上
+  --还有其他装备buff附加的等级，种族天赋等
+
+  dodgeLevel = dodgeLevel+self:getBonus("dodge_lv")
+
+  if (showmsg) then debugmsg(string.format("dodgeLevel:%.1f,attrBouns:%.1f, effectBonus:%.1f,attrlv:%.1f,selfLv:%d",dodgeLevel,val*10,self:getBonus("dodge_lv"),attrlv,self.level))end
   return dodgeLevel
+end
+
+--格挡等级
+function Unit:getBlockLevel()
+  local blockLevel = self.level
+  local attrlv = (self:cur_con()*0.4+self:cur_wil()*0.6)/c.averageAttrGrow --计算出属性的平均等级
+  local val = (attrlv-blockLevel)/(blockLevel+3) -- -1到2以上  常见-0.5 到1  
+
+
+  blockLevel = blockLevel + val*10 -- 属性一般 -5到+10， 最大-10到+20以上
+  --还有其他装备buff附加的等级，种族天赋等
+  blockLevel = blockLevel+self:getBonus("block_lv")
+
+  return blockLevel
 end
 
 
 --根据命中等级和闪避等级，取得命中概率。
 local function hitRate(hitLevel,dodgeLevel)
   --命中率最小20%，最大当然是100%.
-  --命中等级1.5倍时100%
-  --命中等级 = 闪避等级时，命中率90%
-  --同等级单位最大的闪避：60%命中。也就是。闪避等级两倍于命中等级时候，60命中。
-  --4倍约37%左右命中
-  --最小值20%命中
-  --单一公式：-(x-6)^2/8+5
-  local x = hitLevel/(dodgeLevel*0.25)
-  if x>=6 then return 1 end
-  return math.max(0.2,(-(x-6)^2/8+5)*0.2)
-  --[[
-  --(x-1)^2/2+1,-(x-5)^2/2+5,-(x-6)^2/8+5  公式曲线
-  if x<1 then
-    return 0.2
-  elseif x<3 then
-    return ((x-1)^2/2+1)*0.2
-  elseif x<4 then
-    return (-(x-5)^2/2+5)*0.2
-  elseif x<6 then
-    return (-(x-6)^2/8+5)*0.2
-  end
-  return 1  
-  ]]
+  --计算等级差 CHA
+  --CHA>=20， 100%
+  --cha==0   (range =60 为89%)  
+  --cha == 20-0.7*range  50%
+  --cha ==-20-range 0%(不可能，因为在此之前达到最小值20%)20-0.89range 20%
+  local range = 60
+  local cha = hitLevel - dodgeLevel
+  if cha>=20 then return 1 end
+  return math.max(0.2,1-((cha-20)/range)^2)
 end
+
+
+
+
+
 
 --近战命中判定，返回0，miss。返回1，命中，返回。。。其他格挡等等。
 function Unit:check_melee_hit(source,dam_ins,fdelay)
-  local selfDodgeLevel = self:getDodgeLevel()
-  local hit_probability = hitRate(dam_ins.hitLevel,selfDodgeLevel)
+  local selfDodgeLevel = self:getDodgeLevel(true)
+  local hit_probability = hitRate(dam_ins.hit_lv,selfDodgeLevel)
   local hit = 0
-  self:train_attr("dex",rnd(6,8),dam_ins.hitLevel)--训练敏捷，无论是否击中。
+  self:train_attr("dex",rnd(6,8),dam_ins.hit_lv)--训练敏捷，无论是否击中。
   if rnd()<hit_probability then
-    self:deal_damage(source,dam_ins,fdelay)
     hit =1
+    self:deal_damage(source,dam_ins,fdelay)
   else
-    self:train_attr("dex",rnd(4,8),dam_ins.hitLevel)--训练敏捷， 躲闪成功。
+    self:train_attr("dex",rnd(4,8),dam_ins.hit_lv)--训练敏捷， 躲闪成功。
   end
-  debugmsg(string.format("meleeDam:%.1f, hitlevel:%.1f,dodgeLevel:%.1f,dex:%d, rate:%.2f",dam_ins.dam,dam_ins.hitLevel,selfDodgeLevel,self:cur_dex(),hit_probability))
+  debugmsg(string.format("meleeDam:%.1f, hitlevel:%.1f,dodgeLevel:%.1f,dex:%d, rate:%.2f",dam_ins.dam,dam_ins.hit_lv,selfDodgeLevel,self:cur_dex(),hit_probability))
   return hit
 end
 
@@ -166,23 +236,23 @@ function Unit:check_range_hit(projectile)
   if projectile.multi_shot then
     hitrate = hitrate+0.5
   end
-  
+
   if rnd()>hitrate then return false end
-  
+
   local dam_ins = projectile.dam_ins
-  
-  local selfDodgeLevel = self:getDodgeLevel()
-  local hit_probability = hitRate(dam_ins.hitLevel,selfDodgeLevel)
+
+  local selfDodgeLevel = self:getDodgeLevel(true)
+  local hit_probability = hitRate(dam_ins.hit_lv,selfDodgeLevel)
   local hit = rnd()<hit_probability--经过数值运算的结果。
-  
-  
+
+
   local source = projectile.source_unit
   if hit or projectile.dest_unit == self then --只有命中或想要命中的子弹才显示，无意并擦过的子弹不显示。
     local con1 = self:isInPlayerTeam() 
     local con2 = source and source:isInPlayerTeam() 
     if con1 or con2 then
       local selfname = self:getShortName()
-      
+
       if hit then
         if source then
           local sourcename = source:getShortName()
@@ -208,18 +278,18 @@ function Unit:check_range_hit(projectile)
       end
     end
   end
-  
-  
-  self:train_attr("dex",rnd(4,6),dam_ins.hitLevel)--训练敏捷，无论是否击中。
+
+
+  self:train_attr("dex",rnd(4,6),dam_ins.hit_lv)--训练敏捷，无论是否击中。
   if hit then
     self:deal_damage(source,dam_ins,0)
     if projectile.impact then
       self:hitImpact(projectile.rotation,projectile.impact)
     end
   else
-    self:train_attr("dex",rnd(5,7),dam_ins.hitLevel)--训练敏捷，躲闪成功。
+    self:train_attr("dex",rnd(5,7),dam_ins.hit_lv)--训练敏捷，躲闪成功。
   end
-  debugmsg(string.format("hitlevel:%.1f,dodgeLevel:%.1f,dex:%d, rate:%.2f",dam_ins.hitLevel,selfDodgeLevel,self:cur_dex(),hit_probability))
-  
+  debugmsg(string.format("hitlevel:%.1f,dodgeLevel:%.1f,dex:%d, rate:%.2f",dam_ins.hit_lv,selfDodgeLevel,self:cur_dex(),hit_probability))
+
   return hit 
 end

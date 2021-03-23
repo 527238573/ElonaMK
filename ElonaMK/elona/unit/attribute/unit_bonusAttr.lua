@@ -1,3 +1,5 @@
+--三张表，attr存基础属性，里面的值会转存到 basis，basis存变化较少的基本值，bonus存即时
+
 Bonus = { 
   --一些默认值
   --合法的加成属性值名称。除此以外都不合法。
@@ -34,16 +36,15 @@ Bonus = {
   res_dark =0,
   res_light =0,
   
-  AR=0,--护甲等级 增减加成
-  MR=0,--魔抗等级 增减加成
-  ar_lv = 0;--护甲等级 增减加成
-  mr_lv = 0;--魔抗等级 增减加成
-  dog_lv =0;--闪避等级 加成
-  atk_lv =0;--攻击等级加成,所有共用
+  DEF=0,--护甲等级 增减加成
+  MGR=0,--魔抗等级 增减加成
+  dodge_lv =0;--闪避等级 加成 表中属性名字是evade
+  block_lv =0;--格挡等级 加成
+  atk_lv =0;--攻击等级加成,不影响机械枪械
+  mgc_lv = 0;--魔法攻击等级加成。
+  hit_lv =0;--命中等级加成
+  crit_lv = 0;--暴击等级加成
   
-  dodge_mod = 0,--三大平衡修正，范围-0.5 到0.5。（正值增益）
-  melee_mod = 0,
-  range_mod = 0,--仅非机械武器伤害。
   
   --flag形式的加成也登记在此。大于0就会生效。
 }
@@ -73,8 +74,8 @@ function Unit:reloadBasisBonus()
     tra:calculate_bonus(bas_t)
   end
   
-  self.basis["AR"] = math.max(0,self.weapon_list.AR)
-  self.basis["MR"] = math.max(0,self.weapon_list.MR)
+  self.basis["DEF"] = math.max(0,self.weapon_list.DEF)
+  self.basis["MGR"] = math.max(0,self.weapon_list.MGR)
   self:resetMaxHPMP() --有任何变动都会刷新最大hpmp
   --debugmsg("reloadBasisBonus")
 end
@@ -95,31 +96,15 @@ function Unit:getBonus(bonusName)
   return self.basis[bonusName] + self.bonus[bonusName]
 end
 
---护甲值 即时
-function Unit:getAR() 
-  return  self.basis["AR"] +self.bonus["AR"] --后续可能会有百分比的加成
+--防御等级 即时
+function Unit:getDEF()
+  return  self.basis["DEF"] +self.bonus["DEF"]--不允许百分比加成
 end
-function Unit:getAR_mod()
-  local m_attr = self:cur_wil()
-  if m_attr<30 then
-    return 1+math.max((m_attr-20)*0.02,0)
-  else
-    return m_attr*0.04
-  end
+--魔抗等级
+function Unit:getMGR()
+  return  self.basis["MGR"] +self.bonus["MGR"]--不允许百分比加成
 end
 
-function Unit:getMR()
-  return  self.basis["MR"] +self.bonus["MR"] --后续可能会有百分比的加成
-end
-
-function Unit:getMR_mod()
-  local m_attr = self:cur_ler()
-  if m_attr<30 then
-    return 1+math.max((m_attr-20)*0.02,0)
-  else
-    return m_attr*0.04
-  end
-end
 --单一属性的抗性，-8到8之间。
 function Unit:getResistance(atktype)
   local res_str = "res_bash"

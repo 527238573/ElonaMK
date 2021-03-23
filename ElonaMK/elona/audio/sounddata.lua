@@ -46,6 +46,12 @@ local function loadSound()
   for _, v in ipairs(fs.files) do --
     load1sound(v)
   end
+  fs:cd("..")
+  fs:cd("action")
+  dir = "data/sound/action/"
+  for _, v in ipairs(fs.files) do --
+    load1sound(v)
+  end
   debugmsg("load sound Nubmer:"..(soundNum))
 end
 
@@ -71,6 +77,9 @@ return function()
   data.sound["pop2"].volume = 1
   data.sound["bash_hit1"].volume = 0.1
   data.sound["bash_hit2"].volume = 0.1
+  data.sound["bash_heavy1"].volume = 0.1
+  data.sound["bash_heavy2"].volume = 0.15
+  data.sound["bash_heavy3"].volume = 0.15
   data.sound["cut_hit1"].volume = 0.1
   data.sound["cut_hit2"].volume = 0.2
   data.sound["cut_hit3"].volume = 0.1
@@ -128,6 +137,7 @@ return function()
   data.sound["fire_shotgun2"].volume = 0.5
   --声音组
   addSoundGroup("bash_hit",{"bash_hit1","bash_hit2"})
+  addSoundGroup("bash_heavy",{"bash_heavy1","bash_heavy2","bash_heavy3"})
   addSoundGroup("cut1_hit",{"cut_hit1","cut_hit2","cut_hit3"})
   addSoundGroup("cut2_hit",{"cut_hit4","cut_hit5","cut_hit6"})
   addSoundGroup("cut_bighit",{"cut_bighit_1","cut_bighit_2",})

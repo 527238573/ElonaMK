@@ -19,12 +19,18 @@ function g.fastStart()
   p.team[1] = mc
   cmap:unitSpawn(mc,38,20,true)
   
-  p.team[2] = UnitFactory.createMC("teenage_girl","warrior")
-  cmap:unitSpawn(p.team[2],35,20,true)
   
+  local girl = UnitFactory.createMC("teenage_girl","warrior")
+  p.team[2] = girl
+  cmap:unitSpawn(girl,35,20,true)
+  p.inv:addItem(ItemFactory.create("katana"))
+  p.inv:addItem(ItemFactory.create("shield_light"))
+  p.inv:addItem(ItemFactory.create("shield_heavy"))
   p.inv:addItem(ItemFactory.create("dagger"))
   p.inv:addItem(ItemFactory.create("dagger"))
   p.inv:addItem(ItemFactory.create("long_sword"))
+  p.inv:addItem(ItemFactory.create("sledgehammer"))
+  p.inv:addItem(ItemFactory.create("scythe"))
   p.inv:addItem(ItemFactory.create("mace"))
   p.inv:addItem(ItemFactory.create("huge_sword"))
   p.inv:addItem(ItemFactory.create("wakizashi"))
@@ -128,4 +134,7 @@ function g.fastStart()
   p.mc:learnAbility("fire_ball")
   p.mc:learnAbility("jump_slash")
   p.mc:learnAbility("round_slash")
+  p.mc:learnAbility("ancient_wisdom")
+  
+  girl:learnAbility("charge")
 end

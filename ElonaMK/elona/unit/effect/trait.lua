@@ -33,7 +33,7 @@ end
 
 function Trait:getDescription()
   local ttype = self.type
-  local des = ttype.description
+  local des = self.description or ttype.description
   if ttype.levels then
     local lv_t = ttype.levels[self.level]
     if lv_t and lv_t.description then

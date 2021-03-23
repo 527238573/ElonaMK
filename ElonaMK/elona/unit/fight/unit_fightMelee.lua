@@ -3,8 +3,19 @@ function Unit:melee_attack(target)
   --出现不能近战攻击的情况，debuff之类。
   if target ==self then return end
 
+  --确定需要攻击的武器列表
+  local meleeList = {}
+  local org_meleeList = self.weapon_list.melee
+  meleeList[1] = org_meleeList[1]
+  for i=2,#org_meleeList do
+    local oneWeapon = org_meleeList[i]
+    if rnd()<self:getWeaponAttakRate(oneWeapon)then 
+      table.insert(meleeList,oneWeapon)
+    end
+  end
+
+  
   local attack_cost_time = 0.1--最小时间
-  local meleeList= self.weapon_list.melee
   local atk_intv = math.max(0.1,0.3 -#meleeList*0.05)
 
   for i=1,#meleeList do
@@ -23,7 +34,6 @@ function Unit:melee_attack(target)
   for i=1,#meleeList do
     local oneWeapon = meleeList[i]
     self:melee_weapon_attack(target,oneWeapon,fhit+(i-1)*atk_intv)--2武器间隔0.2，4武器间隔0.1
-    
     self:train_weapon_skill(oneWeapon,single_exp,tlevel)
   end
   
@@ -35,24 +45,20 @@ end
 --单个武器的攻击。一次近战攻击中可能多段不同武器攻击（双持）
 function Unit:melee_weapon_attack(target,weapon,fdelay)
   --确定 hir_effect
-  local weaponItem = weapon.item
   local hit_effect = self:getWeaponRandomHitEffect(weapon)
-  local weaponRollDam = self:getWeaponRandomDamage(weapon)
   --创建damage实体。
-  local dam_ins = setmetatable({},Damage)
-  dam_ins.hitLevel = self:getHitLevel(weapon)
-
-  --计算伤害
-  dam_ins.dam =(weaponRollDam+self:getWeaponBaseBonus(weapon))*self:getWeaponModifier(weapon)
-  --todo
+  local dam_ins = self:getWeaponDamageInstance(weapon)
+  --dam_ins.hit_lv =100
+  --dam_ins.dam = 1
   --伤害子类型。
-  if hit_effect == "bash" or hit_effect == "light_bash" then
+  if hit_effect == "bash" or hit_effect == "light_bash" or hit_effect == "heavy_bash" then
     dam_ins.subtype = "bash" --钝击
-  elseif hit_effect =="cut" then
+  elseif hit_effect =="cut"  or  hit_effect == "heavy_cut" then
     dam_ins.subtype = "cut" --劈砍
   elseif hit_effect =="stab" or hit_effect == "spear" then
     dam_ins.subtype = "stab" --穿刺
   end
+  --hit_effect = "heavy_cut"
   --命中判定
   local hit = target:check_melee_hit(self,dam_ins,fdelay)
   if hit ==0 then

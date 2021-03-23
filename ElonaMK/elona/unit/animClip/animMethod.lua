@@ -19,7 +19,7 @@ function clip.init(clip,start_dx,start_dy,playSpeed)
   clip.turn_face = c.face(-start_dx,-start_dy)
   if start_dx~= 0 and start_dy~=0 then clip.playSpeed = clip.playSpeed*1.3 end
 end
-function clip.updateStatus(dt,clip,status,unit)
+function clip.updateStatus(clip,dt,status,unit)
   status.face = clip.turn_face
   local rate = clip.time/clip.totalTime
   rate = c.clamp(rate,0,1)
@@ -44,7 +44,7 @@ function clip.init(clip,midRate,target_x,target_y)
 
 end
 
-function clip.updateStatus(dt,clip,status,unit)
+function clip.updateStatus(clip,dt,status,unit)
   local rate = clip.time/clip.totalTime
   rate = c.clamp(rate,0,1)
   local crate
@@ -71,7 +71,7 @@ function clip.init(clip,midRate,tdx,tdy,delay)
 end
 
 
-function clip.updateStatus(dt,clip,status,unit)
+function clip.updateStatus(clip,dt,status,unit)
   if clip.time<clip.delay then return end
   local ctime = clip.time - clip.delay
 
@@ -96,7 +96,7 @@ function clip.init(clip,midRate,t_scaleY,delay)
 end
 
 
-function clip.updateStatus(dt,clip,status,unit)
+function clip.updateStatus(clip,dt,status,unit)
   if clip.time<clip.delay then return end
   local ctime = clip.time - clip.delay
 
@@ -129,7 +129,7 @@ function clip.init(clip,midRate,tdx,tdy,tdz,backTime)
 end
 
 
-function clip.updateStatus(dt,clip,status,unit)
+function clip.updateStatus(clip,dt,status,unit)
   status.face = clip.turn_face
   if clip.time<clip.stage1t then
     local rate = clip.time/clip.stage1t
@@ -166,7 +166,7 @@ function clip.init(clip,turnTime,backTime,r,startRot,face)
 end
 
 
-function clip.updateStatus(dt,clip,status,unit)
+function clip.updateStatus(clip,dt,status,unit)
   if clip.time<clip.stage1t then
      status.face = clip.turn_face
     local rate = clip.time/clip.stage1t
@@ -184,6 +184,74 @@ function clip.updateStatus(dt,clip,status,unit)
     status.dx =status.dx+math.cos(clip.startRot)*rate*clip.r;
     status.dy =status.dy+math.sin(clip.startRot)*rate*clip.r;
   end
+end
+
+--clip:charge
+clip =  {id ="charge",priority = 1,}--默认priority，可以覆写
+addClip(clip)
+function clip.init(clip,startx,starty,tarX,tarY,fdx,fdy) 
+  clip.startx_acoord = startx*64
+  clip.starty_acoord = starty*64
+  clip.sX_acoord  = tarX *64 +fdx - startx*64
+  clip.sY_acoord = tarY *64 +fdy - starty*64
+  clip.tarX = tarX
+  clip.tarY = tarY
+  
+  clip.playSpeed = 2
+end
+function clip.updateStatus(clip,dt,status,unit)
+  local rate = clip.time/clip.totalTime
+  rate = c.clamp(rate,0,1)
+  
+  local coordx = clip.startx_acoord + rate*clip.sX_acoord
+  local coordy = clip.starty_acoord + rate*clip.sY_acoord
+  
+  local tx = math.floor((coordx+32)/64)
+  local ty = math.floor((coordy+32)/64)
+  
+  if tx== clip.tarX and ty ==clip.tarY then
+    tx,ty = unit.x,unit.y
+    
+  elseif tx ~=unit.x or ty ~= unit.y then
+    unit.map:unitMove(unit,tx,ty)
+  end
+  status.dx = coordx - tx*64 
+  status.dy = coordy - ty*64 
+  status.camera_dx = status.dx
+  status.camera_dy = status.dy
+  
+  local drate = dt/clip.totalTime*clip.playSpeed
+
+  status.rate = status.rate+drate
+  if status.rate>1 then status.rate = status.rate-1 end
+  
+  --debugmsg("charge update")
+end
+
+clip =  {id ="recoverPos",priority = 1,}--默认priority，可以覆写
+addClip(clip)
+function clip.init(clip,startx,starty,fdx,fdy,tarX,tarY) 
+  clip.move_coordx = startx*64+fdx -tarX*64
+  clip.move_coordy = starty*64+fdy -tarY*64
+  
+  clip.playSpeed = 0.5
+end
+
+function clip.updateStatus(clip,dt,status,unit)
+  local rate = clip.time/clip.totalTime
+  rate = 1-c.clamp(rate,0,1)
+  
+  status.dx = rate * clip.move_coordx
+  status.dy = rate * clip.move_coordy
+  status.camera_dx = status.dx
+  status.camera_dy = status.dy
+  
+  local drate = dt/clip.totalTime*clip.playSpeed
+
+  status.rate = status.rate+drate
+  if status.rate>1 then status.rate = status.rate-1 end
+  
+  --debugmsg("charge update")
 end
 
 return function ()

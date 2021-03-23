@@ -9,14 +9,7 @@ function Test.testKillEffect()
 
 end
 
-function Test.attackMember2()
-  local proj = Projectile.new("bullet1")
-  proj.hitLevel = 10
-  local sc = p.team[2]
-  proj:attack(p.mc,nil,nil,sc,sc.x,sc.y)
-  p.mc.target = {unit = p.mc}
 
-end
 
 function Test.genMonster()
   local gentype = UnitFactory.randomUnitTypeByLevel(10)
@@ -79,6 +72,13 @@ end
 
 function Test.refuel_mana()
   p.mc.mp =p.mc.max_mp
+end
+
+function Test.play_sound1()
+  g.playSound("charge",p.mc.x,p.mc.y)
+end
+function g.test2()
+  g.playSound("charge2",p.mc.x,p.mc.y)
 end
 
 

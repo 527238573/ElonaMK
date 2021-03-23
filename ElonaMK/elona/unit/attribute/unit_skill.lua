@@ -32,10 +32,10 @@ g.skills = {
     description = tl("使用像火箭、 榴弹或导弹发射器之类的重型武器的技能。 这些武器用途多样，威力巨大，但他们也很笨重和难用。","Your skill in using heavy weapons like rocket, grenade or missile launchers.  These weapons have a variety of applications and may carry immense destructive power, but they are cumbersome and hard to manage."),},
   throw =       {name = tl("投掷","Throwing"),icon = 26, main_attr = "per",
     description = tl("远距离投掷物体的技能。 等级越高，投掷距离和精度越高。", "Your skill in throwing objects over a distance.  Skill increases accuracy, and at higher levels, the range of a throw."),},
-  sheild =      {name = tl("盾牌","Sheild"),icon = 27, main_attr = "con",
-    description = tl("使用盾牌格挡攻击的技能。也能影响盾牌打击的效果。", "Your skill in using sheild to block attacks.  It can also affect the damage of shield strikes."),},
-  magic_device ={name = tl("魔道具","Magic Device"),icon = 28,main_attr = "mag",
-    description = tl("使用魔法道具武器的能力。将魔杖，魔导器激活后直接放出法术，技能增加这些法术的伤害。", "The Skill to use magical  items. When the wand and the magic artifact are activated, the spells are directly cast, and this skill increases the damage of these spells."),},
+  shield =      {name = tl("盾牌","Shield"),icon = 27, main_attr = "con",
+    description = tl("使用盾牌格挡攻击的技能。也能影响盾牌打击的效果。", "Your skill in using shield to block attacks.  It can also affect the damage of shield strikes."),},
+  magic_chant ={name = tl("咏唱","Magic Chant"),icon = 28,main_attr = "mag",
+    description = tl("引导魔法的能力。影响魔导器、法术的命中。", "The Skill to use magical  items or spells. This skill increases the  hit rate of these spells."),},
   soft_weapon = {name = tl("软兵器","Soft Weapon"),icon = 29,main_attr = "chr",
     description = tl("使用奇门兵器的技能。奇门兵器通常都有古怪的附带效果，但没多少人愿意使用这些伤害较低的武器。", "Your Skill of using soft weapons. Soft weapons usually have some weird effect, but not many people are willing to use these less harmful weapons."),},
 }
@@ -80,6 +80,9 @@ function Unit:train_skill(skill_id,exp,explv)
   if lv_c>10 then lv_fix = 0 elseif lv_c>0 then lv_fix  = 0.8^lv_c end --超过自身等级10级不得经验
   lv_c = cur_lv - explv --
   if lv_c>10 then lv_fix  = lv_fix* math.max(0,1-(lv_c-10)*0.03) end -- 给出的经验质量等级太低不得经验。
+  if lv_c<-20 then lv_fix = 3 end
+  if lv_c<-10 then lv_fix = 1+(-lv_c-10)*0.2 end
+  
   local realexp = exp*lv_fix
   skill = skill +realexp/growExp
   self.skill[skill_id] = skill

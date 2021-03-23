@@ -10,20 +10,7 @@ function ui.drawFix(x,y,w,h)
   for i=1,#meleeList do
     nline = nline+1
     local oneWeapon = meleeList[i]
-    local dice,face,base = mc:getWeaponDisplayData(oneWeapon)
-    local modifier = mc:getWeaponModifier(oneWeapon)
-    local name = oneWeapon.unarmed and tl("格斗","Unarmed") or oneWeapon.item:getShortName()
-    local cost = mc:melee_cost(oneWeapon)
-    local dps = (face/2 +base)*modifier /cost
-    local hitLevel = mc:getHitLevel(oneWeapon)
-    local dmgstr
-    if base ==0 then 
-      dmgstr = string.format("%dr%d x%.1f (%.1f,%.1f)",dice,face,modifier,dps,hitLevel)
-    elseif base>0 then
-      dmgstr = string.format("%dr%d+%d x%.1f (%.1f,%.1f)",dice,face,base,modifier,dps,hitLevel)
-    elseif base<0 then
-      dmgstr = string.format("%dr%d%d x%.1f (%.1f,%.1f)",dice,face,base,modifier,dps,hitLevel)
-    end
+    local name,dmgstr=mc:getWeaponDamStr(oneWeapon)
     love.graphics.print(string.format(tl("近战%d","Melee%d"),i), x+53, y+480+lineH*(nline-1)) 
     love.graphics.print(name, x+133, y+480+lineH*(nline-1)) 
     love.graphics.print(dmgstr, x+233, y+480+lineH*(nline-1)) 
@@ -33,28 +20,7 @@ function ui.drawFix(x,y,w,h)
   for i=1,#rangeList do
     nline = nline+1
     local oneWeapon = rangeList[i]
-    local weaponItem = oneWeapon.item
-    local dice,face,base = mc:getWeaponDisplayData(oneWeapon)
-    local modifier = mc:getWeaponModifier(oneWeapon)
-    local pellet = weaponItem:getPellet()
-    local cost = mc:shoot_cost(oneWeapon)
-    local dps = (face/2 +base)*modifier /cost *pellet
-    local hitLevel = mc:getHitLevel(oneWeapon)
-    local name = weaponItem:getShortName()
-    local dmgstr
-    if base ==0 then 
-      dmgstr = string.format("%dr%d",dice,face)
-    elseif base>0 then
-      dmgstr = string.format("%dr%d+%d",dice,face,base)
-    elseif base<0 then
-      dmgstr = string.format("%dr%d%d",dice,face,base)
-    end
-    if pellet>1 then
-      dmgstr = string.format("%dx(%s) x%.1f (%.1f,%.1f)",pellet,dmgstr,modifier,dps,hitLevel)
-    else
-      dmgstr = string.format("%s x%.1f (%.1f,%.1f)",dmgstr,modifier,dps,hitLevel)
-    end
-    
+    local name,dmgstr=mc:getWeaponDamStr(oneWeapon)
     love.graphics.print(string.format(tl("远程%d","Range%d"),i), x+53, y+480+lineH*(nline-1)) 
     love.graphics.print(name, x+133, y+480+lineH*(nline-1)) 
     love.graphics.print(dmgstr, x+233, y+480+lineH*(nline-1)) 
@@ -62,8 +28,8 @@ function ui.drawFix(x,y,w,h)
   
   
   love.graphics.printf(string.format(tl("闪避等级:%d","Dodge Level:%d"),mc:getDodgeLevel()), x+543, y+480+lineH*0,200,"right") 
-  love.graphics.printf(string.format(tl("护甲:%d x%.1f","Armor:%d x%.1f"),mc:getAR(),mc:getAR_mod()), x+543, y+480+lineH*1,200,"right") 
-  love.graphics.printf(string.format(tl("魔抗:%d x%.1f","Magic Resist:%d x%.1f"),mc:getMR(),mc:getMR_mod()), x+543, y+480+lineH*2,200,"right") 
+  love.graphics.printf(string.format(tl("护甲等级:%d","Armor Level:%d"),mc:getDEF()), x+543, y+480+lineH*1,200,"right") 
+  love.graphics.printf(string.format(tl("魔抗等级:%d","Magic Resist Lv:%d"),mc:getMGR()), x+543, y+480+lineH*2,200,"right") 
   love.graphics.printf(string.format(tl("生命回复每秒:%.1f","HP regeneration:%.1f"),mc.hp_regen), x+543, y+480+lineH*3,200,"right") 
   love.graphics.printf(string.format(tl("魔法回复每秒:%.1f","MP regeneration:%.1f"),mc.mp_regen), x+543, y+480+lineH*4,200,"right") 
 end

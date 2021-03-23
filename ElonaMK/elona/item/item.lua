@@ -11,23 +11,10 @@ Item = {
     index = 0,--在parent内身处的位置。parent专用。
     
     --equipment
-    material_id = "",
-    material = nil,
     level = 1,
     quality = 1,--装备稀有度 LV1=白装 0附魔 总附魔3 LV2 = 优秀1～2附魔 总5  LV3= 奇迹3～4额外附魔 总8 LV4 = 神器 5～6 附魔 总12。
-    --weapon
-    diceNum =1,
-    diceFace =1,
-    baseAtk =0,
-    to_hit = 0,
-    --equipment
-    AR =0,
-    MR =0,
     
-    diceNum_range =1,
-    diceFace_range =1,
-    baseAtk_range =0,
-    to_hit_range = 0,
+    
     
     ammoNum = 0, --剩余子弹数，只对能装弹的远程武器有效
     useReload = false,--只对能装弹的远程武器为true
@@ -43,9 +30,7 @@ function Item:loadfinish()
   rawset(self,"type",assert(data.item[self.id]))
   --self.type = assert(data.item[self.id])
   --如果新版增加字段，则需要补充。
-  if self.material_id~= "" then
-    rawset(self,"material",assert(data.material[self.material_id]))
-  end
+  
 end
 
 

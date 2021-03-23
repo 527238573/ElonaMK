@@ -1,39 +1,66 @@
+--[[
+map.unit表保存所有地格单位 坐标 index =y*self.w+x+1
+对同一格子的单位，使用链表链接
 
-
-
+--]]
 --新加入map。并插入活跃列表
 function Map:unitEnter(unit,x,y)
   assert(x>=0 and x<=self.w-1 and y>=0 and y<=self.h-1)
-  assert(unit.map ==nil)
+  assert(unit.map ==nil,"Unit must leave map before enter map") --进入之前必须处于退出状态
+  assert(unit.next_unit ==nil) --进入之前必须处于退出状态
   if unit:is_dead() then
     debugmsg("Warning:dead unit cant enter map")
     return 
   end
-  if self.unit[y*self.w+x+1]~= c.empty then
-    debugmsg("Warning:unit enter another unit's position")
+  local index = y*self.w+x+1
+  local tarU = self.unit[index] --取得地格单位
+  if tarU == c.empty then --为空
+    self.unit[index] = unit 
+  else
+    --有链表  因为硬插入的情况多为位移技能途中，所以插入末尾，使之不优先占用格子
+    while(tarU.next_unit) do tarU = tarU.next_unit end --移动到尾部
+    tarU.next_unit = unit--插入链表尾部
   end
+  
   unit.x = x
   unit.y = y
-  self.unit[y*self.w+x+1] = unit
   unit.map = self
   if self.activeUnits[unit]==nil then self.activeUnit_num = self.activeUnit_num+1 end --增加数目
   self.activeUnits[unit] = true
+  unit.target  =nil--清除单位引用，防止代入下个地图
 end
 
 function Map:unitLeave(unit)
+  assert(unit.map ==self,"Incorrect leave map call") --严格检查，必须从正确的地图退出。
   unit.map = nil
   local x = unit.x
   local y = unit.y
-  if not(x>=0 and x<=self.w-1 and y>=0 and y<=self.h-1) then
-    --debugmsg("Warning:Leaving unit out of map")
-    return
-  end
-  if self.unit[y*self.w+x+1]== unit then
-    self.unit[y*self.w+x+1] = c.empty
+  assert(x>=0 and x<=self.w-1 and y>=0 and y<=self.h-1,"Error:Leaving unit out of map")
+  
+  
+  local index = y*self.w+x+1
+  local tarU = self.unit[index]
+  if tarU== unit then -- 找到
+    if tarU.next_unit ==nil then
+      self.unit[index] = c.empty --还原为空
+    else
+      self.unit[index] = tarU.next_unit --续接链表
+    end
   else
-    --debugmsg("Warning:Leaving unit with wrong coordinate")
-    return
+    --向后找
+    local find_u = false
+    while(tarU.next_unit) do
+      if tarU.next_unit == unit then
+        tarU.next_unit = unit.next_unit --续接链表
+        find_u = true
+        break
+      end
+      tarU = tarU.next_unit
+    end
+    assert(find_u,"Error:Leaving unit not found in map.unit")
   end
+  unit.next_unit = nil --不能忘记清除，无论是否有值
+  unit.target  =nil --清除单位引用，防止代入下个地图
 end
 
 function Map:unitMove(unit,x,y)
@@ -41,18 +68,45 @@ function Map:unitMove(unit,x,y)
   assert(unit.map ==self) --必须已在地图上。
   local sx = unit.x
   local sy = unit.y
-  if self.unit[sy*self.w+sx+1]== unit then
-    self.unit[sy*self.w+sx+1] = c.empty
+  assert(sx>=0 and sx<=self.w-1 and sy>=0 and sy<=self.h-1) --原位置也要检测
+  
+  --离开原位置 
+  local index = sy*self.w+sx+1
+  local tarU = self.unit[index]
+  if tarU== unit then -- 找到
+    if tarU.next_unit ==nil then
+      self.unit[index] = c.empty --还原为空
+    else
+      self.unit[index] = tarU.next_unit --续接链表
+    end
   else
-    debugmsg("Warning:Leaving unit with wrong coordinate")
+    --向后找
+    local find_u = false
+    while(tarU.next_unit) do
+      if tarU.next_unit == unit then
+        tarU.next_unit = unit.next_unit --续接链表
+        find_u = true
+        break
+      end
+      tarU = tarU.next_unit
+    end
+    assert(find_u,"Error:Moving unit not found in map.unit")
   end
-
-  if self.unit[y*self.w+x+1]~= c.empty then
-    debugmsg("Warning:unit enter another unit's position")
-  end
+  unit.next_unit = nil --不能忘记清除，无论是否有值
+  
+  --进入新位置
   unit.x = x
   unit.y = y
-  self.unit[y*self.w+x+1] = unit
+  
+  index = y*self.w+x+1
+  tarU = self.unit[index]
+  if tarU == c.empty then
+    self.unit[index] = unit
+  else
+    --有链表  因为硬插入的情况多为位移技能途中，所以插入末尾，使之不优先占用格子
+    while(tarU.next_unit) do tarU = tarU.next_unit end --移动到尾部
+    tarU.next_unit = unit
+  end
 end
 
 

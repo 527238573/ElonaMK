@@ -73,6 +73,7 @@ local function mainKeypressed(key)
   elseif key=="reload" then p:reload_action() 
   elseif key=="esc" then p:esc_action()
   elseif key=="j" then g.test1() 
+  elseif key=="l" then g.test2() 
   elseif key=="k" then ui.testWin:Open() 
   else
     for i=1,8 do if key ==c.key_action_id[i] then p:useActionBar(i) end end--table装了action1~8字符串

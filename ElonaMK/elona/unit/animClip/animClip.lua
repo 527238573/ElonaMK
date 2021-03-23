@@ -40,5 +40,5 @@ function AnimClip:updateAnim(dt,status,unit)
     self.time = self.time+dt
   end
   if self.time> self.totalTime then return end --超时就不跟新status
-  self.type.updateStatus(dt,self,status,unit)
+  self.type.updateStatus(self,dt,status,unit)
 end

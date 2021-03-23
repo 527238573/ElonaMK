@@ -2,7 +2,7 @@ local suit = require"ui/suit"
 --先声明本体
 local weaponSkillsWin = {name = tl("武器技能","Weapon Skills"),icon_index = 13}
 
-local skill_List = {"cutting","bashing","stabbing","polearm","martial_arts","bow","firearm","energy_gun","big_gun","throw","sheild","magic_device","soft_weapon",}
+local skill_List = {"cutting","bashing","stabbing","polearm","martial_arts","bow","firearm","energy_gun","big_gun","throw","shield","magic_chant","soft_weapon",}
 local select_skill_index = 1
 
 local icons = c.pic.uiAttr

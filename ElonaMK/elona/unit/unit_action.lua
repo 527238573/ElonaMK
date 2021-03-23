@@ -56,6 +56,22 @@ function Unit:walk_to(dest_x,dest_y)
   return true
 end
 
+--不播放动画，只移动
+function Unit:teleport_to(dest_x,dest_y)
+  local map = assert(self.map)
+  --类似spawn
+  for nx,ny in c.closest_xypoint_rnd(dest_x,dest_y,4) do--9*9的方框内。够大了
+    if map:can_pass(nx,ny) then
+      if map:unit_at(nx,ny) ==nil then
+        --找到合理的放置点
+        map:unitMove(self,nx,ny) --更换地图上的位置。
+        return true
+      end
+    end
+  end
+  return false
+end
+
 
 --操作move
 function Unit:moveAction(dx,dy)
@@ -70,8 +86,6 @@ function Unit:moveAction(dx,dy)
     mdo = self:attak_to(dest_x,dest_y,destunit)
     if mdo then return end
   end
-  
-  
   
   mdo = self:walk_to(self.x+dx,self.y+dy)
   

@@ -32,23 +32,10 @@ local function chooseEquipment()
     local curList = {}
     local slot = selectIndex
     --筛选列表
-    local function checkInCategory(item)
-      if not item:isEquipment() then  return false end
-      local equiptype = item:getEquipType()
-      if slot ==1 then
-        return equiptype == "mainhand" or equiptype == "hand"
-      elseif slot ==2 then
-        return equiptype == "offhand" or equiptype == "hand"
-      elseif slot ==3 then
-        return equiptype == "body"
-      elseif slot ==4 or slot ==5 then
-        return equiptype == "accessory"
-      end
-      return false 
-    end
+    
     for i=1,#itemlist do
       local curitem = itemlist[i]
-      if (not curitem:isHidden()) and checkInCategory(curitem) then
+      if (not curitem:isHidden()) and mc:canWearItem(curitem,slot,false) then
         curList[#curList+1] = curitem
       end
     end

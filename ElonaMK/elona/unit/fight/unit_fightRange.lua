@@ -153,11 +153,8 @@ function Unit:range_weapon_attack(target,weapon)
       proj.impact =8
     end
     if snum>1 then proj.multi_shot = true end
-    local dam_ins = setmetatable({},Damage)
-    proj.dam_ins = dam_ins
-    dam_ins.hitLevel = self:getHitLevel(weapon)
-     --计算伤害
-    dam_ins.dam =(self:getWeaponRandomDamage(weapon)+self:getWeaponBaseBonus(weapon))*self:getWeaponModifier(weapon)
+    proj.dam_ins = self:getWeaponDamageInstance(weapon)
+    proj.dam_ins.subtype =  weaponItem:getRangeWeaponDmgType()
     
     proj:attack(self,nil,nil,target,self.map) 
     if weaponItem:hasFlag("SNIPER") then

@@ -37,7 +37,7 @@ function Unit:findNearestEnemy(findrange)
   if findrange then
     maxrange = math.min(maxrange,findrange)
   end
-  
+
   local closestUnit,range = nil,maxrange+0.001--范围内目标
   local map = self.map
   if map.activeUnit_num<=170 then --数量不多，搜索单位表。
@@ -72,7 +72,7 @@ function Unit:findNearestEnemy(findrange)
       end
     end
   end
-  
+
   return closestUnit --可能为空
 end
 
@@ -116,7 +116,50 @@ function Unit:findSeeRangeEnemyOrSquare(showmsg,aiTarget,clearTarget)
   return nil
 end
 
+--根据条件获取目标或地格conditionCheck(targetunit,x,y)    只允许可见的目标。 敌友检查等在conditionCheck里面进行。
+--square型 只能由aiTarget 和self.target获取
+--maxrange可选参数，默认视野最大值
+function Unit:findConditionRangeUnitOrSquare(showmsg,aiTarget,clearTarget,conditionCheck,maxrange)
+  --第一优先级，ai触发的
+  if aiTarget then --aiTarget默认为视野内可见的,不检查。
+    if conditionCheck(aiTarget.unit,aiTarget.x,aiTarget.y) then
+      return aiTarget
+    end
+  end
+  --第二优先级，所手选的目标。
+  if self:checkTarget() then 
+    if conditionCheck(self.target.unit,self.target.x,self.target.y) then
+      return self.target
+    end
+    --未能成功选择手动目标
+    if clearTarget then self.target = nil end
+  end
+  --第三优先级，搜索附近,视野内，由近到远。不会选择自己
+  maxrange = maxrange or self:get_seen_range()
+  local map = self.map
+  --单位数量很多，按地格搜索
+  local radius = math.floor(maxrange)
+  for nx,ny in c.closest_xypoint_rnd(self.x,self.y,radius) do
+    --搜索每个地格,按方形顺序。大体上是由近到远，但不是严格按圆形远近
+    local unit =map:unit_at(nx,ny)
+    if unit and unit ~= self then
+      local currange= c.dist_2d(self.x,self.y,unit.x,unit.y)
+      if currange<=maxrange and self:seesUnit(unit) then 
+        if conditionCheck(unit,nx,ny) then
+          return Target:new(unit)
+        end
+      end
+    end
+  end
+  --找不到目标： 一般根据情况提示条件，并不在这里提示
+  if showmsg then addmsg(tl("找不到目标!","You cant find a target.")) end
+  return nil
+end
 
+
+
+
+--获得近战1格内目标
 function Unit:findCloseRangeEnemy(showmsg,aiTarget,clearTarget)
   --第一优先级，ai触发的
   if aiTarget then --aiTarget默认为视野内可见的

@@ -1,5 +1,6 @@
-id,name,icon,isMagic,main_attr,baseLevel,difficulty,costMana,cooldown,description,target_type,range
-fire_ball,»ðÇò,fire_ball,TRUE,mag,0,1,3,0.7,,single_enemy,sight
-jump_slash,ÌøÕ¶,jump_slash,FALSE,str,0,1,5,2.5,,single_enemy,close
-round_slash,»ØÐýÕ¶,round_slash,FALSE,str,5,1,7,5,,single_enemy,close
-ancient_wisdom,Ô¶¹ÅÖÇ»Û,ancient_wisdom,TRUE,ler,12,1,5,10,,self,self
+id,name,icon,isMagic,main_attr,baseLevel,difficulty,costMana,cooldown,description,target_type,range,hit_skill,diceNum,diceFace,baseAtk
+fire_ball,»ðÇò,fire_ball,TRUE,mag,0,1,3,0.7,,single_enemy,sight,magic_chant,,,
+jump_slash,ÌøÕ¶,jump_slash,FALSE,str,0,1,5,2.5,,single_enemy,close,cutting,,,
+round_slash,»ØÐýÕ¶,round_slash,FALSE,str,5,1,7,5,,single_enemy,close,cutting,,,
+ancient_wisdom,Ô¶¹ÅÖÇ»Û,ancient_wisdom,TRUE,ler,12,1,5,10,,self,self,,,,
+charge,³å·æ,charge,FALSE,con,5,1,7,5,,single_enemy,sight,martial_arts,,,

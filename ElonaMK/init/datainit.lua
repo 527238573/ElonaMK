@@ -33,17 +33,23 @@ function data.flagsTable(flagstr)
   end
   return ret
 end
---使用数组来排列flag
-function data.flagsArrayTable(flagstr)
-  if flagstr =="" then return {} end
-  return string.split(flagstr,"|")
-end
 
+function data.addFlags(dataT,valname,flagstr)
+  local flagt = dataT[valname]
+  if flagt ==nil then
+    dataT[valname] = data.flagsTable(flagstr)
+  elseif flagstr ~="" then
+    local t1 = string.split(flagstr,"|")
+    for i=1,#t1 do
+      flagt[t1[i]] = true
+    end
+  end
+end
+--使用数组来排列flag
 
 function data.flagsIndexTable(flagstr)
   if flagstr =="" then return {} end
-  local t1 = string.split(flagstr,"|")
-  return t1
+  return string.split(flagstr,"|")
 end
 
 function data.colorTable(colorstr,r,g,b)

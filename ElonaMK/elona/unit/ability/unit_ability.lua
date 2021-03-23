@@ -110,18 +110,49 @@ end
 --瞬发技能不用请求以上这些，可以在做其他动作时同时发出技能。
 
 
+
+function Unit:getAbilityAtkLevel(abi)
+  local atkLevel = abi:getCombinedLevel()
+  atkLevel = self:getBaseRoundLevel(atkLevel) --不会超过一定范围
+  if abi:isMagic() then
+    atkLevel = atkLevel+self:getBonus("mgc_lv")
+  else
+    atkLevel = atkLevel+self:getBonus("atk_lv")
+  end
+  return atkLevel
+end
 --获得技能的命中等级。
 function Unit:getAbilityHitLevel(abi)
-  local hitlevel = abi:getCombinedLevel()+4
-
-  return math.max(1,hitlevel)
-
+  local skill = abi.type.hit_skill
+  local hitLevel=self:getSkillLevel(skill)
+  
+  hitLevel = hitLevel+ self:getBonus("hit_lv")--命中与物理共用，使得命中属性实用性增强
+  return hitLevel
 end
+
+function Unit:getAbilityCritLevel(abi)
+  local critLevel = abi:getCombinedLevel()
+  critLevel = critLevel+ self:getBonus("crit_lv")
+  
+  
+  local ulevel = self.level
+  local attrlv = ulevel
+  if abi:isMagic() then
+    attrlv = (self:cur_per()*0.7+self:cur_ler()*0.3)/c.averageAttrGrow --计算出属性的平均等级
+  else
+    attrlv = (self:cur_dex()*0.5+self:cur_ler()*0.5)/c.averageAttrGrow --计算出属性的平均等级
+  end
+  local val = (attrlv-ulevel)/(ulevel+3) -- -1到2以上  常见-0.5 到1  
+  
+  critLevel = critLevel + val*10 -- (属性一般 -5到+10， 最大-10到+20以上)val*10的时候
+  return critLevel
+end
+
 --伤害倍乘系数。非伤害技能可能有自己的属性加成算法。
 function Unit:getAbilityModifier(abi)
   local attr1 = self:cur_mag()
   local attr2 = self:cur_main_attr(abi.type.main_attr)
-  local m_attr = attr1*0.6 +attr2*0.4 
+  local m_attr = attr1*0.4 +attr2*0.6 
   if m_attr<20 then
     return 0.95+m_attr*(m_attr+1)/2*0.005
   else
@@ -129,9 +160,18 @@ function Unit:getAbilityModifier(abi)
   end
 end
 
---返回伤害，是否暴击
-function Unit:RandomAbilityDmg(abi,dice,face,base)
+--返回伤害dam_ins
+function Unit:getAbilityDamageInstance(abi,dice,face,base)
+  if dice ==nil then
+    local atype = abi.type
+    dice,face,base = atype.diceNum,atype.diceFace,atype.baseAtk --如果没有填，三项都是0
+  end
   local mod = self:getAbilityModifier(abi)
+  local dam_ins = setmetatable({},Damage)
+  dam_ins.hit_lv = self:getAbilityHitLevel(abi)
+  dam_ins.atk_lv = self:getAbilityAtkLevel(abi)
+  dam_ins.crit_lv = self:getAbilityCritLevel(abi)
+     --计算伤害
   local roll = 0
   if dice>0 then
     for i=1,dice do
@@ -139,13 +179,14 @@ function Unit:RandomAbilityDmg(abi,dice,face,base)
     end
     roll = roll/dice
   end
-  return (base+roll*face)*mod,false
+  dam_ins.dam = (base + roll*face) *mod
+  return dam_ins
 end
 
 
 --同时还训练相关属性。
 function Unit:train_ability(abi,trainTime,trainlv)
-  trainlv = trainlv or abi:getLearningLevel() --没有等级，就按技能等级来算。
+  trainlv = trainlv or abi:getCombinedLevel() --没有等级，就按技能等级来算。
   trainTime = trainTime or 1 --默认按训练1秒。或许会修改。
   if abi:isMagic() then
     self:train_attr("mag",rnd(8,12)*trainTime,trainlv) -- 施法主属性

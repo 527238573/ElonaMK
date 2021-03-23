@@ -2,7 +2,9 @@ debugmsg("loading ability2")
 local abi_type
 
 
-
+--[[*****************
+--跳斩 jump_slash
+--**************--]]
 
 local function jump_slash_delay_call(source_unit,target_unit,ax,ay,dx,dy,dam_ins)
   local showmsg = (source_unit:isInPlayerTeam() or target_unit:isInPlayerTeam() )
@@ -99,28 +101,20 @@ function abi_type.func(abi,source_unit,showmsg,target)
   end
 
 
-  local dam_ins = setmetatable({},Damage)
+  local dam_ins = source_unit:getAbilityDamageInstance(abi,2,20,10)
   dam_ins.dtype =1 --物理攻击
   dam_ins.subtype = "cut" --类型切砍
-  dam_ins.hitLevel = source_unit:getAbilityHitLevel(abi)-2
-  --计算伤害
-  local clevel = abi:getCombinedLevel()
-  local dice =2
-  local base =10+c.baseGrow(0.7,3,clevel)
-  local face =20+c.faceGrow(0.12,3,clevel)
-  dam_ins.dam,dam_ins.crital =source_unit:RandomAbilityDmg(abi,dice,face,base)
 
-  source_unit:insertRLDelayFunc(delay,jump_slash_delay_call,source_unit,t_unit,t_unit.x,t_unit.y,dx,dy,dam_ins)
+  source_unit:insertAnimDelayFunc(delay,jump_slash_delay_call,source_unit,t_unit,t_unit.x,t_unit.y,dx,dy,dam_ins)
   return true,1.2,target:getTargetLv()
 end
 
 function abi_type.description(abi,unit)
   local t = {}
   --复制上面的，上面的伤害要改这里也要改
-  local clevel = abi:getCombinedLevel()
   local dice =2
-  local base =10+c.baseGrow(0.7,3,clevel)
-  local face =20+c.faceGrow(0.12,3,clevel)
+  local base =10
+  local face =20
   local mod = unit:getAbilityModifier(abi)
   c.addDesLine(t,tl("先跳起再重重劈下，造成","Jump first and then slash from above, dealing "),c.DES_WHITE)
   c.addDesLine(t,string.format("(%dr%d%+d)x%.1f",dice,face,base,mod),c.DES_SKI)
@@ -128,7 +122,9 @@ function abi_type.description(abi,unit)
   return t
 end
 
-
+--[[*****************
+--旋风斩 round_slash
+--**************--]]
 
 --调用
 local function round_slash_frameUpdate(frame,dt)
@@ -206,17 +202,9 @@ function abi_type.func(abi,source_unit,showmsg,target)
   frame:setFrameUpdateFunc(round_slash_frameUpdate)
 
   --计算伤害
-  local dam_ins = setmetatable({},Damage)
+  local dam_ins = source_unit:getAbilityDamageInstance(abi,2,10,5)
   dam_ins.dtype =1 --物理攻击
   dam_ins.subtype = "cut" --类型切砍
-  dam_ins.hitLevel = source_unit:getAbilityHitLevel(abi)-4
-
-  local clevel = abi:getCombinedLevel()
-  local dice =2
-  local base =5+c.baseGrow(0.3,1,clevel)
-  local face =10+c.faceGrow(0.6,1,clevel)
-  dam_ins.dam,dam_ins.crital =source_unit:RandomAbilityDmg(abi,dice,face,base)
-  --dam_ins.dam = 1
   --实施伤害（预）
   for i=-1,9,1 do 
     local atk_face = cface-i
@@ -232,13 +220,108 @@ end
 function abi_type.description(abi,unit)
   local t = {}
   --复制上面的，上面的伤害要改这里也要改
-  local clevel = abi:getCombinedLevel()
   local dice =2
-  local base =5+c.baseGrow(0.3,1,clevel)
-  local face =10+c.faceGrow(0.6,1,clevel)
+  local base =5
+  local face =10
   local mod = unit:getAbilityModifier(abi)
   c.addDesLine(t,tl("环形挥斩武器，造成","Slash weapon around a circle, dealing "),c.DES_WHITE)
   c.addDesLine(t,string.format("(%dr%d%+d)x%.1f",dice,face,base,mod),c.DES_SKI)
   c.addDesLine(t,tl("物理劈砍伤害。正面的目标会受到两次伤害。"," physical cut damage.The target directly in front will take damage twice."),c.DES_WHITE)
+  return t
+end
+
+
+--[[*****************
+--冲锋 charge
+--**************--]]
+local function apply_dam_charge(x,y,fdx,fdy,source_unit,target_unit)
+  local c_coordx = x*64+fdx
+  local c_coordy = y*64+fdy
+  
+  local ex,ey = x+1,y+1
+  source_unit.map:unitMove(source_unit,ex,ey)
+  local runTime = c.dist_2d(c_coordx,c_coordy,ex*64,ey*64)/64 *0.2
+  
+  --source_unit:teleport_to(tx,ty)
+  local clip  = AnimClip.new("recoverPos",runTime,x,y,fdx,fdy,ex,ey)
+  source_unit:addClip(clip)
+  clip.type.updateStatus(clip,0,source_unit.status,source_unit)
+  
+  source_unit:short_delay(runTime,"recover")
+  
+end
+saveFunction(apply_dam_charge)
+
+
+abi_type = data.ability["charge"]
+abi_type.cooldown = 0.5
+abi_type.costMana = 0
+function abi_type.func(abi,source_unit,showmsg,target)
+  
+  --寻找目标的条件函数
+  local function CheckCondition(unit,x,y)
+    if unit then x,y = unit.x,unit.y end
+    local currange= c.dist_2d(source_unit.x,source_unit.y,x,y)
+    if currange<4 then --距离太近
+      return false
+    end
+    
+    local map = source_unit.map
+    if unit then 
+      if not source_unit:isHostile(unit) then
+        return false
+      end
+      --在周围1格寻找落脚点
+      for nx,ny in c.closest_xypoint_rnd(x,y,1) do
+        if map:can_pass(nx,ny) and map:unit_at(nx,ny) ==nil then
+          return true --有落脚点
+        end
+      end
+      return false
+    else
+      return map:can_pass(x,y)
+    end
+  end
+  target = source_unit:findConditionRangeUnitOrSquare(false,target,false,CheckCondition)
+  
+  if target ==nil then 
+    if showmsg then addmsg(tl("找不到可以冲锋的目标!","Can't find a target to charge!")) end
+    return false 
+  end --找不到目标
+  local req_d = source_unit:requestDelay(0.5,"charge") 
+  if not req_d then return false end --动作失败。
+  
+  source_unit:face_target(target)--朝向目标
+  local tx,ty = target.x,target.y
+  if target.unit then tx,ty =  target.unit.x,target.unit.y end
+  
+  
+  local sx,sy = source_unit.x,source_unit.y
+  local dist = c.dist_2d(sx,sy,tx,ty)
+  local fdx,fdy = (sx-tx)/dist*30 ,(sy-ty)/dist*30
+  
+  local runTime = dist*0.1
+  
+  source_unit:short_delay(runTime,"charge")
+  --source_unit:teleport_to(tx,ty)
+  local clip  = AnimClip.new("charge",runTime,source_unit.x,source_unit.y,tx,ty,fdx,fdy)
+  source_unit:addClip(clip)
+  
+  source_unit:insertAnimDelayFunc(runTime,apply_dam_charge,tx,ty,fdx,fdy,source_unit,target.unit)
+  
+  
+  return true,10,target:getTargetLv()
+end
+
+function abi_type.description(abi,unit)
+  local t = {}
+  --复制上面的，上面的伤害要改这里也要改
+  local dice =2
+  local base =10
+  local face =20
+  local mod = unit:getAbilityModifier(abi)
+  c.addDesLine(t,tl("先跳起再重重劈下，造成","Jump first and then slash from above, dealing "),c.DES_WHITE)
+  c.addDesLine(t,string.format("(%dr%d%+d)x%.1f",dice,face,base,mod),c.DES_SKI)
+  c.addDesLine(t,tl("物理劈砍伤害。"," physical cut damage."),c.DES_WHITE)
   return t
 end

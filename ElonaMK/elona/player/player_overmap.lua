@@ -60,7 +60,7 @@ function Player:updateOM(dt)
     if clip.time> clip.totalTime then
       self.clip=0
     else
-      clip.type.updateStatus(dt,clip,status,self)
+      clip.type.updateStatus(clip,dt,status,self)
     end
   end
 end

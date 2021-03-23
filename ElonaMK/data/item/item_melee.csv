@@ -1,0 +1,32 @@
+id,name,flags,equipType,melee_skill,hit_effect,atkCost,diceNum_m,diceFace_m,baseAtk_m,m_dps,sLevel,hit,crit,DEF,MGR,evade,block,attackRate
+long_sword,³¤½£,SWORD,hand,cutting|stabbing,cut,0.6,2,12,3,15,1,,,,,,,
+knight_sword,ÆïÊ¿½£,SWORD,hand,cutting|stabbing,cut,0.63,2,13,4,16.67,12,,,,,,,
+royal_sword,»Ê¼Ò³¤½£,SWORD,hand,cutting|stabbing,cut,0.63,2,12,5,17.46,20,,,,,,,
+light_saber,¹â½£,SWORD,hand,cutting|stabbing,cut,0.45,2,10,3,17.78,28,,,,,,,
+katana,ÎäÊ¿µ¶,SABER,hand,cutting,cut,0.58,3,15,2,16.38,8,,,,,,,
+hiryuto,·ÉÁúµ¶,SABER,hand,cutting,cut,0.6,4,14,4,18.33,18,,,,,,,
+scimitar,Íäµ¶,SABER,hand,cutting,cut,0.66,4,20,1,16.67,7,,,,,,,
+claymore,´ó½£,CLAYMORE,twohand,cutting,heavy_cut,0.72,3,28,10,33.33,1,,,,,,,
+huge_sword,¾Þ½£,CLAYMORE,twohand,cutting|bashing,heavy_cut|bash,0.85,3,43,8,34.71,15,,,,,,,
+dagger,Ø°Ê×,DAGGER,hand,stabbing,stab,0.42,2,7,2,13.1,1,,,,,,,
+wakizashi,ÈÌµ¶,DAGGER,hand,cutting|stabbing,stab|cut,0.45,2,8,3,15.56,11,,,,,,,
+hand_axe,ÊÖ¸«,AXE,hand,cutting,cut,0.6,1,20,0,16.67,6,,,,,,,
+battle_axe,Õ½¸«,AXE,twohand,cutting,heavy_cut,0.7,1,40,3,32.86,10,,,,,,,
+broadax,ÖØ¸«,AXE,twohand,cutting,heavy_cut,0.8,1,45,7,36.88,21,,,,,,,
+halberd,¸«Ç¹,AXE|SPEAR,twohand,polearm|cutting,spear|cut,0.75,2,30,10,33.33,10,,,,,,,
+spear,³¤Ã¬,SPEAR,twohand,polearm,spear,0.72,3,20,13,31.94,7,,,,,,,
+fauchard,Õ¶Ã¬,SPEAR,twohand,polearm|cutting,spear|cut,0.8,2,38,6,31.25,14,,,,,,,
+trident,Èý²æêª,SPEAR,twohand,polearm,spear,0.8,3,31,10,31.88,18,,,,,,,
+scythe,´óÁ­,SICKLE,twohand,cutting|bashing,heavy_cut|heavy_bash,0.8,4,48,3,33.75,17,,,,,,,
+staves,·¨ÕÈ,STICK,twohand,bashing,bash,0.66,1,22,3,21.21,5,,,,,,,
+mace,¶¤´¸,HAMMER,hand,bashing,bash,0.66,3,16,3,16.67,7,,,,,,,
+sledgehammer,ÖØ´¸,HAMMER,twohand,bashing,heavy_bash,0.8,2,50,6,38.75,12,,,,,,,
+long_stick,³¤¹÷,STICK,twohand,bashing,bash,0.58,2,22,8,32.76,6,,,,,,,
+shield_wood,Ä¾¶Ü,SHIELD,shield,shield,bash,0.7,2,12,2,11.43,1,,,,,,,0.3
+shield_light,Çá¶Ü,SHIELD,shield,shield,bash,0.7,2,12,2,11.43,5,,,,,,,0.3
+shield_tower,Ëþ¶Ü,SHIELD,shield,shield,bash,1.0 ,2,22,2,13,10,,,,,,,0.05
+shield_arm,±Û¶Ü,SHIELD,shield,shield,bash,0.7,2,12,2,11.43,15,,,,,,,0.5
+shield_cone,¼â×¶¶Ü,SHIELD,shield,shield,bash,0.9,2,10,6,12.22,8,,,,,,,0.2
+shield_heavy,ÖØ¶Ü,SHIELD,shield,shield,bash,0.9,2,18,2,12.22,20,,,,,,,0.1
+shield_alloy,ºÏ½ð¶Ü,SHIELD,shield,shield,bash,0.9,2,18,2,12.22,30,,,,,,,0.1
+shield_royal,»Ê¼Ò¶Ü,SHIELD,shield,shield,bash,0.9 ,2,20,2,13.33,45,,,,,,,0.1

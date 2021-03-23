@@ -58,6 +58,7 @@ function Unit:isInPlayerFaction()
   return self.faction==1
 end
 
+--再队伍中，播放信息的角色
 function Unit:isInPlayerTeam()
   return self==p.team[1] or self==p.team[2] or self==p.team[3] or self==p.team[4]
 end

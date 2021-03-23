@@ -18,8 +18,11 @@ function Unit:die(killer,dam_ins)
 
   self.dead = true
   rawset(self,"killer",killer)--设置killer
-
-
+  
+  
+  
+  self:clearDelayFunc() --清除delayfunction，防止复活重用。以及清理一些引用 
+  
   self:drop_frames_to_map()--掉落特效到地图上
 
   --解除在地图上的位置，activeUnit列表里靠自己清理。

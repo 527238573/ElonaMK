@@ -37,7 +37,7 @@ local function loadAbilities()
       if key=="id" then
         dataT.id = val
       elseif  key=="name" then
-        dataT.name = val
+        dataT.name = c.gbk2utf8(val)
       elseif  key=="icon" then
         local img = data.ability_icon[val]
         if img ==nil then error("ability_icon error:"..val) end
@@ -56,11 +56,20 @@ local function loadAbilities()
       elseif key == "cooldown" then
         dataT[key] = tonumber(val) or 1
       elseif key == "description" then
-        dataT[key] = val
+        dataT[key] = c.gbk2utf8(val)
       elseif key == "target_type" then
         dataT[key] = val
       elseif key == "range" then
         dataT[key] = val
+      elseif key == "hit_skill" then
+        if val=="" then val = "magic_chant"end
+        dataT[key] = val
+      elseif  key=="diceNum" then
+        dataT[key] = tonumber(val) or 0
+      elseif  key=="diceFace" then
+        dataT[key] = tonumber(val) or 0
+      elseif  key=="baseAtk" then
+        dataT[key] = tonumber(val) or 0
       else
         error("error key:"..key)
       end
@@ -76,30 +85,7 @@ local function loadAbilities()
   debugmsg("load abilities Nubmer:"..(index-1))
   file:close()
 
-  --loadname
-  file = assert(io.open(c.source_dir.."data/ability/ability_name.csv","r"))
-  line = file:read()
-  attrName = string.split(line,",") 
-  attrName[1] = "id" --utf8头，需要修正
-  line = file:read()
-  while(line) do
-    local strDH = string.split(line,",") 
-    local dataT = nil
-    for i=1,#strDH do
-      local val = strDH[i]
-      local key = attrName[i] 
-      if key=="id" then
-        dataT = data_type_t[val]
-      elseif  key=="name" then
-        --debugmsg(dataT[key].." "..val.." "..c.gbk2utf8(dataT[key]))
-        dataT[key] = val
-      elseif  key=="description" then
-        dataT[key] = val
-      end
-    end
-    line = file:read()
-  end    
-  file:close()
+  
 end
 
 

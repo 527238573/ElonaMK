@@ -36,6 +36,9 @@ function Effect:getBackColor() --名字框颜色。
 end
 --分级
 function Effect:getDescription()
+  if self.description ~= nil then
+    return self.description
+  end
   return self.type.description
 end
 

@@ -86,21 +86,18 @@ function Ability:use(source_unit,showmsg,...)
   return false
 end
 
---计算实际效用的level，命中伤害等
+-- baseLevel代表技能的难度等级，baselevel 为30的技能 1级就相当于31级难度
 function Ability:getCombinedLevel()
   return math.floor(self.level) +self.type.baseLevel
 end
 
---技能等级提升时所相当的等级，暂定
-function Ability:getLearningLevel()
-  return math.floor(self.level) +self.type.baseLevel
-end
+
 
 local ability_up_str = tl("%s的%s升级了。","%s's %s levels up.")
 function Ability:train(exp,explv,unit)
   exp = math.max(0,exp)
   local level = self.level
-  local cur_lv =self:getLearningLevel()
+  local cur_lv =self:getCombinedLevel()
   local growExp = 1000*self.type.difficulty --技能等级每级提升的经验默认1000，但随difficulty有修正
   
   local lv_fix =1
