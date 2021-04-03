@@ -128,6 +128,7 @@ function Unit:findConditionRangeUnitOrSquare(showmsg,aiTarget,clearTarget,condit
   end
   --第二优先级，所手选的目标。
   if self:checkTarget() then 
+    
     if conditionCheck(self.target.unit,self.target.x,self.target.y) then
       return self.target
     end

@@ -35,7 +35,7 @@ function Player:walk_to(dest_x,dest_y)
   self.x = dest_x --更换地图上的位置。
   self.y= dest_y
   --设置动画。 
-  self.clip = AnimClip.new("move",costtime,dx*64,dy*64,self.mc:get_unitAnim_playSpeed()*2.1)
+  self.clip = Animation.Move(costtime,dx*64,dy*64,self.mc:get_unitAnim_playSpeed()*2.1)
   self.delay = costtime
   return true
 end
@@ -55,12 +55,10 @@ function Player:updateOM(dt)
   status.scaleX = 1;status.scaleY =1;
   status.camera_dx = 0;status.camera_dy = 0
   local clip = self.clip
-  if clip~= nil and clip~=0 then
-    clip.time = clip.time+dt
-    if clip.time> clip.totalTime then
-      self.clip=0
-    else
-      clip.type.updateStatus(clip,dt,status,self)
+  if clip~= nil then
+    clip:updateAnim(dt,status,self)
+    if clip:isFinished() then
+      self.clip=nil
     end
   end
 end

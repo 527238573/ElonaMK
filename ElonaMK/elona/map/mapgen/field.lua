@@ -57,7 +57,7 @@ function dirt.generate(newmap,ovmap,x,y)
     local gx,gy = rnd(0,newmap.realw-1),rnd(0,newmap.realh-1)
     for nx,ny in c.closest_xypoint_first(gx,gy,size) do
       if newmap:inbounds_real(nx,ny) then
-        if rnd()<= (size -c.dist_2d(nx,ny,gx,gy))/size then newmap.ter[ny*newmap.realw+nx+1] = gtype end
+        if rnd()<= (size -c.dist_2d(nx,ny,gx,gy))/size then newmap:genTer(gtype,nx,ny) end
       end
     end
   end
@@ -70,7 +70,9 @@ function dirt.generate(newmap,ovmap,x,y)
                               [bi["sapling"]]=4,[bi["tree1"]]=1,[bi["tree2"]]=1,[bi["tree3"]]=3,[bi["withered_tree"]]=15,
                               [bi["stump"]]=12,[bi["cactus"]]=20
                               }
-  for i=1,newmap.realw*newmap.realh do if rnd()<0.06 then newmap.block[i] = pick(block_w) end end
+    for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+      if rnd()<0.06 then newmap:genBlock(pick(block_w),nx,ny) end
+    end
   elseif tree_lv==1 then
   local block_w =  c.weightT{[bi["gallet1"]]=200,[bi["gallet2"]]=200,[bi["stone"]]=100,[bi["bush1"]]=150,[bi["bush2"]]=100,[bi["bush3"]]=100,
                               [bi["grass1"]]=20,[bi["grass2"]]=20,[bi["grass3"]]=20,[bi["grasscluster"]]=3,[bi["weed1"]]=5,[bi["weed2"]]=5,[bi["weed3"]]=5,
@@ -79,7 +81,9 @@ function dirt.generate(newmap,ovmap,x,y)
                               [bi["sapling"]]=80,[bi["tree1"]]=60,[bi["tree2"]]=60,[bi["tree3"]]=60,[bi["withered_tree"]]=50,
                               [bi["pine"]]=80,[bi["fruiter"]]=80,[bi["stump"]]=60,[bi["cactus"]]=20
                               }
-      for i=1,newmap.realw*newmap.realh do if rnd()<0.12 then newmap.block[i] = pick(block_w) end end
+    for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+      if rnd()<0.12 then newmap:genBlock(pick(block_w),nx,ny) end
+    end
   else--tree_lv==2
   local block_w =  c.weightT{[bi["gallet1"]]=90,[bi["gallet2"]]=90,[bi["stone"]]=50,[bi["bush1"]]=200,[bi["bush2"]]=100,[bi["bush3"]]=100,
                               [bi["grass1"]]=20,[bi["grass2"]]=20,[bi["grass3"]]=20,[bi["grasscluster"]]=1,[bi["weed1"]]=2,[bi["weed2"]]=2,[bi["weed3"]]=3,
@@ -88,12 +92,16 @@ function dirt.generate(newmap,ovmap,x,y)
                               [bi["sapling"]]=160,[bi["tree1"]]=80,[bi["tree2"]]=80,[bi["tree3"]]=80,[bi["withered_tree"]]=80,
                               [bi["pine"]]=100,[bi["fruiter"]]=80,[bi["stump"]]=60,
                               }
-      for i=1,newmap.realw*newmap.realh do if rnd()<0.24 then newmap.block[i] = pick(block_w) end end
+    for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+      if rnd()<0.24 then newmap:genBlock(pick(block_w),nx,ny) end
+    end
   end
   
   if ovmap:hasFlag("STUMP",x,y) then
     local tree_w =  c.weightT{[bi["stump"]]=80,[bi["withered_tree"]]=5,[bi["tree1"]]=1,[bi["tree2"]]=1,[bi["tree3"]]=1}
-      for i=1,newmap.realw*newmap.realh do if newmap.block[i] ==1 and rnd()<0.03 then newmap.block[i] = pick(tree_w) end end
+    for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+      if newmap:getBlock_real(nx,ny)==1 and rnd()<0.03 then newmap:genBlock(pick(tree_w),nx,ny) end
+    end
   end
   addDeadTree(newmap,ovmap,x,y,false)
   addPlant(newmap,ovmap,x,y,false)
@@ -124,9 +132,8 @@ function grass.generate(newmap,ovmap,x,y)
   --生成地表
   local baseground = ti["ngrass"]
   if tree_lv >1 then baseground = ti["dgrass"] end
-  for i=1,newmap.realw*newmap.realh do 
-    newmap.ter[i] = baseground 
-  end
+  newmap:genAllTer(baseground)
+  
   --群簇地表
   local group_weight,size_weight,group_num
   if tree_lv ==0 then
@@ -148,7 +155,7 @@ function grass.generate(newmap,ovmap,x,y)
     local gx,gy = rnd(0,newmap.realw-1),rnd(0,newmap.realh-1)
     for nx,ny in c.closest_xypoint_first(gx,gy,size) do
       if newmap:inbounds_real(nx,ny) then
-        if rnd()<= (size -c.dist_2d(nx,ny,gx,gy))/size then newmap.ter[ny*newmap.realw+nx+1] = gtype end
+        if rnd()<= (size -c.dist_2d(nx,ny,gx,gy))/size then newmap:genTer(gtype,nx,ny) end
       end
     end
   end
@@ -161,7 +168,10 @@ function grass.generate(newmap,ovmap,x,y)
                               [bi["sapling"]]=80,[bi["tree1"]]=30,[bi["tree2"]]=30,[bi["tree3"]]=30,[bi["withered_tree"]]=40,
                               [bi["pine"]]=2,[bi["fruiter"]]=30,[bi["stump"]]=50,
                               }
-  for i=1,newmap.realw*newmap.realh do if rnd()<0.1 then newmap.block[i] = pick(block_w) end end
+ 
+    for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+      if rnd()<0.1 then newmap:genBlock(pick(block_w),nx,ny) end
+    end
   elseif tree_lv==1 then
   local block_w =  c.weightT{[bi["gallet1"]]=200,[bi["gallet2"]]=200,[bi["stone"]]=30,[bi["bush1"]]=400,[bi["bush2"]]=150,[bi["bush3"]]=150,
                               [bi["grass1"]]=80,[bi["grass2"]]=60,[bi["grass3"]]=60,[bi["grasscluster"]]=5,[bi["weed1"]]=5,[bi["weed2"]]=5,[bi["weed3"]]=5,
@@ -170,21 +180,29 @@ function grass.generate(newmap,ovmap,x,y)
                               [bi["sapling"]]=180,[bi["tree1"]]=60,[bi["tree2"]]=60,[bi["tree3"]]=60,[bi["withered_tree"]]=50,
                               [bi["pine"]]=80,[bi["fruiter"]]=80,[bi["stump"]]=60,
                               }
-      for i=1,newmap.realw*newmap.realh do if rnd()<0.15 then newmap.block[i] = pick(block_w) end end
+      
+    for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+      if rnd()<0.15 then newmap:genBlock(pick(block_w),nx,ny) end
+    end
   else--tree_lv==2
-  local block_w =  c.weightT{[bi["gallet1"]]=100,[bi["gallet2"]]=100,[bi["stone"]]=10,[bi["bush1"]]=200,[bi["bush2"]]=100,[bi["bush3"]]=100,
+    local block_w =  c.weightT{[bi["gallet1"]]=100,[bi["gallet2"]]=100,[bi["stone"]]=10,[bi["bush1"]]=200,[bi["bush2"]]=100,[bi["bush3"]]=100,
                               [bi["grass1"]]=50,[bi["grass2"]]=30,[bi["grass3"]]=30,[bi["grasscluster"]]=1,[bi["weed1"]]=3,[bi["weed2"]]=3,[bi["weed3"]]=5,
                               [bi["flower"]]=30,[bi["blossom1"]]=30,[bi["blossom2"]]=20,[bi["blossom3"]]=7,[bi["blossom4"]]=5,
                               [bi["vegetation1"]]=15,[bi["vegetation2"]]=4,[bi["vegetation3"]]=15,[bi["vegetation4"]]=4,[bi["rock_m"]]=2,
                               [bi["sapling"]]=160,[bi["tree1"]]=80,[bi["tree2"]]=80,[bi["tree3"]]=80,[bi["withered_tree"]]=50,
                               [bi["pine"]]=100,[bi["fruiter"]]=80,[bi["stump"]]=60,
                               }
-      for i=1,newmap.realw*newmap.realh do if rnd()<0.27 then newmap.block[i] = pick(block_w) end end
+     
+    for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+      if rnd()<0.27 then newmap:genBlock(pick(block_w),nx,ny) end
+    end
   end
   
   if ovmap:hasFlag("STUMP",x,y) then
     local tree_w =  c.weightT{[bi["stump"]]=80,}
-      for i=1,newmap.realw*newmap.realh do if newmap.block[i] ==1 and rnd()<0.04 then newmap.block[i] = pick(tree_w) end end
+    for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+      if newmap:getBlock_real(nx,ny)==1 and rnd()<0.04 then newmap:genBlock(pick(tree_w),nx,ny) end
+    end
   end
   addDeadTree(newmap,ovmap,x,y,false)
   addPlant(newmap,ovmap,x,y,false)
@@ -214,9 +232,7 @@ function desert.generate(newmap,ovmap,x,y)
   --生成地表
   local baseground = ti["desert"]
   debugmsg("base:.."..tostring(baseground))
-  for i=1,newmap.realw*newmap.realh do 
-    newmap.ter[i] = baseground 
-  end
+  newmap:genAllTer(baseground)
   --block
   
   local block_w =  c.weightT{[bi["gallet1"]]=3,[bi["gallet2"]]=3,[bi["stone"]]=80,[bi["rock_m"]]=20,
@@ -225,12 +241,15 @@ function desert.generate(newmap,ovmap,x,y)
                               [bi["vegetation1"]]=20,[bi["vegetation2"]]=10,[bi["vegetation3"]]=40,[bi["vegetation4"]]=20,
                               [bi["withered_tree"]]=15,[bi["stump"]]=15,[bi["cactus"]]=60
                               }
-  for i=1,newmap.realw*newmap.realh do if rnd()<0.06 then newmap.block[i] = pick(block_w) end end
-  
+  for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+    if rnd()<0.06 then newmap:genBlock(pick(block_w),nx,ny) end
+  end
   
   if ovmap:hasFlag("STUMP",x,y) then
     local tree_w =  c.weightT{[bi["stump"]]=13,[bi["withered_tree"]]=4}
-      for i=1,newmap.realw*newmap.realh do if newmap.block[i] ==1 and rnd()<0.03 then newmap.block[i] = pick(tree_w) end end
+    for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+      if newmap:getBlock_real(nx,ny)==1 and rnd()<0.03 then newmap:genBlock(pick(tree_w),nx,ny) end
+    end
   end
   addDeadTree(newmap,ovmap,x,y,false)
   addPlant(newmap,ovmap,x,y,false)
@@ -255,9 +274,7 @@ function snowland.generate(newmap,ovmap,x,y)
   
   --生成地表
   local baseground = ti["snow"]
-  for i=1,newmap.realw*newmap.realh do 
-    newmap.ter[i] = baseground 
-  end
+  newmap:genAllTer(baseground)
   --block
   local block_w =  c.weightT{[bi["road_snow1"]]=50,[bi["road_snow2"]]=50,[bi["road_snow3"]]=50,[bi["road_snow4"]]=50,[bi["road_snow5"]]=50,[bi["road_snow6"]]=50,
                               [bi["plant_snow1"]]=80,[bi["plant_snow2"]]=80,[bi["plant_snow3"]]=80,[bi["flower_snow1"]]=20,[bi["flower_snow2"]]=20,[bi["flower_snow3"]]=20,
@@ -265,20 +282,30 @@ function snowland.generate(newmap,ovmap,x,y)
                               [bi["stone_snow"]]=220,[bi["boulder"]]=150,[bi["snow_big_rock"]]=50,[bi["snow_pile"]]=5,[bi["snowball1"]]=180,[bi["snowball2"]]=180,
                               [bi["ice_pool"]]=30,[bi["snow_dead_wood"]]=60,[bi["stump_snow"]]=60,[bi["stump"]]=50,
                               [bi["withered_tree_snow"]]=60,[bi["pine_snow"]]=60,
-                              }
-  for i=1,newmap.realw*newmap.realh do if rnd()<0.06 then newmap.block[i] = pick(block_w) end end
+                            }
+                            
+  for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+    if rnd()<0.06 then newmap:genBlock(pick(block_w),nx,ny) end
+  end
+  
   --block
   if tree_lv==1 then
     local tree_w =  c.weightT{[bi["snow_dead_wood"]]=10,[bi["stump_snow"]]=60,[bi["stump"]]=30,[bi["withered_tree_snow"]]=80,[bi["pine_snow"]]=260,}
-      for i=1,newmap.realw*newmap.realh do if rnd()<0.02 then newmap.block[i] = pick(tree_w) end end
+    for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+      if rnd()<0.02 then newmap:genBlock(pick(tree_w),nx,ny) end
+    end
   elseif tree_lv==2 then
     local tree_w =  c.weightT{[bi["snow_dead_wood"]]=10,[bi["stump_snow"]]=30,[bi["stump"]]=10,[bi["withered_tree_snow"]]=60,[bi["pine_snow"]]=220,}
-      for i=1,newmap.realw*newmap.realh do if rnd()<0.08 then newmap.block[i] = pick(tree_w) end end
+    for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+      if rnd()<0.08 then newmap:genBlock(pick(tree_w),nx,ny) end
+    end
   end
   
   if ovmap:hasFlag("STUMP",x,y) then
     local tree_w =  c.weightT{[bi["snow_dead_wood"]]=1,[bi["stump_snow"]]=13,[bi["stump"]]=7,[bi["withered_tree_snow"]]=2,[bi["pine_snow"]]=2}
-      for i=1,newmap.realw*newmap.realh do if newmap.block[i] ==1 and rnd()<0.04 then newmap.block[i] = pick(tree_w) end end
+    for nx,ny in c.pointInRect(newmap.realw,newmap.realh) do 
+      if newmap:getBlock_real(nx,ny)==1 and rnd()<0.04 then newmap:genBlock(pick(tree_w),nx,ny) end 
+    end
   end
   addDeadTree(newmap,ovmap,x,y,true)
   addPlant(newmap,ovmap,x,y,true)
@@ -299,12 +326,14 @@ function addDeadTree(newmap,ovmap,x,y,isSnow)
     else
       wt =  c.weightT{[bi["stump"]]=1,[bi["withered_tree"]]=15}
     end
-    for i=1,newmap.realw*newmap.realh do if newmap.block[i] ==1 and rnd()<0.03 then newmap.block[i] = pick(wt) end end
+    for nx = 0,newmap.realw-1 do
+      for ny = 0,newmap.realh-1 do
+        if newmap:getBlock_real(nx,ny)==1 and rnd()<0.03 then newmap:genBlock(pick(wt),nx,ny) end
+      end
+    end
   end
-  
-  
-  
 end
+
 function addFlower(newmap,ovmap,x,y,isSnow)
   local flower_lv = 0
   if ovmap:hasFlag("MORE_FLOWER",x,y) then 
@@ -343,13 +372,10 @@ function addFlower(newmap,ovmap,x,y,isSnow)
     local gx,gy = rnd(0,newmap.realw-1),rnd(0,newmap.realh-1)
     for nx,ny in c.closest_xypoint_first(gx,gy,size) do
       if newmap:inbounds_real(nx,ny) then
-        local ipos = ny*newmap.realw+nx+1
-        if newmap.block[ipos]==1 and rnd()<= (size -c.dist_2d(nx,ny,gx,gy))/size then newmap.block[ipos] = pick(gwt) end
+        if newmap:getBlock_real(nx,ny)==1 and rnd()<= (size -c.dist_2d(nx,ny,gx,gy))/size then newmap:genBlock(pick(gwt),nx,ny) end
       end
     end
   end
-  
-  
 end
 
 function addPlant(newmap,ovmap,x,y,isSnow)
@@ -383,8 +409,7 @@ function addPlant(newmap,ovmap,x,y,isSnow)
     local gx,gy = rnd(0,newmap.realw-1),rnd(0,newmap.realh-1)
     for nx,ny in c.closest_xypoint_first(gx,gy,size) do
       if newmap:inbounds_real(nx,ny) then
-        local ipos = ny*newmap.realw+nx+1
-        if newmap.block[ipos]==1 and rnd()<= (size -c.dist_2d(nx,ny,gx,gy))/size then newmap.block[ipos] = pick(gwt) end
+        if newmap:getBlock_real(nx,ny)==1 and rnd()<= (size -c.dist_2d(nx,ny,gx,gy))/size then newmap:genBlock(pick(gwt),nx,ny) end
       end
     end
   end
@@ -411,16 +436,15 @@ function addRoad(newmap,ovmap,x,y,isDirt)
   local cx,cy = math.floor(newmap.realw/2),math.floor(newmap.realh/2)
   cx = cx+rnd(-5,5)
   cy = cy+rnd(-3,3)
-  newmap.block[cy*newmap.realw+cx+1]=1
-  newmap.ter[cy*newmap.realw+cx+1] = baseter
+  newmap:genBlock(1,cx,cy)
+  newmap:genTer(baseter,cx,cy)
   local chance = {[0] = 1, [1] = 0.98,[2]=0.7,[3] = 0.5,[4] =0.2 }
   
   
   --写入地格
   local function road_square(posx,posy)
-    local ipos = posy*newmap.realw+posx+1
-    newmap.block[ipos]=1
-    newmap.ter[ipos] = baseter 
+    newmap:genBlock(1,posx,posy)
+    newmap:genTer(baseter,posx,posy)
   end
   
   

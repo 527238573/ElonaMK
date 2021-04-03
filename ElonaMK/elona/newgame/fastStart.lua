@@ -137,4 +137,6 @@ function g.fastStart()
   p.mc:learnAbility("ancient_wisdom")
   
   girl:learnAbility("charge")
+  girl:learnAbility("jump_slash")
+  girl:learnAbility("round_slash")
 end

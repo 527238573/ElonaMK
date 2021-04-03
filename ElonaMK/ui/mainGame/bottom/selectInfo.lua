@@ -71,6 +71,8 @@ local bname = tl("障碍","Obstacle")
 local movecostname = tl("行走消耗:%d","Walk cost:%d")
 local movecost_nopass = tl("行走消耗:不可通行","Walk cost:impassable")
 local function draw_ter_info(map,tx,ty,x,y,w,h)
+  
+  local debugstr = string.format("(%d,%d)",tx,ty)
   love.graphics.setColor(1,1,1,0.5)
   suit.theme.drawScale9Quad(c.pic["iteminfo_s9"],x,y,w,h)
   love.graphics.setFont(c.font_c16)
@@ -83,8 +85,13 @@ local function draw_ter_info(map,tx,ty,x,y,w,h)
   local tinfo = data.ter[tid]
   local binfo = data.block[bid]
   love.graphics.setColor(1,1,1)
-  love.graphics.printf(tinfo.name, x+10, y+36,w-20,"left")
+  
+  local debugstr = string.format("%s(%d,%d)",tinfo.name,tx,ty)
+  
+  love.graphics.printf(debugstr, x+10, y+36,w-20,"left")
   love.graphics.printf(binfo.name, x+10, y+36,w-20,"right")
+  
+  --love.graphics.printf(debugstr, x+40, y+36,w-20,"left")
 
   if not binfo.pass then 
     love.graphics.setColor(1,0.2,0.2)

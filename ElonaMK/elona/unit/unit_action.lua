@@ -50,7 +50,7 @@ function Unit:walk_to(dest_x,dest_y)
   
   --local dx = self.x-dest_x
   --local dy = self.y-dest_y
-  local clip  = AnimClip.new("move",costtime,dx*64,dy*64,self:get_unitAnim_playSpeed())
+  local clip  = Animation.Move(costtime,dx*64,dy*64,self:get_unitAnim_playSpeed())
   self:addClip(clip)
   self:short_delay(costtime,"walk")
   return true
@@ -71,6 +71,21 @@ function Unit:teleport_to(dest_x,dest_y)
   end
   return false
 end
+
+--被动地被推挤了。默认目标点可通行。
+function Unit:push_to(dest_x,dest_y,delay,pushtime)
+  delay = delay or 0
+  pushtime = pushtime or 0.4
+  
+  local map = assert(self.map)
+  local dx = self.x-dest_x
+  local dy = self.y-dest_y
+  map:unitMove(self,dest_x,dest_y) --更换地图上的位置。
+  local clip  = Animation.Pushed(pushtime,delay,dx*64,dy*64,self:get_unitAnim_playSpeed())
+  self:addClip(clip)
+  self:short_delay(pushtime+delay,"pushed")
+end
+
 
 
 --操作move

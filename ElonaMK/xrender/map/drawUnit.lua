@@ -124,6 +124,7 @@ function render.generateUnitQueue(camera,map)
           return
         end
       end
+      --error("insert fail")
       table.insert(drawSequence,todraw)--罕见的没找到的情况。
     end
   end
@@ -136,11 +137,12 @@ function render.generateUnitQueue(camera,map)
     local dx,dy = status.dx,status.dy
     local liney = y + math.floor((dy+32)/64)
     local linex = x + math.floor((dx+32)/64)
+    local animY = y*64 +dy
     if  map:isMCSeen(x,y) or map:isMCSeen(linex,liney) then --逻辑处于可见区域或实际处于可见
-      insertUnit(unit,status,dy,liney)
+      
+      insertUnit(unit,status,animY,liney)
     end
   end
-  
   
   return queue
 end

@@ -12,7 +12,6 @@ local loadTerdata = require"elona/map/terdata"
 local loadAnimdata = require"elona/anim/animdata"
 local loadFramesdata = require"elona/anim/framedata"
 local loadUnitdata = require"elona/unit/unitdata"
-local loadAnimClip = require"elona/unit/animClip/animMethod"
 local loadItemdata = require"elona/item/itemdata"
 local loadFielddata = require"elona/field/fielddata"
 local loadAudiodata = require"elona/audio/sounddata"
@@ -52,6 +51,7 @@ require"elona/unit/unit_faction"
 require"elona/unit/unit_turn"
 require"elona/unit/unitfactory"
 require"elona/unit/animClip/animClip"
+require"elona/unit/animClip/Animation"
 require"elona/unit/fight/damage"
 require"elona/unit/fight/projectile"
 require"elona/unit/fight/unit_fight"
@@ -105,7 +105,6 @@ function data.init()
   loadAnimdata()
   loadFramesdata()
   loadUnitdata()
-  loadAnimClip()
   loadItemdata()
   loadFielddata()
   loadAudiodata()

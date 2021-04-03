@@ -1,15 +1,11 @@
+Animation = {} --保存创建初始化的函数
+AnimClip.updates = {}--保存update的函数
+local updates = AnimClip.updates
 
-data.animClip = {}
-local clip
-local function addClip(clip)
-  assert(data.animClip[clip.id]==nil)
-  setmetatable(clip,data.dataMeta)
-  data.animClip[clip.id] = clip
-end
-
-clip =  {id ="move",priority = 1,}--默认priority，可以覆写
-addClip(clip)
-function clip.init(clip,start_dx,start_dy,playSpeed)
+--move基本移动
+function Animation.Move(totalTime,start_dx,start_dy,playSpeed)
+  local clip = AnimClip.new("Move",totalTime)
+  clip.priority =1
   clip.playSpeed = playSpeed
   --clip.playSpeed = 0.5
   clip.start_dx = start_dx
@@ -18,8 +14,10 @@ function clip.init(clip,start_dx,start_dy,playSpeed)
   if start_dy>0 then start_dy=1 elseif start_dy<0 then start_dy =-1 end
   clip.turn_face = c.face(-start_dx,-start_dy)
   if start_dx~= 0 and start_dy~=0 then clip.playSpeed = clip.playSpeed*1.3 end
+  return clip
 end
-function clip.updateStatus(clip,dt,status,unit)
+
+function updates.Move(clip,dt,status,unit)
   status.face = clip.turn_face
   local rate = clip.time/clip.totalTime
   rate = c.clamp(rate,0,1)
@@ -34,17 +32,18 @@ function clip.updateStatus(clip,dt,status,unit)
   if status.rate>1 then status.rate = status.rate-1 end
 end
 
-clip =  {id ="moveAndBack",priority = 2,}--默认priority，可以覆写
-addClip(clip)
-function clip.init(clip,midRate,target_x,target_y) 
+
+function Animation.MoveAndBack(totalTime,midRate,target_x,target_y)
+  local clip = AnimClip.new("MoveAndBack",totalTime)
+  clip.priority =2
   clip.midRate = midRate
   --clip.playSpeed = 0.5
   clip.target_x = target_x
   clip.target_y = target_y
-
+  return clip
 end
 
-function clip.updateStatus(clip,dt,status,unit)
+function updates.MoveAndBack(clip,dt,status,unit)
   local rate = clip.time/clip.totalTime
   rate = c.clamp(rate,0,1)
   local crate
@@ -60,18 +59,18 @@ function clip.updateStatus(clip,dt,status,unit)
   status.rate = rate
 end
 
-clip =  {id ="impact",priority = 4,}--默认priority，可以覆写
-addClip(clip)
-function clip.init(clip,midRate,tdx,tdy,delay) 
+function Animation.Impact(totalTime,midRate,tdx,tdy,delay) 
+  local clip = AnimClip.new("Impact",totalTime)
+  clip.priority =4
   clip.delay = delay or 0
   clip.midRate = midRate
   clip.totalTime = clip.delay+clip.totalTime
   clip.tdx = tdx
   clip.tdy = tdy
+  return clip
 end
 
-
-function clip.updateStatus(clip,dt,status,unit)
+function updates.Impact(clip,dt,status,unit)
   if clip.time<clip.delay then return end
   local ctime = clip.time - clip.delay
 
@@ -86,17 +85,17 @@ function clip.updateStatus(clip,dt,status,unit)
   status.dy =status.dy+clip.tdy*rate;
 end
 
-clip =  {id ="turnFlat",priority = 4,}--默认priority，可以覆写
-addClip(clip)
-function clip.init(clip,midRate,t_scaleY,delay) 
+function Animation.TurnFlat(totalTime,midRate,t_scaleY,delay) 
+  local clip = AnimClip.new("TurnFlat",totalTime)
+  clip.priority =4
   clip.delay = delay or 0
   clip.midRate = midRate
   clip.totalTime = clip.delay+clip.totalTime
   clip.t_scaleY = t_scaleY
+  return clip
 end
 
-
-function clip.updateStatus(clip,dt,status,unit)
+function updates.TurnFlat(clip,dt,status,unit)
   if clip.time<clip.delay then return end
   local ctime = clip.time - clip.delay
 
@@ -112,9 +111,9 @@ function clip.updateStatus(clip,dt,status,unit)
   --status.dz =status.dz - 16*(1-clip.t_scaleY)*rate
 end
 
-clip =  {id ="jump_slash",priority = 2,}--默认priority，可以覆写
-addClip(clip)
-function clip.init(clip,midRate,tdx,tdy,tdz,backTime) 
+function Animation.JumpSlash(totalTime,midRate,tdx,tdy,tdz,backTime) 
+  local clip = AnimClip.new("JumpSlash",totalTime)
+  clip.priority =2
   clip.stage1t = clip.totalTime
   clip.totalTime = clip.totalTime +backTime
   clip.midRate = midRate
@@ -126,10 +125,10 @@ function clip.init(clip,midRate,tdx,tdy,tdz,backTime)
   clip.turn_face = c.face(tdx,tdy)
   local isRight = clip.turn_face>2 and clip.turn_face<7--左或右
   clip.rot = isRight and -0.2 or 0.2
+  return clip
 end
 
-
-function clip.updateStatus(clip,dt,status,unit)
+function updates.JumpSlash(clip,dt,status,unit)
   status.face = clip.turn_face
   if clip.time<clip.stage1t then
     local rate = clip.time/clip.stage1t
@@ -153,9 +152,9 @@ function clip.updateStatus(clip,dt,status,unit)
   end
 end
 
-clip =  {id ="round_slash",priority = 2,}--默认priority，可以覆写
-addClip(clip)
-function clip.init(clip,turnTime,backTime,r,startRot,face) 
+function Animation.RoundSlash(totalTime,turnTime,backTime,r,startRot,face)
+  local clip = AnimClip.new("RoundSlash",totalTime)
+  clip.priority =2
   clip.stage1t = clip.totalTime
   clip.stage2t = turnTime
   clip.stage3t = backTime
@@ -163,10 +162,10 @@ function clip.init(clip,turnTime,backTime,r,startRot,face)
   clip.r = r
   clip.startRot= startRot
   clip.turn_face = face
+  return clip
 end
 
-
-function clip.updateStatus(clip,dt,status,unit)
+function updates.RoundSlash(clip,dt,status,unit)
   if clip.time<clip.stage1t then
      status.face = clip.turn_face
     local rate = clip.time/clip.stage1t
@@ -186,20 +185,20 @@ function clip.updateStatus(clip,dt,status,unit)
   end
 end
 
---clip:charge
-clip =  {id ="charge",priority = 1,}--默认priority，可以覆写
-addClip(clip)
-function clip.init(clip,startx,starty,tarX,tarY,fdx,fdy) 
+function Animation.Charge(totalTime,startx,starty,tarX,tarY,fdx,fdy) 
+  local clip = AnimClip.new("Charge",totalTime)
+  clip.priority =1
   clip.startx_acoord = startx*64
   clip.starty_acoord = starty*64
   clip.sX_acoord  = tarX *64 +fdx - startx*64
   clip.sY_acoord = tarY *64 +fdy - starty*64
   clip.tarX = tarX
   clip.tarY = tarY
-  
   clip.playSpeed = 2
+  return clip
 end
-function clip.updateStatus(clip,dt,status,unit)
+
+function updates.Charge(clip,dt,status,unit)
   local rate = clip.time/clip.totalTime
   rate = c.clamp(rate,0,1)
   
@@ -224,20 +223,19 @@ function clip.updateStatus(clip,dt,status,unit)
 
   status.rate = status.rate+drate
   if status.rate>1 then status.rate = status.rate-1 end
-  
-  --debugmsg("charge update")
 end
 
-clip =  {id ="recoverPos",priority = 1,}--默认priority，可以覆写
-addClip(clip)
-function clip.init(clip,startx,starty,fdx,fdy,tarX,tarY) 
+function Animation.RecoverPos(totalTime,startx,starty,fdx,fdy,tarX,tarY) 
+  local clip = AnimClip.new("RecoverPos",totalTime)
+  clip.priority =1
   clip.move_coordx = startx*64+fdx -tarX*64
   clip.move_coordy = starty*64+fdy -tarY*64
   
   clip.playSpeed = 0.5
+  return clip
 end
 
-function clip.updateStatus(clip,dt,status,unit)
+function updates.RecoverPos(clip,dt,status,unit)
   local rate = clip.time/clip.totalTime
   rate = 1-c.clamp(rate,0,1)
   
@@ -250,13 +248,45 @@ function clip.updateStatus(clip,dt,status,unit)
 
   status.rate = status.rate+drate
   if status.rate>1 then status.rate = status.rate-1 end
-  
-  --debugmsg("charge update")
 end
 
-return function ()
-  for k,v in pairs(data.animClip) do
-    v.id = k
-    setmetatable(v,data.dataMeta)--作为不保存类型。
+function Animation.Pushed(totalTime,delay,start_dx,start_dy,playSpeed)
+  local clip = AnimClip.new("Pushed",totalTime)
+  clip.priority =2
+  clip.delay = delay
+  clip.totalTime = clip.delay+clip.totalTime
+  
+  clip.playSpeed = playSpeed
+  clip.start_dx = start_dx
+  clip.start_dy = start_dy
+  if start_dx>0 then start_dx=1 elseif start_dx<0 then start_dx =-1 end --标准化为1
+  if start_dy>0 then start_dy=1 elseif start_dy<0 then start_dy =-1 end
+  if start_dx~= 0 and start_dy~=0 then clip.playSpeed = clip.playSpeed*1.3 end
+  return clip
+end
+
+function updates.Pushed(clip,dt,status,unit)
+  if clip.time<clip.delay then 
+    status.dx =status.dx+clip.start_dx;
+    status.dy =status.dy+clip.start_dy;
+    status.camera_dx = status.camera_dx+clip.start_dx
+    status.camera_dy = status.camera_dy+clip.start_dy
+    return 
   end
+  local ctime = clip.time - clip.delay
+  local pushtime = clip.totalTime-clip.delay
+  
+  local rate = ctime/pushtime
+  rate = c.clamp(rate,0,1)
+  local dx = clip.start_dx*(1-rate)
+  local dy = clip.start_dy*(1-rate)
+  status.dx =status.dx+dx;
+  status.dy =status.dy+dy;
+  status.camera_dx = status.camera_dx+dx
+  status.camera_dy = status.camera_dy+dy
+
+  local drate = dt/pushtime*clip.playSpeed
+
+  status.rate = status.rate+drate
+  if status.rate>1 then status.rate = status.rate-1 end
 end

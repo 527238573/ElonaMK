@@ -19,9 +19,9 @@ end
 
 local function getsquare(map,x,y)
   if (x>=-map.edge and x<=map.w+map.edge-1 and y>=-map.edge and y<=map.h+map.edge-1) then
-    return map:getTer(x,y)
+    return map:getTer(x,y),{map:getTerColor(x,y)}
   else
-    return nil
+    return nil,nil
   end
 end
 
@@ -36,12 +36,12 @@ local htileRad=   {r18,r9,r27,r0,r0,r18,r18,r27,r0,r9,r27,r9,r0,r9,r0}
 --diretion: up =8 right=4 down =2 left =1
 
 local function drawSquareToBatch(map,x,y)
-  local tid= getsquare(map,x,y)
+  local tid,tColor= getsquare(map,x,y)
   if tid ==nil then return end
-  local up  = getsquare(map,x,y+1)
-  local right  = getsquare(map,x+1,y)
-  local down  = getsquare(map,x,y-1)
-  local left  = getsquare(map,x-1,y)
+  local up,upColor  =       getsquare(map,x,y+1)
+  local right,rightColor  = getsquare(map,x+1,y)
+  local down,downColor  =   getsquare(map,x,y-1)
+  local left,leftColor  =   getsquare(map,x-1,y)
   
   local dx,dy = x-lastSX,y-lastSY
   local sx,sy = dx*64,(-dy-1)*64 --左上角相对坐标
@@ -49,6 +49,9 @@ local function drawSquareToBatch(map,x,y)
   
   
   local info = data.ter[tid]
+  --上色。
+  batch:setColor(tColor)
+  
   if info.type=="edged" then
     --左上角
     if up== tid then
@@ -113,7 +116,7 @@ local function drawSquareToBatch(map,x,y)
   --drawHierarchy
   local edgelist
   
-  local function checkEdge(edge,direction)
+  local function checkEdge(edge,direction,color)
     if edge==nil then return end
     local edge_ter_info = data.ter[edge]
     if(edge_ter_info.type =="hierarchy") and (edge_ter_info.priority > info.priority) then
@@ -121,19 +124,19 @@ local function drawSquareToBatch(map,x,y)
       if(edgelist==nil) then edgelist = {}end
       for i = 1,4 do 
         if(edgelist[i]==nil) then 
-          edgelist[i] = {index =edge, val = direction,p =edge_ter_info.priority,info = edge_ter_info}
+          edgelist[i] = {index =edge, val = direction,p =edge_ter_info.priority,info = edge_ter_info,color = color}
           break
         elseif edgelist[i].index == edge then
           edgelist[i].val = edgelist[i].val+direction
           break
         elseif edgelist[i].p>edge_ter_info.priority then
-          table.insert(edgelist,i,{index =edge, val = direction,p =edge_ter_info.priority,info = edge_ter_info})
+          table.insert(edgelist,i,{index =edge, val = direction,p =edge_ter_info.priority,info = edge_ter_info,color = color})
           break
         end
       end
     end
   end
-  checkEdge(up,8);checkEdge(right,4);checkEdge(down,2);checkEdge(left,1)
+  checkEdge(up,8,upColor);checkEdge(right,4,rightColor);checkEdge(down,2,downColor);checkEdge(left,1,leftColor)
   if edgelist~=nil then 
     for _,v in ipairs(edgelist) do
       local to_render_info = v.info
@@ -141,6 +144,7 @@ local function drawSquareToBatch(map,x,y)
       local quad = to_render_info[htileIndex[v.val]]
       local ox = 32/scale --一半，取中心点旋转
       local oy = 32/scale
+      batch:setColor(v.color)
       batch:add(quad,sx+32,sy+32,rotation,scale,scale,ox,oy) --直接使用常数
     end
   end

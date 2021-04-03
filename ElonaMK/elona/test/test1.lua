@@ -17,7 +17,11 @@ function Test.genMonster()
   for i=1,1 do
     local utype = gentype()
     local unit = UnitFactory.create(utype.id,nil,"wild")
+    
+    
     cmap:monsterSpawn(unit,p.mc.x,p.mc.y+3,false)
+    
+    
     unit:setFaction("wild")
   end
 end
@@ -78,7 +82,22 @@ function Test.play_sound1()
   g.playSound("charge",p.mc.x,p.mc.y)
 end
 function g.test2()
-  g.playSound("charge2",p.mc.x,p.mc.y)
+  --g.playSound("charge2",p.mc.x,p.mc.y)
+  --debugOn()
+  local gentype = UnitFactory.randomUnitTypeByLevel(10)
+
+  for i=1,1 do
+    local utype = gentype()
+    local unit = UnitFactory.create(utype.id,nil,"wild")
+    
+    
+    --cmap:monsterSpawn(unit,p.mc.x,p.mc.y+3,false)
+    cmap:unitPushPlace(unit,p.mc.x,p.mc.y+3)
+    
+    unit:setFaction("wild")
+  end
+  Test.refuel_mana()
+  --debugOff()
 end
 
 

@@ -173,3 +173,186 @@ function Map:monsterSpawn(unit,x,y,force)
   end
   self:unitSpawn(unit,x,y,force)
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--搜索一条推挤单位的路径。push_dis推挤距离
+local function searchPushRoute(map,x,y,push_dis)
+  push_dis = math.max(1,push_dis or 4) --默认4格距离,最小为1
+  local max_dis = math.ceil(push_dis)--非整数时，计算影响最远格子距离（比如3.5，那么最远推按4格）
+  
+  local searched = {} --储存搜索路径信息
+  --搜索落脚空间 
+  for i=-max_dis,max_dis do
+    searched[i] = {} --二维数组
+  end
+  --remain_dis：剩余可延伸的距离
+  --lastdir 上次推挤的方向(1-8)。
+  --原点 --连续推挤最多3个单位（4个地格距离）
+  searched[0][0] = {remain_dis = push_dis, lastdir = 0}
+  
+  --增加一个预搜索的地格info路径信息
+  --Px py：路径的前一个坐标
+  local function addRoadInfo(px,py,remain_dis,lastdir)
+    --输入的dir可能不在1~8范围内，在这里规范到1~8内
+    lastdir = (lastdir-1)%8 +1
+    
+    if lastdir %2 ==1 then --斜向移动消耗1.5
+      remain_dis = remain_dis-1.5
+    else
+      remain_dis = remain_dis-1
+    end
+    
+    local fx,fy = c.face_dir(lastdir)
+    local tx,ty = fx+px,fy+py --需要添加路径信息的坐标
+    local roadinfo = searched[tx][ty] --可能被添加过了
+    if roadinfo ==nil or roadinfo.remain_dis<remain_dis then--没有添加过，或当前路径更短
+      searched[tx][ty] = {px =px, py = py, lastdir = lastdir,remain_dis =remain_dis} --增加路径信息
+    end
+  end
+  
+  
+  --搜索节点，顺带添加与此节点链接的路径信息
+  local function search_space(dx,dy)
+    local sx,sy = dx+x,dy+y --当前地点真实坐标
+    local roadinfo = searched[dx][dy] --当前路径信息
+    
+    
+    if roadinfo ==nil then --没有通向此处的路径，可能在墙后面。
+      
+      return false --直接返回。此格无效
+    end
+    
+    if not (dx==0 and dy ==0) then
+      --当前不是起始点
+      ----判断这个地格是否是终点
+      if not map:can_pass(sx,sy) then
+        return false --如果不可通行，直接返回。
+      end
+      if map:unit_at(sx,sy) ==nil then
+        --可通行，--又没有单位占用的地格，
+        --debugmsg("search end:"..sx.." "..sy)
+        return true --有路径信息，这就是终点。
+      end
+    end
+    
+    
+    --现在是可通行，有路径，但是有单位占用。需要准备搜索其他格
+    if roadinfo.remain_dis<=0 then 
+      return false --搜索距离用完了。不用往下执行
+    end
+    
+    --安排路径点
+    if dx==0 and dy ==0 then
+      for dir= 1,8 do 
+        addRoadInfo(dx,dy,roadinfo.remain_dis,dir)
+      end
+    else
+      --本次的方向只能+0，+1 或-1 或+2-2
+      addRoadInfo(dx,dy,roadinfo.remain_dis,roadinfo.lastdir)
+      addRoadInfo(dx,dy,roadinfo.remain_dis,roadinfo.lastdir+1)
+      addRoadInfo(dx,dy,roadinfo.remain_dis,roadinfo.lastdir-1)
+      addRoadInfo(dx,dy,roadinfo.remain_dis,roadinfo.lastdir+2)
+      addRoadInfo(dx,dy,roadinfo.remain_dis,roadinfo.lastdir-2)
+    end
+    return false--当前不是终点，返回。
+  end
+  
+  --开始搜索，从原点开始扫描周围
+  for nx,ny in c.closest_xypoint_rnd(0,0,max_dis) do--push_dis=4时是9*9的方框内。够大了
+    --debugmsg("search point:"..nx.." "..ny)
+    if search_space(nx,ny) then
+      --搜索成功，建立路径
+      local route = {}
+      local sx,sy = nx,ny
+      while (not(sx==0 and sy ==0)) do
+        local roadinfo = searched[sx][sy]
+        table.insert(route,{x = x+sx,y=y+sy})
+        sx,sy = roadinfo.px,roadinfo.py
+      end
+      return route
+    end
+  end
+  
+  --没有搜索到,地图挤满了
+  return nil
+end
+
+
+
+
+
+
+
+
+
+
+
+
+--将单位置于X,Y位置，推挤原有xy上的单位。
+--strength最远推挤距离。 最小为1，默认为4
+--返回false表示仍然有单位重叠
+function Map:unitPushPlace(unit,x,y,strength)
+  if not self:inbounds(x,y) then --若超出范围
+    x =c.clamp(x,0,self.w-1)
+    y =c.clamp(y,0,self.h-1)
+  end
+  strength = strength or 4
+  
+  if (unit.map == self) then --移动到所在点，排外最末尾。
+    self:unitMove(unit,x,y)
+  else
+    self:unitEnter(unit,x,y)
+  end
+  
+  --如果有单位
+  local unit_topush = self:unit_at(x,y)
+  while(unit_topush~= unit) do
+    
+    local route = searchPushRoute(self,x,y,strength)
+    if route then
+      --路径是从后到前的
+      --[[
+      local str =""
+      for i=1,#route do
+        str = str.. string.format("(%d,%d),",route[i].x,route[i].y)
+      end
+      debugmsg(str)]]
+      local delay = 0.2*(#route-1)
+      local pushtime =0.4
+      
+      for i=2,#route do
+        local uc = route[i]
+        local dc = route[i-1]
+        local cu = self:unit_at(uc.x,uc.y)
+        
+        cu:push_to(dc.x,dc.y,delay,pushtime)
+        delay = delay -0.2
+        --pushtime =pushtime-0.05
+      end
+      local last = route[#route]
+      unit_topush:push_to(last.x,last.y,delay,pushtime)
+    else
+      --没有路径
+      debugmsg("no room to push unit!")
+      return false
+    end
+    
+    unit_topush = self:unit_at(x,y)
+  end
+  return true
+end
+
+
+

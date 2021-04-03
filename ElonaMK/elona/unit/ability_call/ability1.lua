@@ -19,7 +19,7 @@ local function fire_proj(source_unit,target,proj)
   
   local dx =math.cos(proj.rotation) *8
   local dy =-math.sin(proj.rotation) *8
-  local clip  = AnimClip.new("impact",0.21,0.3333,dx,dy,0)--运动时间：0.07,0.14
+  local clip  = Animation.Impact(0.21,0.3333,dx,dy,0)--运动时间：0.07,0.14
   source_unit:addClip(clip)
 end
 saveFunction(fire_proj) --使这个函数可以保存，吟唱火球到一半退出并保存游戏，读取后还能重建延迟调用。
@@ -37,7 +37,7 @@ local function stepback_anim(source_unit,target,ftime)
   local rotation =   -math.atan2 (movey, movex)
   local dx =-math.cos(rotation) *8
   local dy =math.sin(rotation) *8
-  local clip  = AnimClip.new("impact",0.3,0.8333,dx,dy,ftime-0.3) --运动时间：0.25,0.05
+  local clip  = Animation.Impact(0.3,0.8333,dx,dy,ftime-0.3) --运动时间：0.25,0.05
   clip.isRL= true --RL时间的clip，保证和RL时间的读条同步
   source_unit:addClip(clip)
   return clip

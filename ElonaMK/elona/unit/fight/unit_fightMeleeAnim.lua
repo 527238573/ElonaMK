@@ -7,7 +7,7 @@ function Unit:attack_animation(destunit,costtime)
   local midRate = 0.33 --冲锋时间占比33%
 
   local dx,dy =  destunit.x -self.x ,destunit.y - self.y
-  local clip  = AnimClip.new("moveAndBack",anim_time,midRate,dx*28,dy*28)
+  local clip  = Animation.MoveAndBack(anim_time,midRate,dx*28,dy*28)
   self:addClip(clip)
   self:short_delay(costtime,"melee_attack")
   return anim_time*midRate --返回冲锋时间
@@ -644,7 +644,7 @@ function Unit:melee_hit_animation(source_u,delay,hit_effect)
   if dx~=0 and dy~=0 then impact_xishu = 0.8 end
   local impact_rnd = (rnd()-0.5)*4 *impact_xishu    
   local tdx,tdy = 8*dx*impact_xishu+impact_rnd*dy,8*dy*impact_xishu+4*impact_rnd*dx
-  local clip  = AnimClip.new("impact",0.2,0.25,tdx,tdy,delay)
+  local clip  = Animation.Impact(0.2,0.25,tdx,tdy,delay)
   self:addClip(clip)
 end
 

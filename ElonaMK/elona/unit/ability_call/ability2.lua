@@ -22,9 +22,9 @@ local function jump_slash_delay_call(source_unit,target_unit,ax,ay,dx,dy,dam_ins
     if dx~=0 and dy~=0 then impact_xishu = 1.2 end
     local impact_rnd = (rnd()-0.5)*4 *impact_xishu    
     local tdx,tdy = 8*dx*impact_xishu+impact_rnd*dy,8*dy*impact_xishu+4*impact_rnd*dx
-    local impact_clip  = AnimClip.new("impact",0.2,0.25,tdx,tdy,0)
+    local impact_clip  = Animation.Impact(0.2,0.25,tdx,tdy,0)
     target_unit:addClip(impact_clip)
-    local flat_clip  = AnimClip.new("turnFlat",0.2,0.25,0.7,0)
+    local flat_clip  = Animation.TurnFlat(0.2,0.25,0.7,0)
     target_unit:addClip(flat_clip)
   else
     if showmsg then addmsg(tl("被躲开了。","But got dodged."),"info") end
@@ -41,8 +41,8 @@ end
 saveFunction(jump_slash_delay_call)--使这个函数可以保存  。
 
 abi_type = data.ability["jump_slash"]
---abi_type.cooldown = 0
---abi_type.costMana = 0
+abi_type.cooldown = 0
+abi_type.costMana = 0
 function abi_type.func(abi,source_unit,showmsg,target)
   target = source_unit:findCloseRangeEnemy(showmsg,target,false) --近战技能不会清除目标
   if target ==nil then return false end --找不到目标
@@ -53,7 +53,7 @@ function abi_type.func(abi,source_unit,showmsg,target)
   local t_unit = target.unit
   --攻击动画
   local dx,dy =  t_unit.x -source_unit.x ,t_unit.y - source_unit.y
-  local clip  = AnimClip.new("jump_slash",0.4,0.5,dx*28,dy*28,35,0.4)
+  local clip  = Animation.JumpSlash(0.4,0.5,dx*28,dy*28,35,0.4)
   source_unit:addClip(clip)
 
   --攻击动画动画
@@ -154,7 +154,7 @@ local function apply_dam_round_slash(map,x,y,dam_ins,source_unit)
       if dx~=0 and dy~=0 then impact_xishu = 1.2 end
       local impact_rnd = (rnd()-0.5)*4 *impact_xishu    
       local tdx,tdy = 8*dx*impact_xishu+impact_rnd*dy,8*dy*impact_xishu+4*impact_rnd*dx
-      local impact_clip  = AnimClip.new("impact",0.2,0.25,tdx,tdy,0)
+      local impact_clip  = Animation.Impact(0.2,0.25,tdx,tdy,0)
       unit:addClip(impact_clip)
       local fdx,fdy=0,0
       if dx~=0 and dy~=0 then
@@ -188,7 +188,7 @@ function abi_type.func(abi,source_unit,showmsg,target)
   g.playSound("swing_round_slash",source_unit.x,source_unit.y,1)
   local cface =  source_unit.status.face
   local facerot = source_unit:getFace_Rotation()
-  local clip  = AnimClip.new("round_slash",0.2,0.6,0.2,20,facerot,cface)
+  local clip  = Animation.RoundSlash(0.2,0.6,0.2,20,facerot,cface)
   source_unit:addClip(clip)
 
   local frame = FrameClip.createUnitFrame("round_slash",0,0,0)
@@ -234,18 +234,124 @@ end
 --[[*****************
 --冲锋 charge
 --**************--]]
-local function apply_dam_charge(x,y,fdx,fdy,source_unit,target_unit)
+--charge_rot冲锋方向换算成的1-8的方向，用于决定落脚点
+local function apply_dam_charge(x,y,fdx,fdy,charge_rot,source_unit,target_unit)
+  local map = source_unit.map
+  
+  local unit_at_des  = map:unit_at(x,y) 
+  if unit_at_des and( not source_unit:isHostile(unit_at_des)) then
+    unit_at_des = nil
+  end
+  if unit_at_des and (target_unit==nil) then
+    target_unit = unit_at_des
+  end
+  if unit_at_des == target_unit then
+    unit_at_des = nil
+  end
+  
+  
+  --先确定目标位置会不会被撞击到
+  local hitTarget = false 
+  local recoverToDes = true --恢复位置为冲锋目标点
+  if target_unit then
+    if target_unit.x == x and target_unit.y ==y then
+      recoverToDes = false
+      hitTarget = true
+    else
+      local lx,ly = target_unit:getLineXY()
+      if lx==x and ly ==y then
+        hitTarget = true
+      end
+    end
+  end
+  
+  --回退点
+  local ex,ey = x,y
+  --推挤点
+  local px,py = x,y
+  
+  
+  local function checkBackPoint(dir)
+    dir = (dir-1)%8 +1 --使dir在合法区间
+    debugmsg("check dir:"..dir)
+    local cx,cy  = c.face_dir(dir)
+    cx,cy = x +cx,y+cy
+    if map:can_pass(cx,cy)  then
+      local searchu = map:unit_at(cx,cy)
+      if searchu ==nil or (searchu==source_unit and source_unit.next_unit==nil) then
+        ex,ey = cx,cy
+        return true
+      end
+    end
+  end
+  local function checkPushPoint(dir)
+    dir = (dir-1)%8 +1 --使dir在合法区间
+    local cx,cy  = c.face_dir(dir)
+    cx,cy = x +cx,y+cy
+    if map:can_pass(cx,cy) and map:unit_at(cx,cy) ==nil then
+      px,py = cx,cy
+      return true
+    end
+  end
+  
+  --尝试推挤
+  local push = false
+  if not recoverToDes then
+    if checkPushPoint(charge_rot) then-- or checkPushPoint(charge_rot-1)  or checkPushPoint(charge_rot+1) then
+      push = true --成功找到位置进行推挤
+      recoverToDes = true
+    end
+  end
+  --push = false
+  
+  --寻找向后落点
+  if not recoverToDes then
+    
+    if checkBackPoint(charge_rot-4)  or checkBackPoint(charge_rot-3)  or checkBackPoint(charge_rot-5) then
+      recoverToDes = false
+      --debugmsg("check back suc")
+    else
+      --debugmsg("check back fail")
+      recoverToDes = true--没办法只能恢复到
+    end
+  end
+  
+  
+  if push then
+    --推挤动画
+    local pushx,pushy = c.face_dir(charge_rot)
+    target_unit:push_to(px,py,0,0.3)
+    local l = math.sqrt(pushx*pushx +pushy*pushy)
+    
+    local impact_clip  = Animation.Impact(0.3,0.4,-fdx*2,-fdy*2,0)
+    target_unit:addClip(impact_clip)
+    
+    target_unit:clips_update(0)
+  elseif hitTarget then
+    --被撞动画
+    local impact_clip  = Animation.Impact(0.4,0.25,-fdx*1.5,-fdy*1.5,0)
+    target_unit:addClip(impact_clip)
+  end
+  
+  debugmsg("ex ey :"..ex..","..ey)
+  if recoverToDes then
+    debugmsg("push place")
+    map:unitPushPlace(source_unit,ex,ey)
+  else
+    map:unitMove(source_unit,ex,ey)
+  end
+  
+  
+  
   local c_coordx = x*64+fdx
   local c_coordy = y*64+fdy
   
-  local ex,ey = x+1,y+1
-  source_unit.map:unitMove(source_unit,ex,ey)
-  local runTime = c.dist_2d(c_coordx,c_coordy,ex*64,ey*64)/64 *0.2
+  local runTime = c.dist_2d(c_coordx,c_coordy,ex*64,ey*64)/64 *0.4
   
   --source_unit:teleport_to(tx,ty)
-  local clip  = AnimClip.new("recoverPos",runTime,x,y,fdx,fdy,ex,ey)
+  local clip  = Animation.RecoverPos(runTime,x,y,fdx,fdy,ex,ey)
   source_unit:addClip(clip)
-  clip.type.updateStatus(clip,0,source_unit.status,source_unit)
+  source_unit:clips_update(0)
   
   source_unit:short_delay(runTime,"recover")
   
@@ -262,11 +368,14 @@ function abi_type.func(abi,source_unit,showmsg,target)
   local function CheckCondition(unit,x,y)
     if unit then x,y = unit.x,unit.y end
     local currange= c.dist_2d(source_unit.x,source_unit.y,x,y)
-    if currange<4 then --距离太近
+    if currange<2.5 then --距离太近
+      return false
+    end
+    local map = source_unit.map
+    if not map:can_pass(x,y) then
       return false
     end
     
-    local map = source_unit.map
     if unit then 
       if not source_unit:isHostile(unit) then
         return false
@@ -279,7 +388,7 @@ function abi_type.func(abi,source_unit,showmsg,target)
       end
       return false
     else
-      return map:can_pass(x,y)
+      return true
     end
   end
   target = source_unit:findConditionRangeUnitOrSquare(false,target,false,CheckCondition)
@@ -300,14 +409,21 @@ function abi_type.func(abi,source_unit,showmsg,target)
   local dist = c.dist_2d(sx,sy,tx,ty)
   local fdx,fdy = (sx-tx)/dist*30 ,(sy-ty)/dist*30
   
-  local runTime = dist*0.1
+  local rot = math.atan2(ty-sy,tx-sx)
   
-  source_unit:short_delay(runTime,"charge")
+  rot = (-math.pi*9/8-rot)%(math.pi*2) *4/math.pi
+  rot = math.ceil(rot)
+  if rot <=0 then rot =8 end
+  --debugmsg("rot:"..rot)
+  
+  local runTime = dist*0.08
+  
+  source_unit:short_delay(runTime+0.1,"charge")
   --source_unit:teleport_to(tx,ty)
-  local clip  = AnimClip.new("charge",runTime,source_unit.x,source_unit.y,tx,ty,fdx,fdy)
+  local clip  = Animation.Charge(runTime,source_unit.x,source_unit.y,tx,ty,fdx,fdy)
   source_unit:addClip(clip)
   
-  source_unit:insertAnimDelayFunc(runTime,apply_dam_charge,tx,ty,fdx,fdy,source_unit,target.unit)
+  source_unit:insertAnimDelayFunc(runTime,apply_dam_charge,tx,ty,fdx,fdy,rot,source_unit,target.unit)
   
   
   return true,10,target:getTargetLv()

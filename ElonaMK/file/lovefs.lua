@@ -67,8 +67,6 @@ end
 
 
 --转化windows下的汉字
-c.u2w = u2w
-c.w2u = w2u
 local CP_UTF8 = 65001
 local CP_ACP =936
 function c.gbk2utf8(str)

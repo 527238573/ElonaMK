@@ -8,6 +8,14 @@ function Unit:camera_Focus()
   g.camera:setCenter(x,y)
 end
 
+--算上dxdy后估计的XY值。用于确定大概位置等
+function Unit:getLineXY()
+  local dx,dy = self.status.dx,self.status.dy
+  local liney = self.y + math.floor((dy+32)/64)
+  local linex = self.x + math.floor((dx+32)/64)
+  return linex,liney
+end
+
 --获得当前动画偏移值dxdy
 function Unit:get_anim_dxdy()
   local anim = self:get_unitAnim() --anim数据
@@ -163,7 +171,7 @@ function Unit:hitImpact(hit_rotation,dis)
   if dis>8 then tTime = tTime*dis/8 end
   local dx = dis *math.cos(hit_rotation)
   local dy = -dis *math.sin(hit_rotation) 
-  local clip  = AnimClip.new("impact",tTime,0.25,dx,dy,0)
+  local clip  = Animation.Impact(tTime,0.25,dx,dy,0)
   self:addClip(clip)
 end
 
@@ -172,6 +180,6 @@ function Unit:recoilImpact(shot_rotation,dis)
   if dis>8 then tTime = tTime*dis/8 end
   local dx = -dis *math.cos(shot_rotation)
   local dy = dis *math.sin(shot_rotation) 
-  local clip  = AnimClip.new("impact",tTime,0.25,dx,dy,0)
+  local clip  = Animation.Impact(tTime,0.25,dx,dy,0)
   self:addClip(clip)
 end

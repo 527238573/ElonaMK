@@ -34,7 +34,7 @@ end
 
 
 
-function ui.message.addmsg(msg,msgtype)
+function ui.addmsg(msg,msgtype)
   msgtype = msgtype or "info"
   if msg == nil then return end
   local count_msg = (msgtype~="hit") and  (msgtype~="enemy_hit") --符合条件才count数值。
@@ -69,7 +69,7 @@ function ui.message.addmsg(msg,msgtype)
   end
   needFlush = true
 end
-addmsg = ui.message.addmsg
+addmsg = ui.addmsg
 
 
 

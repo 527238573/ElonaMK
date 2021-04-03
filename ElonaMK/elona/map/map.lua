@@ -14,11 +14,13 @@ Map = {
     gen_id ="",--map生成及刷新相关函数的id。data.mapgen[gen_id] 
     can_exit = false,--能否在边缘退出。
   }
-  
-saveMetaType("Map",Map)--注册保存类型
-  
+local niltable = {
+  terColor = true,--两个颜色color的
+  blockColor = true,
+}
+saveMetaType("Map",Map,niltable)--注册保存类型
 Map.__newindex = function(o,k,v)
-  if Map[k]==nil then error("使用了Map的意料之外的值。") else rawset(o,k,v) end
+  if Map[k]==nil and niltable[k]==nil then error("使用了Map的意料之外的值。") else rawset(o,k,v) end
 end
 
 function Map:preSave()
@@ -35,6 +37,7 @@ function Map:loadfinish()
   --如果新版增加字段，则需要补充。
   self.transparent_dirty = true
   self.seen_dirty = true
+  self:reloadOldVersionTer()
 end
 
 local empty = 0--{saveType = 0}
@@ -51,10 +54,10 @@ function Map.new(x,y,edge)
   o.edge = edge
   o.realw = x+2*edge;o.realh = y+2*edge
   
+  --一部分初始化代码放在这里
+  Map.initTerAndBlock(o) --ter block
   
   
-  o.ter = {} --地型
-  o.block = {} --地面上的物体 树，块等等。 trap合并入这一层。
   o.field = {} --地形效果。烟雾，火，一滩水，立场等等。
   
   o.unit = {} --单位，所站地格之上的。
@@ -70,10 +73,6 @@ function Map.new(x,y,edge)
   o.frames = {}--地图上的活动特效。--不会保存
   o.projectiles={} --地图中的弹道投射物等。--不会保存
   
-  for i=1,o.realw*o.realh do --无效区域内只有ter 和block，做装饰用。
-    o.ter[i] = 1 --默认为index为1 的类型 ，是泥土实地，最基本的ter类型
-    o.block[i] = 1 --block为1代表空气，无东西，但block类型里存在这一类型。也就是说block也必须有值
-  end
   for i=1,x*y do
     o.field[i] = empty --field是一个list，列出了地形上的所有field。按绘制优先级顺序。empty为空占位
     o.unit[i] = empty --unit指具体的unit。 empty空占位

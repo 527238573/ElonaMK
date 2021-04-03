@@ -76,6 +76,25 @@ function debugmsg(msg)
   out:flush()
 end
 
+--debug模式及初始化，控制开关。
+local mobdebug
+function c.initDebug()
+  if arg and arg[#arg] == "-debug" then 
+    mobdebug = require("mobdebug") 
+    mobdebug.start()
+    mobdebug.off()--开始时保持关闭，否则很卡
+  end
+end
+--只在需要debug的代码段，开关
+function debugOn()
+  if mobdebug then mobdebug.on() end
+end
+function debugOff()
+  if mobdebug then mobdebug.off() end
+end 
+
+
+
 --全局变量 随机函数
 rnd = love.math.random
 function rnd_float(f1,f2)
@@ -125,7 +144,6 @@ local function search_weight(t,v)
     end
     return right
 end
-c.search_weight = search_weight
 
 --[[从权重表中随机值：
 权重表结构:
@@ -167,7 +185,24 @@ function c.pushWeightVal(wt,val,weight)
   return wt
 end
 
-
+--返回迭代器,遍历区域内所有点。可以只传wh
+function c.pointInRect(w,h,startx,starty)
+  startx = startx or 0
+  starty = starty or 0
+  local mx,my = 0,0
+  return function()
+    local rx,ry
+    if my<h then
+      rx,ry =  startx+mx,starty+my
+    end
+    mx = mx+1
+    if mx>=w then
+      mx = 0
+      my = my+1
+    end
+    return rx,ry
+  end
+end
 
 function c.closest_xypoint_first(x,y,radius)
   local mx,my = 0,0
@@ -251,7 +286,7 @@ function string.split(szFullString, szSeparator)
   local nSplitIndex = 1
   local nSplitArray = {}
   while true do
-    local nFindLastIndex = string.find(szFullString, szSeparator, nFindStartIndex)
+    local nFindLastIndex = string.find(szFullString, szSeparator, nFindStartIndex,true)
     if not nFindLastIndex then
       nSplitArray[nSplitIndex] = string.sub(szFullString, nFindStartIndex, string.len(szFullString))
       break
