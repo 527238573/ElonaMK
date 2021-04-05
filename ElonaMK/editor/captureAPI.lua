@@ -6,6 +6,7 @@ local lovefs = require("file/lovefs")
 
 --扫描文件后收集的信息收集
 local funcTable
+local totalLine = 0
 
 local function findFunction(baseName,fName,memberDes)
   local base = funcTable[baseName]
@@ -72,6 +73,7 @@ local function ScanFile(filename,base)
   local line_c = file:read()
   
   while(line_c) do
+    totalLine = totalLine+1
     local gets = string.match(line_c,"function [%s%a%d%.:_]+%(.*%)")
     if gets then
       local islocal = string.match(line_c,"local +function")~=nil
@@ -122,12 +124,14 @@ local function ScanDir(fs,dirName,base)
 end
 
 local function ScanSourceCode()
+  totalLine = 0
   local fs = lovefs(c.source_dir)
   for _, v in ipairs(fs.dirs) do
     if v~="assets" and v~= "data" then
       ScanDir(fs,v,c.source_dir)
     end
   end
+  debugmsg("Scan Line Num:"..totalLine)
 end
 
 

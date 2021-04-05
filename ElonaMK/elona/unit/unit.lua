@@ -217,7 +217,9 @@ function Unit:updateAnimDelayFunc(dt)
     end
   end
 end
+
 -- 新 延迟调用。。。。
+--参数存在nil的话，后面的参数不起作用，需要注意
 function Unit:insertAnimDelayFunc(delay,func,...)
   checkSaveFunc(func) --检查function 必须是可保存的。
   local onet = {delay = delay, args = {...},f= func}
@@ -237,7 +239,7 @@ function Unit:updateRLDelayFunc(dt)
     end
   end
 end
-
+--参数存在nil的话，后面的参数不起作用，需要注意
 function Unit:insertRLDelayFunc(delay,func,...)
   checkSaveFunc(func) --检查function 必须是可保存的。
   local onet = {delay = delay, args = {...},f= func}

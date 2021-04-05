@@ -1,6 +1,14 @@
 
 
-
+function Unit:hasEffect(effect_id)
+  local list = self.effects
+  for _,o_eff in ipairs(list) do
+    if o_eff.id == effect_id then
+      return o_eff
+    end
+  end
+  return nil
+end
 
 
 function Unit:addEffect(effect)
@@ -31,7 +39,7 @@ function Unit:updateEffectsRL(dt)
   while i<=#list do
     local effect = list[i]
     changed = changed or effect:updateRL(dt,self)
-    if effect.remain<0 then
+    if effect.remain<=0 then
       table.remove(list,i)
       --debugmsg("end frame:"..frame.id)
       changed = true

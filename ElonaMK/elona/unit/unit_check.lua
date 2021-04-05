@@ -80,7 +80,13 @@ function Unit:canOperate()
   return not self.dead
 end
 
-
+--能否被推动。
+function Unit:canPush()
+  if self:hasEffect("sprinting") then
+    return false
+  end
+  return true
+end
 
 
 --在小队中对队伍负重的贡献。最小为0.

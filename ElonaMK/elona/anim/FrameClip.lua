@@ -58,12 +58,18 @@ function FrameClip:updateAnim(dt)
   self.life = self.life+dt
   if self.rotation_speed ~=0 then self.rotation = self.rotation + self.rotation_speed*dt end
   if self.rot_uv_speed~=0 then self.rot_uv = self.rot_uv + self.rot_uv_speed*dt end
+  if self.fadeIn then
+    local fadeInAlpha = self.fadeIn>0 and self.life/self.fadeIn or 1
+    local fadeOutAlpha = self.fadeOut>0 and  (self.remaining_life)/self.fadeOut or 1
+    self.alpha = math.min(fadeInAlpha,fadeOutAlpha,1)
+  end
+  
 end
 
 function FrameClip:isFinish()
   if self.finished then return true end
   if self.loop then
-    return self.remaining_life<0
+    return self.remaining_life<=0
   else
     local frameT = self.type
     return self.time>frameT.secPerFrame*frameT.frameNum
@@ -97,6 +103,21 @@ function FrameClip:setLoopPeriod(remaining_life)
   self.loop = true
   self.remaining_life = remaining_life
 end
+
+function FrameClip:setFadeInFadeOut(fadeIn,fadeOut)
+  assert(fadeIn>=0 and fadeOut>=0)
+  self.fadeIn = fadeIn
+  self.fadeOut = fadeOut
+  self.alpha = 0
+end
+
+--处于unit背部
+function FrameClip:setUnitBack(unit)
+  if unit.status.face>4 then
+    self.underUnit = true
+  end
+end
+
 
 function FrameClip:setFrameUpdateFunc(func)
   checkSaveFunc(func)

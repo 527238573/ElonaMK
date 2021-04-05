@@ -240,10 +240,13 @@ local function searchPushRoute(map,x,y,push_dis)
       if not map:can_pass(sx,sy) then
         return false --如果不可通行，直接返回。
       end
-      if map:unit_at(sx,sy) ==nil then
+      local sunit = map:unit_at(sx,sy)
+      if sunit ==nil then
         --可通行，--又没有单位占用的地格，
         --debugmsg("search end:"..sx.." "..sy)
         return true --有路径信息，这就是终点。
+      elseif not sunit:canPush() then--所在单位不能被推挤，可能是炮台，或处于霸体等，
+        return false --当作墙壁类似处理
       end
     end
     

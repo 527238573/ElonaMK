@@ -78,8 +78,8 @@ local function drawOneSquareUnit(camera,todraw)
 
   local img,quad,flip = unit:getImgQuad(status)
   if flip then scaleX =scaleX*-1 end--水平翻转 
-  love.graphics.setColor(1,1,1,1)
   drawUnitFrames(unit,true,acx,acy,camera)
+  love.graphics.setColor(1,1,1,1)
   love.graphics.draw(img,quad,screenx,screeny,rotation,scaleX,scaleY,ox,oy)--绘制
   drawUnitFrames(unit,false,acx,acy,camera)
   drawUnitLifebar(unit,status,camera,x,y)

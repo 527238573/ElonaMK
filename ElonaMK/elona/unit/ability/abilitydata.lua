@@ -85,15 +85,48 @@ local function loadAbilities()
   debugmsg("load abilities Nubmer:"..(index-1))
   file:close()
 
-  
 end
+
+
+
+--读取代码机制文件
+local function loadAbilityCode()
+  local baseDir = c.source_dir.."elona/unit/ability_call"
+  local fs = lovefs(baseDir)
+  local fileNum = 0
+  local function loadOneFile(fileName,base)
+    local aloadfunc = assert(loadfile(base.."/"..fileName))
+    aloadfunc()
+    fileNum = fileNum +1
+  end
+  
+  local function ScanAbiDir(dirName,base)
+    local link = base.."/"..dirName;
+    fs:cd(link)
+    for _, v in ipairs(fs.files) do
+      --debugmsg(link.."/"..v)
+      loadOneFile(v,link)
+    end
+    for _, v in ipairs(fs.dirs) do
+      ScanAbiDir(v,link)
+    end
+  end
+  
+  for _, v in ipairs(fs.files) do
+    --debugmsg(link.."/"..v)
+    loadOneFile(v,baseDir)
+  end
+  for _, v in ipairs(fs.dirs) do
+    ScanAbiDir(v,baseDir)
+  end
+  
+  debugmsg("load ability code files:"..fileNum)
+end
+
 
 
 return function ()
   loadAbilityIcons()
   loadAbilities()
-  local aloadfunc = assert(loadfile(c.source_dir.."elona/unit/ability_call/ability1.lua"))
-  aloadfunc()
-  aloadfunc = assert(loadfile(c.source_dir.."elona/unit/ability_call/ability2.lua"))
-  aloadfunc()
+  loadAbilityCode()
 end
