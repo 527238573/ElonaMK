@@ -36,7 +36,7 @@ function Overmap:inbounds(x,y)
 end
 
 function Overmap:copyFrom(omap,sx,sy)
-  if getmetatable(omap) ~= Overmap then
+  if omap.saveType ~= "Overmap" then
     error("copy map error")
   end
   sx =sx or 0

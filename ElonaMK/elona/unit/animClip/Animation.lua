@@ -290,3 +290,64 @@ function updates.Pushed(clip,dt,status,unit)
   status.rate = status.rate+drate
   if status.rate>1 then status.rate = status.rate-1 end
 end
+
+function Animation.BurstPunch(dx,dy,time1,time2,time3)
+  local totalTime  =time1 +time2 +time3
+  local clip = AnimClip.new("BurstPunch",totalTime)
+  clip.priority =2
+  
+  clip.stage1 = time1
+  clip.stage2 = time1+time2
+  
+  local nx,ny = dx,dy
+  if dx~=0 and dy ~=0 then
+    --nx,ny = nx/1.4,ny/1.4 --距离均等化
+  end
+  clip.nx = nx
+  clip.ny = ny
+  return clip
+end
+function updates.BurstPunch(clip,dt,status,unit)
+  local back1 = 18
+  local front = 28
+  if clip.time<clip.stage1 then  
+    local rate = clip.time/clip.stage1
+    local dx,dy = clip.nx*-back1 * rate,clip.ny*-back1 * rate
+    status.dx =status.dx+dx;
+    status.dy =status.dy+dy;
+  elseif clip.time < clip.stage2 then
+    local rate = (clip.time-clip.stage1)/(clip.stage2-clip.stage1)
+    local golen = -back1+ (back1+front)*rate
+    local dx,dy = clip.nx*golen,clip.ny*golen
+    status.dx =status.dx+dx;
+    status.dy =status.dy+dy;
+  else
+    local rate = (clip.time-clip.stage2)/(clip.totalTime-clip.stage2)
+    local golen = front-front*rate
+    local dx,dy = clip.nx*golen,clip.ny*golen
+    status.dx =status.dx+dx;
+    status.dy =status.dy+dy;
+    
+  end
+end
+
+--自由选定点的move
+function Animation.FreeMove(totalTime,startdx,startdy,enddx,enddy)
+  local clip = AnimClip.new("FreeMove",totalTime)
+  clip.priority =2
+  
+  
+  clip.sx = startdx
+  clip.sy = startdy
+  clip.ex = enddx
+  clip.ey = enddy
+  return clip
+end
+
+function updates.FreeMove(clip,dt,status,unit)
+  local rate = clip.time/clip.totalTime
+  local dx = clip.sx + (clip.ex-clip.sx)*rate
+  local dy = clip.sy + (clip.ey-clip.sy)*rate
+  status.dx =status.dx+dx;
+  status.dy =status.dy+dy;
+end

@@ -116,7 +116,7 @@ function Unit:getImgQuad(status)
   return anim.img,quad,flip
 end
 
-
+--注意不能在updateFrame时插入，其他还好(updateFrame 不允许逻辑代码，只能允许改变frame本身的代码)
 function Unit:addFrameClip(framec)
   for i=1,#self.frames do
     if self.frames[i].priority>framec.priority then--按优先级插入，同优先级后来的排在后

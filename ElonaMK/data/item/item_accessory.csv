@@ -1,4 +1,6 @@
 id,name,flags,equipType,sLevel,DEF,MGR,hit,crit,evade,block,life,mana,speed,atk_lv,mgc_lv
+str,notLoad,flagstable,str,number,number,number,number,number,number,number,number,number,number,number,number
+D=ND,,ADD,D=ND,D=ND,,,,,,,,,,,
 wings,ÓğÒí,WINGS,accessory,15,1,2,,,,,,,5,,
 patagium,Ä¤Òí,WINGS,accessory,25,2,,,,,2,,,5,,
 shoes,Ğ¬,SHOES,accessory,1,,,,,3,,,,5,,

@@ -5,6 +5,8 @@ Effect = {
   life = 0, --持续存在的时间。
   remain = 0, --剩余寿命时间。 
   loopSound = nil, --循环的声音id。设置后自动循环该声音。
+  isAnim = nil,--是否根据Anim时间流失。
+  
 }
 
 saveMetaType("Effect",Effect)--注册保存类型
@@ -17,6 +19,7 @@ end
 function Effect.new(typeid)
   local etype = assert(data.effect[typeid])
   local o= {type = etype,id = typeid}
+  o.isAnim = etype.isAnim --默认使用type类型。可被覆盖
   setmetatable(o,Effect)
   
   return o
@@ -44,13 +47,20 @@ end
 
 ----返回true，如果强化变动。（注意可能在角色已经死亡的情况下调用。）
 function Effect:updateRL(dt,unit)
-  self.life = self.life+dt
-  self.remain = self.remain-dt
+  if not self.isAnim then
+    self.life = self.life+dt
+    self.remain = self.remain-dt
+  end
   return false
 end
 
 --刷新所掌管的frames的持续时间。
 function Effect:updateAnim(dt,unit)
+  if self.isAnim then
+    self.life = self.life+dt
+    self.remain = self.remain-dt
+  end
+  
   local frames = self.frames
   if frames then
     for i=1,#frames do
@@ -120,7 +130,7 @@ function Effect:onLifeEnd(unit)
     local msg = self.type.end_message or self.end_message
     if msg then addmsg(string.format(msg,unit:getShortName()),self.type.rating or "info") end
   end
-  if self.end_call  then
+  if self.end_call  and not self.isAnim then --不能在anim类型触发逻辑代码。时序逻辑应使用delayFunc
     self.end_call.f(unpack(self.end_call.args))
   end
 end
@@ -133,6 +143,9 @@ function Effect:calculate_bonus(bonus)
     bonus[k] = bonus[k] + v
   end
 end
+
+--可以在endcall里添加逻辑，包括delaycall或衔接新Effect，但不能保证时序同步
+--不能在Anim类型的EFFECT里使用。
 function Effect:setEndCall(func,...)
   checkSaveFunc(func)
   self.end_call = {args = {...},f= func}

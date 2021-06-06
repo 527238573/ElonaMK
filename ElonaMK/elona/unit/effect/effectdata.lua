@@ -14,9 +14,11 @@ return function()
       
     }
     
-  addEffect{ id = "sprinting",name = tl("冲刺","Sprinting"), description = tl("正在冲刺状态。","Sprinting state."),front_c = {0.1,0.1,0.1},back_c = {0.9,0.9,0.9}
-      
+  addEffect{ id = "sprinting",name = tl("冲刺","Sprinting"), description = tl("正在冲刺状态。","Sprinting state."),front_c = {0.1,0.1,0.1},back_c = {0.9,0.9,0.9},isAnim = true
+  }
+  addEffect{ id = "knock_back",name = tl("击退","Knock back"), description = tl("正在被击退状态。","Being beaten back."),front_c = {0.6,0.1,0.1},back_c = {0.9,0.9,0.9},isAnim = true
     }
+  
   addEffect{ id = "test1",name = tl("测试效果1","Chanting"), description = tl("正在吟唱法术技能。较长的描述。","Casting a spell."), front_c = {1,0,0},back_c = {0.9,0.9,0.9}}
   addEffect{ id = "test2",name = tl("第二测试效果","Chanting"), description = tl("正在吟唱法术技能。较长的描述。较长的描述。较长的描述。较长的描述。","Casting a spell."), front_c = {0.2,1,0},back_c = {0.5,0.5,0.5}}
 end

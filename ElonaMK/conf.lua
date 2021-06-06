@@ -1,6 +1,6 @@
 function love.conf(c)
   
-  c.title = "Elona: Mercenary King"
+  c.title = "Elona: Border Lord"
   local window = c.window
   window.width = 1600
   window.height = 1000

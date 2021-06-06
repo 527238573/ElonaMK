@@ -39,7 +39,6 @@ function abi_type.func(abi,source_unit,showmsg,target)
     if not map:can_pass(x,y) then
       return false
     end
-    
     if unit then 
       if not source_unit:isHostile(unit) then
         return false
@@ -86,6 +85,7 @@ function abi_type.func(abi,source_unit,showmsg,target)
   --添加冲刺状态
   local effect = Effect.new("sprinting")
   effect.remain =runTime+0.1 --
+  effect.isAnim = true
   source_unit:addEffect(effect)
   --添加冲刺动画
   local clip  = Animation.Charge(runTime,source_unit.x,source_unit.y,tx,ty,fdx,fdy)

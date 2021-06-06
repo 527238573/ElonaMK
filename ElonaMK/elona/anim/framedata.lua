@@ -111,6 +111,9 @@ local function loadFrames()
   load1f("red_dead",86,56)
   load1f("green_dead",84,48)
   load1f("impact1",64,64,0.07)
+  load1f("impact2",64,64,0.07)
+  load1f("impact3",32,32,0.07)
+  load1f("storingEnergy",32,32,0.085)
   
 end
 

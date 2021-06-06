@@ -139,4 +139,5 @@ function g.fastStart()
   girl:learnAbility("charge")
   girl:learnAbility("jump_slash")
   girl:learnAbility("round_slash")
+  girl:learnAbility("burst_punch")
 end

@@ -1,4 +1,6 @@
-raceid,name,life,mana,speed,DEF,MGR,atk_lv,dodge_lv,block_lv,hit_lv,crit_lv,height,weight,male_ratio,startfactor,str,con,dex,per,ler,wil,mag,chr,weapon_skills,profession_skills,traits
+id,name,life,mana,speed,DEF,MGR,atk_lv,dodge_lv,block_lv,hit_lv,crit_lv,height,weight,male_ratio,startfactor,str,con,dex,per,ler,wil,mag,chr,weapon_skills,profession_skills,traits
+str,str,number,number,number,number,number,number,number,number,number,number,number,number,number,number,number,number,number,number,number,number,number,number,flagstable,flagstable,flagstable
+D=ND,UTF8,D=ND,D=ND,D=ND,,,,,,,,D=ND,D=ND,D=ND,D=1,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,,,
 null,无种族,100,100,70,,,,,,,,100,100,50,,,,,,,,,,,,
 yerles,耶鲁士,110,100,70,,,,,,,,172,58,52,,6,6,3,8,9,2,4,4,,,
 eulderna,艾沃达纳,100,110,70,,,,,,,,168,54,50,,4,5,5,5,4,7,8,4,,,magicRes

@@ -58,6 +58,8 @@ local niltable = { --默认值为nil的成员变量
   actionBar = true, --动作条，1-8的位置放技能或物品引用。
   effects = true,--effect列表，数组。
   traits = true,--traits列表，数组。
+  
+  brain = true, --brain状态机table，ai相关
 }
 saveMetaType("Unit",Unit,niltable) --注册保存类型
 Unit.__newindex = function(o,k,v)
@@ -116,6 +118,7 @@ function Unit.new(typeid,level)
   o.effects = {}
   o.traits = {}
   o:initActionBar()
+  o:initBrain()
   return o
 end
 
@@ -169,7 +172,6 @@ end
 
 
 function Unit:updateRL(dt)
-  self:update_damage(dt)
   self:updateEffectsRL(dt)
   self:updateRLDelayFunc(dt)
   if self.dead then return end
@@ -196,16 +198,21 @@ function Unit:updateRL(dt)
 end
 
 
-function Unit:updateAnim(dt)
-  self:updateEffectsAnim(dt)
-  self:clips_update(dt)
-  self:updateFrameClips(dt)
-  self:updateAnimDelayFunc(dt)
+
+--为保证同步，每个计时判定都是 remaining<=0 或time>= remaining,保证同一帧delayFunc AnimClip同步。
+--注意在AnimClip结束时，当前帧的位移不会起效，如果有同步触发delayFunc衔接新的位移动画，
+--在添加新clip后要调用clips_update（0）刷新一下新产生的位移，参见charge技能。（冲锋动画完毕后衔接恢复位置动画）
+function Unit:updateAnim(dt) 
+  self:update_damage(dt)--延迟伤害触发。可能导致死亡并执行死亡逻辑。
+  self:updateEffectsAnim(dt) --更新Effect 。Anim类型不能触发endCall，无法执行逻辑代码。Anim类别时序控制代码应使用delayFunc
+  self:clips_update(dt)--更新AnimClip。不执行任何逻辑代码
+  self:updateFrameClips(dt)--更新Unit身上的Frames。不执行任何逻辑代码
+  self:updateAnimDelayFunc(dt) --delayfunc可能会插入新的 frames，animClips，delayFunc等，但会从下一帧计时。同一单位同步
 end
 
 
 
--- update延迟调用。。。。
+-- update延迟调用。。。。如果在update时插入新的delayFunc，会排在队列尾。计时从下一帧开始
 function Unit:updateAnimDelayFunc(dt)
   local list = self.delayAnim_list
   for i= #list,1,-1 do
@@ -220,6 +227,7 @@ end
 
 -- 新 延迟调用。。。。
 --参数存在nil的话，后面的参数不起作用，需要注意
+--可以在delayFunc触发时添加delayFunc，形成连续延迟触发逻辑，用于编辑连续复杂过程
 function Unit:insertAnimDelayFunc(delay,func,...)
   checkSaveFunc(func) --检查function 必须是可保存的。
   local onet = {delay = delay, args = {...},f= func}
@@ -227,7 +235,7 @@ function Unit:insertAnimDelayFunc(delay,func,...)
   list[#list+1] = onet
 end
 
-
+--如果在update时插入新的delayFunc，会排在队列尾。计时从下一帧开始
 function Unit:updateRLDelayFunc(dt)
   local list = self.delayRL_list
   for i= #list,1,-1 do

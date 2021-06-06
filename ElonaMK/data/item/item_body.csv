@@ -1,4 +1,6 @@
 id,name,flags,equipType,sLevel,DEF,MGR,evade,block,life,mana,res_bash,res_cut,res_stab,res_fire,res_ice,res_nature,res_earth,res_dark,res_light
+str,notLoad,flagstable,str,number,number,number,number,number,number,number,number,number,number,number,number,number,number,number,number
+D=ND,,ADD,D=ND,D=ND,,,,,,,,,,,,,,,
 robe,³¤ÅÛ,,body,1,-2,2,,,,,,,,,,,,,
 coat,ÍâÌ×,,body,5,1,1,,,,,,,,,,,,,
 mage_robe,·¨ÅÛ,,body,10,-2,3,,,,,,,,,,,,,

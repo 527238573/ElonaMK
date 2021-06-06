@@ -118,7 +118,8 @@ function FrameClip:setUnitBack(unit)
   end
 end
 
-
+--每帧跟新frame的call。
+--不允许插入任何逻辑代码。只允许操纵frame效果本身。比如透明度渐变等，miss向上漂等等
 function FrameClip:setFrameUpdateFunc(func)
   checkSaveFunc(func)
   self.updateFunc = func

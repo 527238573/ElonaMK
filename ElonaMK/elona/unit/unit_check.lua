@@ -80,9 +80,13 @@ function Unit:canOperate()
   return not self.dead
 end
 
---能否被推动。
+--能否被推动。 --冲刺 击退 击飞 霸体 扎根固定等状态下均不可
 function Unit:canPush()
   if self:hasEffect("sprinting") then
+    return false
+  end
+  
+  if self:hasEffect("knock_back") then
     return false
   end
   return true

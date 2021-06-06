@@ -17,78 +17,6 @@ local function loadAbilityIcons()
 end
 
 
-
-local function loadAbilities()
-  local file = assert(io.open(c.source_dir.."data/ability/ability.csv","r"))
-  local data_type_t= data.ability
-  local index = 1
-  local line = file:read()
-  local attrName = string.split(line,",") 
-  attrName[1] = "id" --utf8头，需要修正
-  line = file:read()
-
-  while(line) do
-    local strDH = string.split(line,",") 
-    local dataT = {}
-    for i=1,#strDH do
-      local val = strDH[i]
-      local key = attrName[i] 
-
-      if key=="id" then
-        dataT.id = val
-      elseif  key=="name" then
-        dataT.name = c.gbk2utf8(val)
-      elseif  key=="icon" then
-        local img = data.ability_icon[val]
-        if img ==nil then error("ability_icon error:"..val) end
-        dataT[key] = img
-      elseif key == "isMagic" then
-        dataT[key] = strToBoolean(val,false)
-      elseif key == "main_attr" then
-        if g.main_attr[val]==nil then error("error mainattr:"..val) end
-        dataT[key] = val
-      elseif key == "baseLevel" then
-        dataT[key] = tonumber(val) or 0
-      elseif key == "difficulty" then
-        dataT[key] = tonumber(val) or 1
-      elseif key == "costMana" then
-        dataT[key] = tonumber(val) or 0
-      elseif key == "cooldown" then
-        dataT[key] = tonumber(val) or 1
-      elseif key == "description" then
-        dataT[key] = c.gbk2utf8(val)
-      elseif key == "target_type" then
-        dataT[key] = val
-      elseif key == "range" then
-        dataT[key] = val
-      elseif key == "hit_skill" then
-        if val=="" then val = "magic_chant"end
-        dataT[key] = val
-      elseif  key=="diceNum" then
-        dataT[key] = tonumber(val) or 0
-      elseif  key=="diceFace" then
-        dataT[key] = tonumber(val) or 0
-      elseif  key=="baseAtk" then
-        dataT[key] = tonumber(val) or 0
-      else
-        error("error key:"..key)
-      end
-    end
-    if data_type_t[dataT.id]~=nil then
-      error("repetitive ability id :"..dataT.id)
-    end
-    setmetatable(dataT,data.dataMeta)
-    data_type_t[dataT.id] = dataT
-    line = file:read()
-    index = index+1
-  end
-  debugmsg("load abilities Nubmer:"..(index-1))
-  file:close()
-
-end
-
-
-
 --读取代码机制文件
 local function loadAbilityCode()
   local baseDir = c.source_dir.."elona/unit/ability_call"
@@ -127,6 +55,18 @@ end
 
 return function ()
   loadAbilityIcons()
-  loadAbilities()
+  
+  local linkF,indexList =data.LoadCVS("ability","data/ability/ability.csv",nil)
+  for i=1,#indexList do
+    local dataT = indexList[i]
+    --icon
+    local val = dataT.icon
+    local img = data.ability_icon[val]
+    if img ==nil then error("ability_icon error:"..val) end
+    dataT.icon = img
+    if g.main_attr[dataT.main_attr]==nil then error("error mainattr:"..dataT.main_attr) end
+  end
+  
+  --loadAbilities()
   loadAbilityCode()
 end

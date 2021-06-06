@@ -1,0 +1,30 @@
+表第一行 =字段名 ，必须有一项叫id，作为主键，不一定需要放最开始
+表第二行 =类型
+类型：
+str   字符串   缺省默认值： D="" 空字符
+number 数字  缺省默认值： D=0
+bool  只能式 TRUE FLASE 缺省默认值： D=ND
+flagstable   缺省默认值： D="" 空字符（生成空table）
+link   链接，链接到某个表的某行（操作符L=表名，填入行id）。 缺省默认值： D=ND
+
+表第三行 =操作符，用|隔开
+
+D  默认值，例如默认为1填D=1
+D=ND (没有默认值，留空直接报错。数字转化不出来直接报错)
+D= ？ （其他合理的留空默认值）
+D = nil  （留空直接填nil，）
+
+
+UTF8 str专用，转化为UTF8
+
+
+L=？？？link专用，表名 。link必须有此项
+
+
+Min=？
+Max=？  数字专用 超过范围报错
+
+ADD  flagstable专用，叠加flag而不是覆盖 
+GEN_A flagstable专用，生成相应的 xxx_a indextable
+
+

@@ -55,7 +55,24 @@ end
 
 
 function Unit:updateEffectsAnim(dt)
-  for _,effect in ipairs(self.effects) do effect:updateAnim(dt,self) end
+  local changed = false
+  local list = self.effects
+  local i=1
+  while i<=#list do
+    local effect = list[i]
+    effect:updateAnim(dt,self)
+    if effect.remain<=0 then
+      table.remove(list,i)
+      --debugmsg("end frame:"..frame.id)
+      changed = true
+      effect:onLifeEnd(self)
+    else
+      i = i+1
+    end
+  end
+  if changed then
+    self:reloadRealTimeBouns()--只要有可能变动，就重算加成。
+  end
 end
 
 --根据id移除

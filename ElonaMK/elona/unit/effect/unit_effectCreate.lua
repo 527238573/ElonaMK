@@ -40,3 +40,5 @@ function Unit:addEffect_chanting(magic_style,time)
   self:bar_delay(time,"chant","chant")--启用行动占用。
   return effect
 end
+
+

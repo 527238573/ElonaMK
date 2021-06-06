@@ -16,6 +16,14 @@ function editor.itemList_init()
   for _,v in pairs(item_data) do
     local info = v
     local typename = info.type
+    
+    
+    if typename == nil then
+      for k,y in pairs(info) do
+        debugmsg(k)
+      end
+    end
+    
     if typeTable[typename] == nil then
       typeTable[typename] = {}
     end

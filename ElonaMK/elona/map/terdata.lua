@@ -20,55 +20,30 @@ data.overmapImg = love.graphics.newImage("data/terrain/overmap.png")
 data.oter = {} --index 的数组
 
 
-local strToBoolean =data.strToBoolean
-local flagsTable =data.flagsTable
-
-
-
-local function loadTer()
-
-  local file = assert(io.open(c.source_dir.."data/terrain/ter.csv","r"))
-
-
-  local datater= data.ter
-
-  local index = 1
-  local line = file:read()
-  line = file:read()
-  while(line) do
-    local strDH = string.split(line,",") 
-    local dataT = {}
-    --序号
-    dataT.index = tonumber(strDH[1])
-    assert(dataT.index == index)
-    --id
-    dataT.id = strDH[2]
-    --name
-    dataT.name = strDH[3]
-    --type --默认single
-    dataT.type = strDH[4]
-    if dataT.type=="" then dataT.type =  "single" end
-    --color
-    dataT.color = strDH[5]
-    if dataT.color=="" then dataT.color =  "grey" end
-    --priority
-    dataT.priority = tonumber(strDH[6]) or 24
-    --quadX
-    dataT.quadX = assert(tonumber(strDH[7]))
-    --quadY
-    dataT.quadY = assert(tonumber(strDH[8]))
-    --quadSize
-    dataT.quadSize = tonumber(strDH[9]) or 64
-    --move_cost
-    dataT.move_cost = tonumber(strDH[10]) or 100
-
-    --flags
-    dataT.flags = flagsTable(strDH[11])
-
+return function()
+  
+  --id到ter的表，其他需要后续生成
+  local linkF,ter_indexList = data.LoadCVS("terID","data/terrain/ter.csv",nil)
+  local linkBlock,block_indexList = data.LoadCVS("blockID","data/terrain/block.csv",nil)
+  local _,oter_indexList = data.LoadCVS("oterID","data/terrain/overmap.csv",nil)
+  
+  linkBlock()
+  
+  --整理ter
+  local ter = {}
+  local terIndex = {}
+  data.ter = ter
+  data.terIndex = terIndex
+  for i=1,#ter_indexList do
+    local dataT = ter_indexList[i]
+    --插入新表
+    assert(ter[dataT.index]==nil)
+    ter[dataT.index] = dataT
+    terIndex[dataT.id]=dataT.index
     --读取quad
     local function loadQuad(x,y,size,tt)
       local scale = data.terScale/2
-      table.insert(tt,love.graphics.newQuad(x*64*scale,y*64*scale,size*scale,size*scale,twidth,theight))
+      table.insert(tt.__source,love.graphics.newQuad(x*64*scale,y*64*scale,size*scale,size*scale,twidth,theight))
     end
     if dataT.type =="edged" then
       loadQuad(dataT.quadX,     dataT.quadY,    32,dataT)
@@ -90,103 +65,31 @@ local function loadTer()
     else--single
       loadQuad(dataT.quadX,dataT.quadY,64,dataT)
     end
-
-    setmetatable(dataT,data.dataMeta)
-    datater[dataT.index] = dataT
-    index = index+1
-    line = file:read()
   end
-
-  debugmsg("load terNubmer:"..(index-1))
-  file:close()
   
-  --loadname
-  file = assert(io.open(c.source_dir.."data/terrain/ter_name.csv","r"))
-  line = file:read()
-  local attrName = string.split(line,",") 
-  attrName[1] = "index" --utf8头，需要修正
-  line = file:read()
-  while(line) do
-    local strDH = string.split(line,",") 
-    local dataT = nil
-    for i=1,#strDH do
-      local val = strDH[i]
-      local key = attrName[i] 
-      if key=="index" then
-        dataT = datater[tonumber(val)]
-      elseif  key=="name" then
-        dataT[key] = val
-      end
+  
+  --整理block
+  local block = {}
+  local blockIndex = {}
+  data.block = block
+  data.blockIndex = blockIndex
+  for i=1,#block_indexList do
+    local dataT = block_indexList[i]
+    --插入新表
+    assert(block[dataT.index]==nil)
+    block[dataT.index] = dataT
+    blockIndex[dataT.id]=dataT.index
+    --anchorX
+    if dataT.anchorX<0 then
+      dataT.anchorX = math.floor(dataT.w/2)
     end
-    line = file:read()
-  end    
-  file:close()
-
-end
-
-local function loadBlock()
-  local file = assert(io.open(c.source_dir.."data/terrain/block.csv","r"))
-
-
-  local datablock= data.block
-  local index = 1
-  local line = file:read()
-  line = file:read()
-  while(line) do
-    local strDH = string.split(line,",") 
-    local dataT = {}
-    --序号
-    dataT.index = tonumber(strDH[1])
-    assert(dataT.index == index)
-    --id
-    dataT.id = strDH[2]
-    --name
-    dataT.name = strDH[3]
-    --type --默认single
-    dataT.type = strDH[4]
-    if dataT.type=="" then dataT.type =  "single" end
-    --color
-    dataT.color = strDH[5]
-    if dataT.color=="" then dataT.color =  "brown" end
     --img
-    local img = data.blockImgs[strDH[6]]
+    local img = data.blockImgs[dataT.img]
     assert(img,"error block img name")
     dataT.img = img
-    --quadX
-    dataT.quadX = assert(tonumber(strDH[7]))
-    --quadY
-    dataT.quadY = assert(tonumber(strDH[8]))
-    --w
-    dataT.w = tonumber(strDH[9]) or 64
-    --h
-    dataT.h = tonumber(strDH[10]) or 64
-    --anchorX
-    dataT.anchorX = tonumber(strDH[11]) or math.floor(dataT.w/2)
-    --anchorY
-    dataT.anchorY = tonumber(strDH[12]) or 0
-    --altitude
-    dataT.altitude = tonumber(strDH[13]) or 0
-    --pass
-    dataT.pass = strToBoolean(strDH[14],true)
-    --transparent
-    dataT.transparent = strToBoolean(strDH[15],true)
-    --move_cost
-    dataT.move_cost = tonumber(strDH[16]) or 0
-    --flags
-    dataT.flags = flagsTable(strDH[17])
-    --ground
-    dataT.ground = strToBoolean(strDH[18],false)
-    --frameNum
-    dataT.frameNum =tonumber(strDH[19]) --后续检查
-    --frameInterval
-    dataT.frameInterval = tonumber(strDH[20])--后续检查
-    --turnTo
-    dataT.turnTo = strDH[21]
-    if  dataT.turnTo =="" then  dataT.turnTo =nil end --后续检查
-
     --读取quad
     local function loadQuad(x,y,w,h,tt)
-      table.insert(tt,love.graphics.newQuad(x*64,y*64,w,h,tt.img:getWidth(),tt.img:getHeight()))
+      table.insert(tt.__source,love.graphics.newQuad(x*64,y*64,w,h,tt.img:getWidth(),tt.img:getHeight()))
     end
     if dataT.type =="wall" then
       loadQuad(dataT.quadX,       dataT.quadY,    64,64,dataT)
@@ -202,112 +105,43 @@ local function loadBlock()
       if type(dataT.frameNum)~="number"  or  type(dataT.frameInterval)~="number" then
         error("animError index:"..dataT.index)
       end
-
       for i=1,dataT.frameNum do
         loadQuad(dataT.quadX+(i-1)*dataT.w/64,dataT.quadY,dataT.w,dataT.h,dataT)
       end
     else--single
       loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
     end
-    
-    --if not dataT.transparent then  debugmsg("find no trans") end
-
-
-    setmetatable(dataT,data.dataMeta)
-    datablock[dataT.index] = dataT
-    index = index+1
-    line = file:read()
   end
-
-  debugmsg("load blockNubmer:"..(index-1))
-  file:close()
   
-  
-  --loadname
-  file = assert(io.open(c.source_dir.."data/terrain/block_name.csv","r"))
-  line = file:read()
-  local attrName = string.split(line,",") 
-  attrName[1] = "index" --utf8头，需要修正
-  line = file:read()
-  while(line) do
-    local strDH = string.split(line,",") 
-    local dataT = nil
-    for i=1,#strDH do
-      local val = strDH[i]
-      local key = attrName[i] 
-      if key=="index" then
-        dataT = datablock[tonumber(val)]
-      elseif  key=="name" then
-        dataT[key] = val
-      end
-    end
-    line = file:read()
-  end    
-  file:close()
-
-end
-
-
-local function loadOvermapTer()
-  
-  local file = assert(io.open(c.source_dir.."data/terrain/overmap.csv","r"))
+  --整理oter
   local imgw = data.overmapImg:getWidth()
   local imgh = data.overmapImg:getHeight()
-
-
-  local dataOter= data.oter
-  local index = 1
-  local line = file:read()
-  line = file:read()
-  while(line) do
-    local strDH = string.split(line,",") 
-    local dataT = {}
-    --序号
-    dataT.index = tonumber(strDH[1])
-    assert(dataT.index == index)
-    --id
-    dataT.id = strDH[2]
-    --name
-    dataT.name = strDH[3]
-    --type --默认single
-    dataT.type = strDH[4]
-    if dataT.type=="" then dataT.type =  "single" end
-    --layer
-    dataT.layer = assert(tonumber(strDH[5]))
-    --quadX
-    dataT.quadX = assert(tonumber(strDH[6]))
-    --quadY
-    dataT.quadY = assert(tonumber(strDH[7]))
-    --w
-    dataT.w = tonumber(strDH[8]) or 64
-    --h
-    dataT.h = tonumber(strDH[9]) or 64
-    --anchorX
-    dataT.anchorX = tonumber(strDH[10]) or math.floor(dataT.w/2)
-    --anchorY
-    dataT.anchorY = tonumber(strDH[11]) or math.floor(dataT.h/2)
-    --pass
-    dataT.pass = strToBoolean(strDH[12],true)
+  
+  local oter = {}
+  local oterIndex = {}
+  data.oter = oter
+  data.oterIndex = oterIndex
+  for i=1,#oter_indexList do
+    local dataT = oter_indexList[i]
+    --插入新表
+    assert(oter[dataT.index]==nil)
+    oter[dataT.index] = dataT
+    oterIndex[dataT.id]=dataT.index
+    --anchorX Y
+    dataT.anchorX = dataT.anchorX>=0 and dataT.anchorX  or math.floor(dataT.w/2)
+    dataT.anchorY = dataT.anchorY>=0 and dataT.anchorY  or math.floor(dataT.h/2)
     --move_cost
-    dataT.move_cost = tonumber(strDH[13])
-    if dataT.move_cost==nil then
+    if dataT.move_cost==-666 then --默认值
       if dataT.layer==1 then
         dataT.move_cost = 100
       else
         dataT.move_cost = 0
       end
     end
-    --flags
-    dataT.flags = flagsTable(strDH[14])
-    --targetMap
-    dataT.targetMap = strDH[15]
-    if  dataT.targetMap =="" then  dataT.targetMap =nil end --需要检查
-    --priority
-    dataT.priority = tonumber(strDH[16]) or 1
-
+    
     --读取quad
     local function loadQuad(x,y,w,h,tt)
-      table.insert(tt,love.graphics.newQuad(x*32,y*32,w,h,imgw,imgh))
+      table.insert(tt.__source,love.graphics.newQuad(x*32,y*32,w,h,imgw,imgh))
     end
     if dataT.type =="hierarchy" then
       loadQuad(dataT.quadX,dataT.quadY,64,64,dataT)
@@ -327,52 +161,6 @@ local function loadOvermapTer()
       loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
     end
 
-    setmetatable(dataT,data.dataMeta)
-    dataOter[dataT.index] = dataT
-    index = index+1
-    line = file:read()
   end
-
-  debugmsg("load oterNubmer:"..(index-1))
-  file:close()
   
-  
-end
-
-
-
-
-local function linkId()
-  data.terIndex={}
-  for i=1,#data.ter do
-    local id = data.ter[i].id
-    if data.terIndex[id]~=nil then debugmsg("repetitive ter id:"..id) end
-    data.terIndex[id] = i
-  end
-  data.blockIndex={}
-  for i=1,#data.block do
-    local id = data.block[i].id
-    if data.blockIndex[id]~=nil then debugmsg("repetitive block id:"..id) end
-    data.blockIndex[id] = i
-  end
-
-  --turnTo 转index
-  for i=1,#data.block do
-    local block = data.block[i]
-    if block.turnTo then
-      block.turnTo = data.blockIndex[block.turnTo]
-      if block.turnTo==nil then
-        error("turnTo error index:"..block.index)
-      end
-    end
-  end
-end
-
-
-
-return function()
-  loadTer()
-  loadBlock()
-  loadOvermapTer()
-  linkId()
 end

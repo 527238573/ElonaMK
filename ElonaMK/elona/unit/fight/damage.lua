@@ -31,3 +31,12 @@ c.damageType =
   dark = 2, --暗
   light = 2, --光
 }
+
+function Damage:clone()
+  local dam = {}
+  for k,v in pairs(self) do
+    dam[k] = v
+  end
+  setmetatable(dam,Damage)
+  return dam
+end

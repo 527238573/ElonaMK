@@ -1,4 +1,6 @@
 id,file,type,stillframe,autoWH,w,h,anchorX,anchorY,num,scalefactor,pingpong,playSpeed,shadowSize
+str,str,str,number,bool,number,number,number,number,number,number,bool,number,number
+D=ND,,D=twoside,D=1,D=TRUE,D=32,D=32,D=-1,D=-1,D=4,D=2,D=TRUE,D=0.5,D=1
 Nilo,Nilo.png,twoside,,,,,,,,,,,
 Kavina,Kavina.png,twoside,,,,,,,,,,0.4,
 Heston,Heston.png,twoside,2,,,,,,,,,,

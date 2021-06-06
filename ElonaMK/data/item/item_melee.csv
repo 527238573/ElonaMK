@@ -1,4 +1,6 @@
 id,name,flags,equipType,melee_skill,hit_effect,atkCost,diceNum_m,diceFace_m,baseAtk_m,m_dps,sLevel,hit,crit,DEF,MGR,evade,block,attackRate
+str,notLoad,flagstable,str,flagstable,flagsIndex,number,number,number,number,notLoad,number,number,number,number,number,number,number,number
+D=ND,,ADD,D=ND,D=ND|GEN_A,D=ND,D=ND,D=ND,D=ND,D=ND,,D=ND,,,,,,,D=1
 long_sword,长剑,SWORD,hand,cutting|stabbing,cut,0.6,2,12,3,15,1,,,,,,,
 knight_sword,骑士剑,SWORD,hand,cutting|stabbing,cut,0.63,2,13,4,16.67,12,,,,,,,
 royal_sword,皇家长剑,SWORD,hand,cutting|stabbing,cut,0.63,2,12,5,17.46,20,,,,,,,

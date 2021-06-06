@@ -44,7 +44,7 @@ end
 
 
 function Map:copyFrom(omap)
-  if getmetatable(omap) ~= Map then
+  if omap.saveType ~= "Map" then
     error("copy map error")
   end
   self.transparent_dirty = true
@@ -206,6 +206,12 @@ end
 --CONTAINER
 --LOCKED --
 function Map:hasFlag(flag,x,y)
+  
+  
+end
+
+--攻击地格，
+function Map:bash_square(x,y,power)
   
   
 end
