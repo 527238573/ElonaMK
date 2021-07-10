@@ -137,7 +137,7 @@ function Unit:fastShootAction(show_msg)
   end
 end
 
-
+--改为延迟调用
 function Unit:range_weapon_attack(target,weapon)
   local weaponItem = weapon.item
   local snum = weaponItem:getPellet()
@@ -169,8 +169,9 @@ function Unit:range_weapon_attack(target,weapon)
     g.playSound(fire_sound,self.x,self.y) 
   end
 end
+--虽然是成员函数，仍然要保存到延迟调用CB里
+CB.range_weapon_attack = Unit.range_weapon_attack
 
-saveFunction(Unit.range_weapon_attack)--注册function，变为可延迟的
 
 
 

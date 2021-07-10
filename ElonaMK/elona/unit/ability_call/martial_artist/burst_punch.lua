@@ -6,8 +6,6 @@ local abi_type
 --爆裂拳 burst_punch
 --**************--]]
 
---提前声明的local function
-local burst_punch_delay_call
 
 abi_type = data.ability["burst_punch"]
 abi_type.cooldown = 0
@@ -51,12 +49,12 @@ function abi_type.func(abi,source_unit,showmsg,target)
   dam_ins.subtype = "bash" --类型钝击
   dam_ins.hit_lv = dam_ins.hit_lv +10
 
-  source_unit:insertAnimDelayFunc(delay,burst_punch_delay_call,source_unit,t_unit,t_unit.x,t_unit.y,dx,dy,dam_ins)
+  source_unit:insertAnimDelayFunc(delay,CB.burst_punch_delay_call,source_unit,t_unit,t_unit.x,t_unit.y,dx,dy,dam_ins)
   return true,1.2,target:getTargetLv()
 end
 
 --延迟调用函数 axay 目标点 
-function burst_punch_delay_call(source_unit,target_unit,ax,ay,dx,dy,dam_ins)
+function CB.burst_punch_delay_call(source_unit,target_unit,ax,ay,dx,dy,dam_ins)
   --先选择当前目标
   if target_unit:is_dead() then
     target_unit = nil
@@ -123,5 +121,4 @@ function burst_punch_delay_call(source_unit,target_unit,ax,ay,dx,dy,dam_ins)
     end
   end
 end
-saveFunction(burst_punch_delay_call)--使这个函数可以保存  。
 

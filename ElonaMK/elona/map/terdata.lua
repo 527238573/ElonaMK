@@ -1,8 +1,7 @@
 
 
---先创建好表结构
-data.ter = {} --index的数组
-local terImg = love.graphics.newImage("data/terrain/terrain.png")
+
+local terImg = data.newImage("data/terrain/terrain.png")
 data.terImg = terImg
 data.terScale = 1 --默认放大倍数
 
@@ -11,23 +10,23 @@ local theight = terImg:getHeight()
 
 data.blockImgs = {}
 
-data.blockImgs["wall"] = love.graphics.newImage("data/terrain/walls.png")
-data.blockImgs["block"] = love.graphics.newImage("data/terrain/block.png")
-data.block ={} --index的数组
+data.blockImgs["wall"] = data.newImage("data/terrain/walls.png")
+data.blockImgs["block"] = data.newImage("data/terrain/block.png")
 
-data.overmapImg = love.graphics.newImage("data/terrain/overmap.png")
+
+data.overmapImg = data.newImage("data/terrain/overmap.png")
 --data.overmapImg:setFilter( "nearest", "nearest" )
-data.oter = {} --index 的数组
 
 
+data.addLoadingCvs("terID","data/terrain/ter.csv",nil)
+data.addLoadingCvs("blockID","data/terrain/block.csv",nil)
+data.addLoadingCvs("oterID","data/terrain/overmap.csv",nil)
 return function()
+  --获得读取完成后的临时index表
+  local ter_indexList = data.GetCVSIndexList("data/terrain/ter.csv")
+  local block_indexList = data.GetCVSIndexList("data/terrain/block.csv")
+  local oter_indexList = data.GetCVSIndexList("data/terrain/overmap.csv")
   
-  --id到ter的表，其他需要后续生成
-  local linkF,ter_indexList = data.LoadCVS("terID","data/terrain/ter.csv",nil)
-  local linkBlock,block_indexList = data.LoadCVS("blockID","data/terrain/block.csv",nil)
-  local _,oter_indexList = data.LoadCVS("oterID","data/terrain/overmap.csv",nil)
-  
-  linkBlock()
   
   --整理ter
   local ter = {}
@@ -43,7 +42,7 @@ return function()
     --读取quad
     local function loadQuad(x,y,size,tt)
       local scale = data.terScale/2
-      table.insert(tt.__source,love.graphics.newQuad(x*64*scale,y*64*scale,size*scale,size*scale,twidth,theight))
+      data.insertQuad(tt,x*64*scale,y*64*scale,size*scale,size*scale,twidth,theight)
     end
     if dataT.type =="edged" then
       loadQuad(dataT.quadX,     dataT.quadY,    32,dataT)
@@ -89,7 +88,7 @@ return function()
     dataT.img = img
     --读取quad
     local function loadQuad(x,y,w,h,tt)
-      table.insert(tt.__source,love.graphics.newQuad(x*64,y*64,w,h,tt.img:getWidth(),tt.img:getHeight()))
+      data.insertQuad(tt,x*64,y*64,w,h,tt.img:getWidth(),tt.img:getHeight())
     end
     if dataT.type =="wall" then
       loadQuad(dataT.quadX,       dataT.quadY,    64,64,dataT)
@@ -141,7 +140,7 @@ return function()
     
     --读取quad
     local function loadQuad(x,y,w,h,tt)
-      table.insert(tt.__source,love.graphics.newQuad(x*32,y*32,w,h,imgw,imgh))
+      data.insertQuad(tt,x*32,y*32,w,h,imgw,imgh)
     end
     if dataT.type =="hierarchy" then
       loadQuad(dataT.quadX,dataT.quadY,64,64,dataT)

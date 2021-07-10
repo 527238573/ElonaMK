@@ -5,7 +5,7 @@ require "file/saveT"
 --载入图片之前需预设置此项，如果延后设置对之前载入的图片无效
 love.graphics.setDefaultFilter("linear","nearest")--linear nearest
 --载入主要模块代码（主要为建立全局变量 函数等，后续仍需load）
-require "init/init"
+require "game/init"
 local suit = require"ui/suit"
 
 
@@ -23,17 +23,17 @@ function love.load()
   --love.graphics.setBackgroundColor(70/255,70/255,70/255) 
   love.graphics.setBackgroundColor(0,0,0) 
   
-  g.runScene(require"Scenes/mainMenu")
+  Scene.runScene(require"game/scenes/mainMenu")
 end
 
 
 function love.update(dt)
-  g.checkNextScene()--在一帧开始时检查切换scene
-  g.current_Scene.update(dt)
+  Scene.checkNextScene()--在一帧开始时检查切换scene
+  Scene.current_Scene.update(dt)
 end
 
 function love.draw()
-  g.current_Scene.draw()
+  Scene.current_Scene.draw()
 end
 
 
@@ -47,12 +47,16 @@ end
 
 function love.keypressed(key)
   suit:keypressed(key)
-  g.current_Scene.keypressed(key)
+  Scene.current_Scene.keypressed(key)
   --debugmsg("key press:"..key)
   
 end
 
 
-
+function love.threaderror(thread, errorstr)
+  error("Thread error! "..errorstr)
+  --debugmsg("Thread error!\n"..errorstr)
+  -- thread:getError() will return the same error string now.
+end
 
 

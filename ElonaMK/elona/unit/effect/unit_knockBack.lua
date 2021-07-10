@@ -41,7 +41,7 @@ local function KnockBackCheckSquare(dx,dy,power,map,cx,cy,attacker,dam)
   return true
 end
 
-local function knockBackDelayFunc(unit,dx,dy,power,nx,ny,attacker,dam)
+function CB.knockBackDelayFunc(unit,dx,dy,power,nx,ny,attacker,dam)
   local map = unit.map
   local cost = (dx~=0 and dy~=0 ) and 1.4 or 1
   
@@ -60,7 +60,7 @@ local function knockBackDelayFunc(unit,dx,dy,power,nx,ny,attacker,dam)
       unit:addClip(clip)
       unit:clips_update(0)
       unit:short_delay(halfTime*2+0.1,"knockBack")
-      unit:insertAnimDelayFunc(halfTime*2,knockBackDelayFunc,unit,dx,dy,power-cost,nx+dx,ny+dy,attacker,dam)
+      unit:insertAnimDelayFunc(halfTime*2,CB.knockBackDelayFunc,unit,dx,dy,power-cost,nx+dx,ny+dy,attacker,dam)
       
       --添加击退状态（续接时间）
       local effect = Effect.new("knock_back")
@@ -75,7 +75,6 @@ local function knockBackDelayFunc(unit,dx,dy,power,nx,ny,attacker,dam)
   end
   
 end
-saveFunction(knockBackDelayFunc)--使这个函数可以保存  。
 
 --被击退 dam指的是每power的damage
 function Unit:KnockBack(dx,dy,power,attacker,dam)
@@ -97,5 +96,5 @@ function Unit:KnockBack(dx,dy,power,attacker,dam)
   
   
   local nx,ny = self.x +dx,self.y+dy
-  self:insertAnimDelayFunc(halfTime,knockBackDelayFunc,self,dx,dy,power,nx,ny,attacker,dam)
+  self:insertAnimDelayFunc(halfTime,CB.knockBackDelayFunc,self,dx,dy,power,nx,ny,attacker,dam)
 end

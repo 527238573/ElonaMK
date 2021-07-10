@@ -19,7 +19,7 @@ local cancel_opt = {id={}}
 local textFilename_opt = {id={}}
 local textinput_info = {text = "",opt = {id={}}}
 
-local filters = {'MapFile | *.lua', 'All | *.*'}
+local filters = {'MapFile | *.bsr', 'All | *.*'}
 local filter_combo = {data = filters,select= 1,opt= {id={}}}
 fs:setFilter(filters[1])
 

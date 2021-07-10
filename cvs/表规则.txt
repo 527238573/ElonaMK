@@ -5,7 +5,11 @@ str   字符串   缺省默认值： D="" 空字符
 number 数字  缺省默认值： D=0
 bool  只能式 TRUE FLASE 缺省默认值： D=ND
 flagstable   缺省默认值： D="" 空字符（生成空table）
+flagsIndex  数组顺序flag 缺省默认值： D=ND
 link   链接，链接到某个表的某行（操作符L=表名，填入行id）。 缺省默认值： D=ND
+notLoad 不载入
+valTable多个数值的table 缺省默认值： D="" 空字符（生成空table）
+color3 三个值的数组table，表示color 缺省默认值： 0.5|0.5|0.5
 
 表第三行 =操作符，用|隔开
 
@@ -27,4 +31,5 @@ Max=？  数字专用 超过范围报错
 ADD  flagstable专用，叠加flag而不是覆盖 
 GEN_A flagstable专用，生成相应的 xxx_a indextable
 
-
+SKILL flagstable或str 字串检查是否是技能
+ATTR   str类检查是否是属性

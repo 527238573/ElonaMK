@@ -6,9 +6,6 @@ local abi_type
 --跳斩 jump_slash
 --**************--]]
 
---提前声明的local function
-local jump_slash_delay_call
-
 abi_type = data.ability["jump_slash"]
 abi_type.cooldown = 0
 abi_type.costMana = 0
@@ -87,12 +84,12 @@ function abi_type.func(abi,source_unit,showmsg,target)
   dam_ins.dtype =1 --物理攻击
   dam_ins.subtype = "cut" --类型切砍
 
-  source_unit:insertAnimDelayFunc(delay,jump_slash_delay_call,source_unit,t_unit,t_unit.x,t_unit.y,dx,dy,dam_ins)
+  source_unit:insertAnimDelayFunc(delay,CB.jump_slash_delay_call,source_unit,t_unit,t_unit.x,t_unit.y,dx,dy,dam_ins)
   return true,1.2,target:getTargetLv()
 end
 
 --延迟调用函数
-function jump_slash_delay_call(source_unit,target_unit,ax,ay,dx,dy,dam_ins)
+function CB.jump_slash_delay_call(source_unit,target_unit,ax,ay,dx,dy,dam_ins)
   local showmsg = (source_unit:isInPlayerTeam() or target_unit:isInPlayerTeam() )
   if showmsg then addmsg(string.format(tl("%s跳斩%s。","%s jump slash %s."),source_unit:getShortName(),target_unit:getShortName()),"info") end
   local show_miss = false
@@ -124,5 +121,4 @@ function jump_slash_delay_call(source_unit,target_unit,ax,ay,dx,dy,dam_ins)
     end
   end
 end
-saveFunction(jump_slash_delay_call)--使这个函数可以保存  。
 

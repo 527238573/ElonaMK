@@ -164,48 +164,48 @@ function ui.mainGameKeyCheck(dt)
     if(keyD(priority[i])) then
       if(priority[i] == "up") then
         if(keyD("left")) then
-          mc:moveAction(-1,1)
+          p:mc_move_action(-1,1)
         elseif(keyD("right")) then
-          mc:moveAction(1,1)
+          p:mc_move_action(1,1)
         else
-          mc:moveAction(0,1)
+          p:mc_move_action(0,1)
         end
       elseif (priority[i] =="down") then
         if(keyD("left")) then
-          mc:moveAction(-1,-1)
+          p:mc_move_action(-1,-1)
         elseif(keyD("right")) then
-          mc:moveAction(1,-1)
+          p:mc_move_action(1,-1)
         else
-          mc:moveAction(0,-1)
+          p:mc_move_action(0,-1)
         end
       elseif (priority[i] =="right") then
         if(keyD("up")) then
-          mc:moveAction(1,1)
+          p:mc_move_action(1,1)
         elseif(keyD("down")) then
-          mc:moveAction(1,-1)
+          p:mc_move_action(1,-1)
         else
-          mc:moveAction(1,0)
+          p:mc_move_action(1,0)
         end
       elseif (priority[i] =="left") then
         if(keyD("up")) then
-          mc:moveAction(-1,1)
+          p:mc_move_action(-1,1)
         elseif(keyD("down")) then
-          mc:moveAction(-1,-1)
+          p:mc_move_action(-1,-1)
         else
-          mc:moveAction(-1,0)
+          p:mc_move_action(-1,0)
         end
       end
       return
     end
   end
   if loveKeyD("kp1") then
-    mc:moveAction(-1,-1)
+    p:mc_move_action(-1,-1)
   elseif  loveKeyD("kp3") then
-    mc:moveAction(1,-1)
+    p:mc_move_action(1,-1)
   elseif  loveKeyD("kp7") then
-    mc:moveAction(-1,1)
+    p:mc_move_action(-1,1)
   elseif  loveKeyD("kp9") then
-    mc:moveAction(1,1)
+    p:mc_move_action(1,1)
   end
   
 end

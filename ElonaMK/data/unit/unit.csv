@@ -1,6 +1,6 @@
 id,name,sex,race,class,attrFactor,level,weapon_skills,profession_skills,traits,animMale,animFemale,flags,rarity
 str,str,str,link,link,number,number,flagstable,flagstable,flagstable,str,str,flagstable,number
-D=ND,UTF8,D=random,L=race,L=class,D=1,D=1,,,,,,,D=1
+D=ND,UTF8,D=random,L=race,L=class,D=1,D=1,SKILL,SKILL,,,,,D=1
 null,¿ÕÖÃµ¥Î»,,null,null,,1,,,,Nilo,,NORANDOM,
 Nilo,ÄáÂå,male,eulderna,null,,1,,,,Nilo,,NORANDOM,
 Kavina,¿¨Þ±ÄÈ,female,elea,null,,1,,,,Kavina,,NORANDOM,

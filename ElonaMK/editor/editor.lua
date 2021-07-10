@@ -2,7 +2,7 @@ editor={}
 require"file/saveTAdv"
 local MapClass = Map
 local OvermapClass = Overmap
-local CameraClass = require"elona/camera/camera"
+local CameraClass = require"game/camera/camera"
 
 editor.home = love.filesystem.getSourceBaseDirectory().."/map"
 
@@ -196,17 +196,21 @@ function editor.brushSquare(x,y)
 end
 
 
-function editor.changeMapSize(w,h,edge,id)
+function editor.changeMapSize(w,h,edge,id,offsetX,offsetY)
+  local hasOffset = offsetX~=0 or offsetY ~=0
+  
   if editor.overmapMode == false then 
-    if w~=editor.map.w or h~=editor.map.h or edge~=editor.map.edge then
+    if w~=editor.map.w or h~=editor.map.h or edge~=editor.map.edge or hasOffset then
       local omap = MapClass.new(w,h,edge)
-      omap:copyFrom(editor.map)
+      omap:copyFrom(editor.map,offsetX,offsetY)
+      omap:fetchFieldsFrom(editor.map,offsetX,offsetY)
+      omap:fetchItemsFrom(editor.map,offsetX,offsetY)
       editor.repalceMap(omap)
     end
   else
-    if w~=editor.map.w or h~=editor.map.h then
+    if w~=editor.map.w or h~=editor.map.h or hasOffset then
       local omap = OvermapClass.new(w,h)
-      omap:copyFrom(editor.map)
+      omap:copyFrom(editor.map,offsetX,offsetY)
       editor.repalceMap(omap)
     end
   end
@@ -280,7 +284,7 @@ end
 --传递的name带后缀   path为目录+sep
 function editor.openFile(name,path)
   curFilePath = path..name
-  local result,err = table.loadAdv(curFilePath)
+  local result,err = c.LoadFile(curFilePath)
   print("load",result,err)
   io.flush()
   --for k,v in pairs(result) do debugmsg("k:"..k.." v:"..tostring(v)) end
@@ -302,17 +306,19 @@ end
 --可能不带后缀，也可能带  path为目录+sep
 function editor.saveFile(name,path)
 
-  if not(#name > 4 and name:sub(-4,-1) == ".lua") then
-    name = name..".lua"
+  if not(#name > 4 and name:sub(-4,-1) == ".bsr") then--以后优先bsr了
+    name = name..".bsr"
   end
   curFilePath = path..name
   editor.internalSave(name,curFilePath)
 end
 
 function editor.internalSave(name,fullpath)
-  local result,err  = table.saveAdv(  editor.map,curFilePath )
+  local result,err  = c.SaveFile(  editor.map,curFilePath )
   print("save",result,err)
   io.flush()
+  
+  
   if result ==1 then
     curFileName = name
     love.window.setTitle("MapEditor-"..name)

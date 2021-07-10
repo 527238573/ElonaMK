@@ -70,12 +70,13 @@ function Unit:reloadBasisBonus()
       bas_t[key] = self.attr[key] 
     end
   end
+  self.basis["DEF"] = math.max(0,self.weapon_list.DEF) 
+  self.basis["MGR"] = math.max(0,self.weapon_list.MGR) 
+  --todo 其他装备效果
   for _,tra in ipairs(self.traits) do
     tra:calculate_bonus(bas_t)
   end
   
-  self.basis["DEF"] = math.max(0,self.weapon_list.DEF)
-  self.basis["MGR"] = math.max(0,self.weapon_list.MGR)
   self:resetMaxHPMP() --有任何变动都会刷新最大hpmp
   --debugmsg("reloadBasisBonus")
 end

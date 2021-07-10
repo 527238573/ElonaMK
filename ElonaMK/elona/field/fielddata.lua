@@ -1,8 +1,9 @@
 
 
-
+data.addLoadingCvs("field","data/field/field.csv",nil)
 return function ()
-  local linkF,indexList =data.LoadCVS("field","data/field/field.csv",nil)
+  if SubThread then return end--子线程不执行
+  local indexList =data.GetCVSIndexList("data/field/field.csv")
   
   local picbase = "data/field/anim/"
   for i=1,#indexList do
@@ -24,12 +25,12 @@ return function ()
     --图片quad。
     if dataT.type == "anim" or dataT.type == "density" then
       for i= 1,dataT.frameNum do
-        table.insert(dataT.__source,love.graphics.newQuad(dataT.w*(i-1),0,dataT.w,dataT.h,imgw,imgh))
+        data.insertQuad(dataT,dataT.w*(i-1),0,dataT.w,dataT.h,imgw,imgh)
       end
     elseif dataT.type == "edge" then
-      table.insert(dataT.__source,love.graphics.newQuad(5*16,0,32,32,imgw,imgh))
+      data.insertQuad(dataT,5*16,0,32,32,imgw,imgh)
       local function loadQuad(x,y)
-        table.insert(dataT.__source,love.graphics.newQuad(x*16,y*16,16,16,imgw,imgh))
+        data.insertQuad(dataT,x*16,y*16,16,16,imgw,imgh)
       end
       loadQuad(0,0);loadQuad(1,0);loadQuad(2,0);
       loadQuad(0,1);loadQuad(1,1);loadQuad(2,1);

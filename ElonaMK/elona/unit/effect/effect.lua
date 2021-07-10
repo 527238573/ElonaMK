@@ -11,9 +11,6 @@ Effect = {
 
 saveMetaType("Effect",Effect)--注册保存类型
 
-function Effect:loadfinish()
-  rawset(self,"type",assert(data.effect[self.id])) --
-end
 
 
 function Effect.new(typeid)

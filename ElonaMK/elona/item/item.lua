@@ -25,13 +25,6 @@ Item.__newindex = function(o,k,v)
   if Item[k]==nil and k~="parent" then error("使用了Item的意料之外的值:"..tostring(k)) else rawset(o,k,v) end
 end
 
---读取完成后自动调用。不再使用index。id是字符串，永不变化。
-function Item:loadfinish()
-  rawset(self,"type",assert(data.item[self.id]))
-  --self.type = assert(data.item[self.id])
-  --如果新版增加字段，则需要补充。
-  
-end
 
 
 function Item.new(typeid)

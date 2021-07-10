@@ -60,5 +60,9 @@ end
 
 --再队伍中，播放信息的角色
 function Unit:isInPlayerTeam()
-  return self==p.team[1] or self==p.team[2] or self==p.team[3] or self==p.team[4]
+  for i=1,#p.team do
+    if self==p.team[i] then return true end
+  end
+  return false
+  --return self==p.team[1] or self==p.team[2] or self==p.team[3] or self==p.team[4]
 end

@@ -80,9 +80,19 @@ function Unit:removeEffect(effect_id)
   local list = self.effects
   for i=1,#list do
     if list[i].id == effect_id then
+      list[i]:onRemove(self)
       table.remove(list,i)
-      list[i]:onRemove(unit)
       break
+    end
+  end
+end
+
+function Unit:clearEffectWhenLeaveMap()
+  local list = self.effects
+  for i=#list,1,-1 do
+    if list[i].type.leaveClear then
+      list[i]:onRemove(self)
+      table.remove(list,i)
     end
   end
 end

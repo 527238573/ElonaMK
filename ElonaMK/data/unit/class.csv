@@ -1,6 +1,6 @@
 id,name,str,con,dex,per,ler,wil,mag,chr,weapon_skills,profession_skills,traits
 str,str,number,number,number,number,number,number,number,number,flagstable,flagstable,flagstable
-D=ND,UTF8,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,,,
+D=ND,UTF8,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,Min=0|Max=15,SKILL,SKILL,
 null,无,,,,,,,,,,,
 warrior,战士,9,9,3,2,,2,,,cutting|stabbing|bashing|polearm|shield,,
 martial_artist,武者,8,9,7,,,,,,martial_arts|throw,,

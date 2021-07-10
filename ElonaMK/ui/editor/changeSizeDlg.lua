@@ -7,6 +7,8 @@ local close_quads = c.pic.close_quads
 
 local w_input_info = {text = "",opt = {id={}}}
 local h_input_info = {text = "",opt = {id={}}}
+local offsetX_input_info = {text = "",opt = {id={}}}
+local offsetY_input_info = {text = "",opt = {id={}}}
 local edge_input_info = {text = "",opt = {id={}}}
 local textinput_info = {text = "",opt = {id={}}}
 local weight_input_info = {text = "100",opt = {id={}}}
@@ -25,6 +27,9 @@ return function()
     w_input_info.text = tostring(map.w); h_input_info.text = tostring(map.h);
     edge_input_info.text = tostring(map.edge)
     textinput_info.text = map.id or ""
+    offsetX_input_info.text = "0"
+    offsetY_input_info.text = "0"
+    
     --weight_input_info.text = tostring(map.weight)
     
     debugmsg("map.id:"..map.id)
@@ -37,11 +42,17 @@ return function()
   local close_st = suit:ImageButton(close_quads,closeBtn_Opt,dlg.x+369,dlg.y+3,30,24)
   
   suit:Label("W:",label_opt,dlg.x+30,dlg.y+60,50,22)
-  suit:Input(w_input_info, w_input_info.opt,dlg.x+80,dlg.y+60,185,22)
+  suit:Input(w_input_info, w_input_info.opt,dlg.x+80,dlg.y+60,90,22)
   suit:Label("H:",label_opt,dlg.x+30,dlg.y+90,50,22)
-  suit:Input(h_input_info, h_input_info.opt,dlg.x+80,dlg.y+90,185,22)
+  suit:Input(h_input_info, h_input_info.opt,dlg.x+80,dlg.y+90,90,22)
   suit:Label("edge:",label_opt,dlg.x+30,dlg.y+120,50,22)
   suit:Input(edge_input_info, edge_input_info.opt,dlg.x+80,dlg.y+120,185,22)
+  
+  suit:Label("OffsetX:",label_opt,dlg.x+180,dlg.y+60,60,22)
+  suit:Input(offsetX_input_info, offsetX_input_info.opt,dlg.x+240,dlg.y+60,90,22)
+  suit:Label("OffsetY:",label_opt,dlg.x+180,dlg.y+90,60,22)
+  suit:Input(offsetY_input_info, offsetY_input_info.opt,dlg.x+240,dlg.y+90,90,22)
+  
   
   suit:Label("Map name id:",label_opt,dlg.x+30,dlg.y+150,130,22)
   suit:Input(textinput_info, textinput_info.opt,dlg.x+190,dlg.y+150,185,22)
@@ -60,6 +71,6 @@ return function()
   if s_confirm.hit then
     read_value = false
     editor.popwindow = nil
-    editor.changeMapSize(tonumber(w_input_info.text) or 20,tonumber(h_input_info.text) or 20,tonumber(edge_input_info.text) or 0,textinput_info.text)
+    editor.changeMapSize(tonumber(w_input_info.text) or 20,tonumber(h_input_info.text) or 20,tonumber(edge_input_info.text) or 0,textinput_info.text,tonumber(offsetX_input_info.text) or 0, tonumber(offsetY_input_info.text) or 0)
   end
 end

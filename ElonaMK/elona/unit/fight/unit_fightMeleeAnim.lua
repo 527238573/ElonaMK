@@ -650,13 +650,13 @@ end
 
 
 
-local function missFrameMoveUp(self,dt)self.dy = self.dy +dt*64 end
-saveFunction(missFrameMoveUp)
+function CB.missFrameMoveUp(self,dt)self.dy = self.dy +dt*64 end
+
 function Unit:fly_miss_word(delay)
   local frame = FrameClip.createUnitFrame("miss",0,-16,delay)
   frame.drop_to_map = true
   self:addFrameClip(frame)
-  frame:setFrameUpdateFunc(missFrameMoveUp)
+  frame:setFrameUpdateFunc(CB.missFrameMoveUp)
 end
 
 --未击中的动画

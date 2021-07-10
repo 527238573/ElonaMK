@@ -1,5 +1,32 @@
 
 
+function Map:rebuildItemsGrid()
+  local empty = c.empty
+  local itemsGrid = {noSave = true}
+  self.items = itemsGrid
+  for i=1,self.w*self.h do
+    itemsGrid[i] = empty
+  end
+  --重建unitGrid
+  for list,_ in pairs(self.allItemLists) do
+    itemsGrid[list.y*self.w+list.x+1] = list
+  end
+end
+
+function Map:clearItemLists()
+  local leaveItemLists = {}
+  for list,_ in pairs(self.allItemLists) do
+    if list:getNum()==0 then 
+      table.insert(leaveItemLists,list)
+    end
+  end
+  for _,list in ipairs(leaveItemLists) do
+    self.allItemLists[list]=nil
+    self.items[list.y*self.w+list.x+1] = c.empty
+  end
+  
+end
+
 --默认force为false，若为true则强行创建。否则返回nil
 function Map:getItemList(x,y,force)
   assert(x>=0 and x<=self.w-1 and y>=0 and y<=self.h-1)
@@ -8,23 +35,22 @@ function Map:getItemList(x,y,force)
   
   if list==nil and force then 
     list = Inventory.new(true)
+    list.x =x
+    list.y =y
     self.items[y*self.w+x+1] = list
+    self.allItemLists[list]=true
   end
   return list
 end
---尝试回收itemList节约空间，如果为空的话。
-function Map:releaseItemList(x,y)
-  assert(x>=0 and x<=self.w-1 and y>=0 and y<=self.h-1)
-  local list = self.items[y*self.w+x+1]
-  if list~= c.empty and list:getNum()==0 then 
-    self.items[y*self.w+x+1] = c.empty --回收
-  end
-end
+
 
 --清除一个地格上的物品。连带list也。
 function Map:clearSquareItem(x,y)
   assert(x>=0 and x<=self.w-1 and y>=0 and y<=self.h-1)
+  
+  local list = self.items[y*self.w+x+1]
   self.items[y*self.w+x+1] = c.empty
+  self.allItemLists[list]=nil
 end
 
 --不检查直接添加
@@ -82,3 +108,24 @@ function Map:dropItem(item,x,y)
 end 
 
 
+
+function Map:fetchItemsFrom(omap,offsetX,offsetY)
+  offsetX = offsetX or 0
+  offsetY = offsetY or 0
+  for x = 0,self.w-1 do
+    for y = 0,self.h-1 do
+      local destX = x+offsetX
+      local destY = y+offsetY
+      if omap:inbounds(destX,destY) then
+        local index = destY*omap.w+destX+1
+        local list = omap.items[index]
+        if list ~= c.empty then
+          list.x = x
+          list.y = y
+          self.allItemLists[list] = true
+        end
+      end
+    end
+  end
+  self:rebuildItemsGrid()
+end

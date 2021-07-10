@@ -3,18 +3,23 @@
 
 
 data.itemImgs = {}
-data.itemImgs["item1"] = love.graphics.newImage("data/item/item1.png")
+data.itemImgs["item1"] = data.newImage("data/item/item1.png")
 local itemScale = 1 --使用64*64格子的图 不能缩小到32*32，因为在1.5缩放效果看上去不佳。
 --data.itemImgs["item1"]:setFilter("linear","linear")
-
+data.addLoadingCvs("enchantment","data/item/enchantment.csv",nil)
+data.addLoadingCvs("item","data/item/item.csv",nil)
+data.addLoadingCvs("item","data/item/item_melee.csv","combine")
+data.addLoadingCvs("item","data/item/item_range.csv","combine")
+data.addLoadingCvs("item","data/item/item_body.csv","combine")
+data.addLoadingCvs("item","data/item/item_accessory.csv","combine")
 
 
 
 
 local function dataTLoadQuad(dataT)
   dataT.scaleFactor = itemScale
-  local function loadQuad(x,y,w,h,tt)
-    table.insert(tt.__source,love.graphics.newQuad(x*64/itemScale,y*64/itemScale,w,h,tt.img:getWidth(),tt.img:getHeight()))
+  local function loadQuad(x,y,w,h)
+    data.insertQuad(dataT,x*64/itemScale,y*64/itemScale,w,h,dataT.img:getWidth(),dataT.img:getHeight())
   end
   if dataT.useAnim then
     for i=1,dataT.frameNum do
@@ -27,13 +32,11 @@ end
 
 
 return function ()
-  data.LoadCVS("enchantment","data/item/enchantment.csv",nil)
-  ---[[
-  local linkF,item_indexList =data.LoadCVS("item","data/item/item.csv",nil)
-  local _,melee_indexList =data.LoadCVS("item","data/item/item_melee.csv","combine")
-  local _r,range_indexList =data.LoadCVS("item","data/item/item_range.csv","combine")
-  local _b,body_indexList =data.LoadCVS("item","data/item/item_body.csv","combine")
-  local _a,acc_indexList =data.LoadCVS("item","data/item/item_accessory.csv","combine")
+  local item_indexList =data.GetCVSIndexList("data/item/item.csv")
+  local melee_indexList =data.GetCVSIndexList("data/item/item_melee.csv")
+  local range_indexList =data.GetCVSIndexList("data/item/item_range.csv")
+  local body_indexList =data.GetCVSIndexList("data/item/item_body.csv")
+  local acc_indexList =data.GetCVSIndexList("data/item/item_accessory.csv")
   
   for i=1,#item_indexList do
     local dataT = item_indexList[i]

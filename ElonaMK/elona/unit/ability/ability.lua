@@ -12,9 +12,6 @@ Ability.__newindex = function(o,k,v)
   if Ability[k]==nil and niltable[k]==nil then error("使用了Ability的意料之外的值。") else rawset(o,k,v) end
 end
 
-function Ability:loadfinish()
-  rawset(self,"type",assert(data.ability[self.id])) 
-end
 
 
 function Ability.new(typeid)

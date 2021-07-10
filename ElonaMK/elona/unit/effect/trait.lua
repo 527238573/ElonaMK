@@ -7,9 +7,7 @@ Trait = {
 }
 saveMetaType("Trait",Trait)--注册保存类型
 
-function Trait:loadfinish()
-  rawset(self,"type",assert(data.trait[self.id])) --
-end
+
 
 
 function Trait.new(typeid)

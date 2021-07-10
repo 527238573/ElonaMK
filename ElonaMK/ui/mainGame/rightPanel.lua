@@ -17,7 +17,7 @@ return function()
 
   suit:Panel(panel_opt,x,y,w,h)
   
-  if g.inOvermapMode() then
+  if Scene.inOvermapMode() then
     miniMap(wmap,g.wcamera,x+25,y+25,250,250)
   else
     miniMap(cmap,g.camera,x+25,y+25,250,250)

@@ -1,0 +1,9 @@
+id,name,name_en,description,front_c,back_c,leaveClear,isAnim,mod_t
+str,str,str,str,color3,color3,bool,bool,valTable
+D=ND,UTF8|D=ND,UTF8,UTF8,,,D=FALSE,D=FALSE,D=nil
+test1,测试效果1,test1,正在吟唱法术技能。较长的描述。,1|0|0,0.9|0.9|0.9,,,
+test2,第二测试效果,test2,正在吟唱法术技能。较长的描述。较长的描述。较长的描述。较长的描述。,0.2|1|0,0.5|0.5|0.5,,,
+chanting,吟唱,Chanting,正在吟唱法术技能。,250|250|221,28|107|221,TRUE,,
+ancient_wisdom,远古智慧,Ancient wisdom,魔力得到加强。,20|68|180,200|250|200,,,
+sprinting,冲刺,Sprinting,正在冲刺状态。,0.1|0.1|0.1,0.9|0.9|0.9,TRUE,TRUE,
+knock_back,击退,Knock back,正在被击退状态。,0.6|0.1|0.1,0.9|0.9|0.9,TRUE,TRUE,

@@ -3,6 +3,32 @@ map.unit表保存所有地格单位 坐标 index =y*self.w+x+1
 对同一格子的单位，使用链表链接
 
 --]]
+
+
+function Map:rebuildUnitGrid()
+  local empty = c.empty
+  local unitGrid = {noSave = true}
+  self.unit = unitGrid
+  for i=1,self.w*self.h do
+    unitGrid[i] = empty
+  end
+  --重建unitGrid
+  for unit,_ in pairs(self.activeUnits) do
+    local index = unit._y*self.w+unit._x+1 --unit可能未重建完成，读_x _y
+    if unitGrid[index] ==empty then
+      unit.next_unit = nil --清除链
+      unitGrid[index] = unit
+    else
+      unit.next_unit = unitGrid[index]
+      unitGrid[index] = unit
+    end
+  end
+end
+
+
+
+
+
 --新加入map。并插入活跃列表
 function Map:unitEnter(unit,x,y)
   assert(x>=0 and x<=self.w-1 and y>=0 and y<=self.h-1)
@@ -22,8 +48,8 @@ function Map:unitEnter(unit,x,y)
     tarU.next_unit = unit--插入链表尾部
   end
   
-  unit.x = x
-  unit.y = y
+  unit._x = x
+  unit._y = y
   unit.map = self
   if self.activeUnits[unit]==nil then self.activeUnit_num = self.activeUnit_num+1 end --增加数目
   self.activeUnits[unit] = true
@@ -61,6 +87,9 @@ function Map:unitLeave(unit)
   end
   unit.next_unit = nil --不能忘记清除，无论是否有值
   unit.target  =nil --清除单位引用，防止代入下个地图
+  unit:clearDelayFunc() --清除所有DelayFunc。防止任何延迟逻辑和引用被带出地图
+  unit:clearEffectWhenLeaveMap()--清除任何临时的buff。
+  
 end
 
 function Map:unitMove(unit,x,y)
@@ -95,8 +124,8 @@ function Map:unitMove(unit,x,y)
   unit.next_unit = nil --不能忘记清除，无论是否有值
   
   --进入新位置
-  unit.x = x
-  unit.y = y
+  unit._x = x
+  unit._y = y
   
   index = y*self.w+x+1
   tarU = self.unit[index]

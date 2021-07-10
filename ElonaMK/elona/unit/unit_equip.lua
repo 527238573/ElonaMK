@@ -29,7 +29,7 @@ function Unit:dropEquipmentToInventory(slot)
   local equipment = self.equipment[slot]
   if equipment then
     self.equipment[slot] = nil
-    if p:isUnitInTeam(self) then
+    if self:isInPlayerTeam() then
       --进入玩家背包
       p.inv:addItem(equipment)
     else--进入单位自身背包

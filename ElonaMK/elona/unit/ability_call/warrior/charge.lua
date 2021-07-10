@@ -5,8 +5,6 @@ local abi_type
 --冲锋 charge
 --**************--]]
 
---提前声明的local function
-local apply_dam_charge
 
 
 
@@ -107,14 +105,14 @@ function abi_type.func(abi,source_unit,showmsg,target)
   dam_ins.dtype =1 --物理攻击
   dam_ins.subtype = "bash" --类型钝击
   --延迟调用
-  source_unit:insertAnimDelayFunc(runTime,apply_dam_charge,dam_ins,tx,ty,fdx,fdy,rot,source_unit,target.unit)
+  source_unit:insertAnimDelayFunc(runTime,CB.apply_dam_charge,dam_ins,tx,ty,fdx,fdy,rot,source_unit,target.unit)
   
   return true,10,target:getTargetLv()
 end
 
 --延迟调用
 --charge_rot冲锋方向换算成的1-8的方向，用于决定落脚点
-function apply_dam_charge(dam_ins,x,y,fdx,fdy,charge_rot,source_unit,target_unit)
+function CB.apply_dam_charge(dam_ins,x,y,fdx,fdy,charge_rot,source_unit,target_unit)
   
   local map = source_unit.map
   
@@ -253,4 +251,3 @@ function apply_dam_charge(dam_ins,x,y,fdx,fdy,charge_rot,source_unit,target_unit
   
   source_unit:short_delay(runTime,"recover")
 end
-saveFunction(apply_dam_charge)

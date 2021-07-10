@@ -19,6 +19,10 @@ function Map:enterMap(x,y)
     if unit  and unit ~= p.mc then self:unitSpawn(unit,x,y) end --进入地图
   end
   addmsg(string.format(tl("你进入了%s。","You entered %s."),self.name))
+  
+  --主角单位进图后。刷新cache
+  self:buildSeenCache()
+  
 end
 
 
@@ -59,42 +63,5 @@ function Map:getEntrance(face)
   return math.floor(self.w/2),math.floor(self.h/2)
 end
 
-
-function Map.enterWorldMap(x,y)
-  p.x = x
-  p.y = y
-  g.enterWmap = true --记录下，等到checkNextScene时才切换。
-end
-
-function Map.setNextMap(map,enterX,enterY)
-  local nextMap = {map = map,x=enterX,y = enterY}
-  g.nextMap = nextMap --记录下，等到checkNextScene时才切换。
-end
-
---在checkNextScene时调用此函数。
-function Map.checkNextMap()
-  
-  --如果同一帧调用以上两个方法，优先进入大地图而不是另一张地图。
-  if g.enterWmap then
-    g.enterWmap = false
-    g.nextMap = nil
-    if cmap then
-      cmap:leaveMap()
-      cmap = nil
-    end
-    debugmsg("enterOvmap")
-    g.runScene(g.overMap_scene)
-  elseif g.nextMap then
-    if cmap then
-      cmap:leaveMap()
-      cmap = nil
-    end
-    cmap = g.nextMap.map
-    cmap:enterMap(g.nextMap.x,g.nextMap.y)
-    g.runScene(g.mainGame_scene)
-    g.nextMap = nil
-  end
-  
-end
 
 

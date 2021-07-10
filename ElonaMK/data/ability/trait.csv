@@ -1,0 +1,5 @@
+id,name,name_en,description,description_en,good,mod_t
+str,str,str,str,str,bool,valTable
+D=ND,UTF8|D=ND,UTF8,UTF8,UTF8,D=FALSE,D=nil
+native_trait,种族天赋,Ethnic talent,属性修正。,Fixed bonus value.,TRUE,
+magicRes,先天魔抗,Innate Magic Res,能少量减少受到的魔法伤害。,Slightly reduces the amount of magic damage taken.,TRUE,MGR=10

@@ -4,9 +4,6 @@ local abi_type
 --[[*****************
 --旋风斩 round_slash
 --**************--]]
---提前声明的local function
-local round_slash_frameUpdate
-local apply_dam_round_slash
 
 
 abi_type = data.ability["round_slash"]
@@ -47,7 +44,7 @@ function abi_type.func(abi,source_unit,showmsg,target)
   frame.rotation = 0+math.pi/2-facerot+10.4*0.2
   --debugmsg("facerot:"..facerot)
   --frame.rotation_speed = -10.4
-  frame:setFrameUpdateFunc(round_slash_frameUpdate)
+  frame:setFrameUpdateFunc(CB.round_slash_frameUpdate)
 
   --计算伤害
   local dam_ins = source_unit:getAbilityDamageInstance(abi,2,10,5)
@@ -58,7 +55,7 @@ function abi_type.func(abi,source_unit,showmsg,target)
     local atk_face = cface-i
     atk_face = (atk_face-1)%8+1 
     local dx,dy = c.face_dir(atk_face)
-    source_unit:insertAnimDelayFunc(0.2+i*(0.6/8),apply_dam_round_slash,source_unit.map,source_unit.x+dx,source_unit.y+dy,dam_ins,source_unit)
+    source_unit:insertAnimDelayFunc(0.2+i*(0.6/8),CB.apply_dam_round_slash,source_unit.map,source_unit.x+dx,source_unit.y+dy,dam_ins,source_unit)
   end
 
   return true,1.8,source_unit.level
@@ -66,7 +63,7 @@ end
 
 
 --延迟调用
-function round_slash_frameUpdate(frame,dt)
+function CB.round_slash_frameUpdate(frame,dt)
   local remaining = frame.remaining_life
   if remaining>0.8 then
     local rate = (1-remaining)/0.2
@@ -79,9 +76,8 @@ function round_slash_frameUpdate(frame,dt)
   end
 
 end
-saveFunction(round_slash_frameUpdate)
 
-function apply_dam_round_slash(map,x,y,dam_ins,source_unit)
+function CB.apply_dam_round_slash(map,x,y,dam_ins,source_unit)
   local unit = map:unit_at(x,y);
   if unit and source_unit:isHostile(unit) then
     local hit = unit:check_melee_hit(source_unit,dam_ins,0.1)
@@ -111,4 +107,3 @@ function apply_dam_round_slash(map,x,y,dam_ins,source_unit)
     end
   end
 end
-saveFunction(apply_dam_round_slash)

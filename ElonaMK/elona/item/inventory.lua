@@ -4,6 +4,8 @@ Inventory = {
   maxWeight = 100,
   maxNum = 400,
   weight = 0,
+  x =-1,
+  y=-1,
 }
 saveMetaType("Inventory",Inventory)--注册保存类型
 

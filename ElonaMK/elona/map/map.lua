@@ -6,17 +6,23 @@ Map = {
     id = "null",
     name = tl("未知之地","Unknown place"),
     refreshMiniMap = false, --刷新小地图
-    seen ={w=10,sx=1,sy=1,allseen = true,time = 0},
-    transparent = {},
-    transparent_dirty = true,
+    seen ={w=10,sx=1,sy=1,allseen = true,time = 0},--cache
+    squareInfo_dirty = true,
     seen_dirty = true,
     lastTurn = 0,--最后次更新的游戏内时间。载入新cmap时使用
     gen_id ="",--map生成及刷新相关函数的id。data.mapgen[gen_id] 
     can_exit = false,--能否在边缘退出。
   }
 local niltable = {
-  terColor = true,--两个颜色color的
-  blockColor = true,
+  --terColor = true,--两个颜色color的
+  --blockColor = true,
+  --seen = true, --cache
+  transparent = true,--cache
+  movecost = true,--cache
+  
+  unit = true,--临时table
+  field = true,--临时table
+  items = true,--临时table
 }
 saveMetaType("Map",Map,niltable)--注册保存类型
 Map.__newindex = function(o,k,v)
@@ -26,8 +32,11 @@ end
 function Map:preSave()
   self.seen = nil
   self.transparent = nil
-  self.transparent_dirty = true
+  self.movecost = nil
+  self.squareInfo_dirty = true
   self.seen_dirty = true
+  self:clearFieldLists()
+  self:clearItemLists()
 end
 function Map:postSave()
   
@@ -35,8 +44,13 @@ end
 
 function Map:loadfinish()
   --如果新版增加字段，则需要补充。
-  self.transparent_dirty = true
+  self.squareInfo_dirty = true
   self.seen_dirty = true
+  self:decodeTerrainCdata()
+  self:rebuildUnitGrid()
+  self:rebuildFieldGrid()
+  self:rebuildItemsGrid()
+  
   self:reloadOldVersionTer()
 end
 
@@ -58,31 +72,30 @@ function Map.new(x,y,edge)
   Map.initTerAndBlock(o) --ter block
   
   
-  o.field = {} --地形效果。烟雾，火，一滩水，立场等等。
-  
-  o.unit = {} --单位，所站地格之上的。
-  o.items = {} -- itemlist.一个list，包含多个物品。
   
   o.transparent={}
   
   o.activeUnit_num = 0--登记活跃单位的数量。
   o.activeUnits = {} --活跃中的单位列表。以key为值。无先后顺序。
-  o.activeFields = {} --所有地图上的field。以key为值。无先后顺序。
+  o.activeFieldLists = {} --所有地图上的fieldlist。以key为值。无先后顺序。
+  o.allItemLists = {}--已有的itemList
   --其他npc列表
   
   o.frames = {}--地图上的活动特效。--不会保存
   o.projectiles={} --地图中的弹道投射物等。--不会保存
   
   for i=1,x*y do
-    o.field[i] = empty --field是一个list，列出了地形上的所有field。按绘制优先级顺序。empty为空占位
-    o.unit[i] = empty --unit指具体的unit。 empty空占位
-    o.items[i] = empty --items是物品的列表。
     
     o.transparent[i] = true --
   end
-  o.transparent_dirty = false
+  o.squareInfo_dirty = false
   o.seen_dirty = true
+  
   setmetatable(o,Map)
+  
+  o:rebuildUnitGrid()--重建unitGrid
+  o:rebuildFieldGrid()--重建fielGrid --地形效果。烟雾，火，一滩水，立场等等。
+  o:rebuildItemsGrid()
   return o
 end
 
@@ -93,22 +106,13 @@ function Map:updateRL(dt)
   for unit,_ in pairs(self.activeUnits) do
     unit:updateRL(dt)
   end
-  for field,_ in pairs(self.activeFields) do
-    field:updateRL(dt)
+  for list,_ in pairs(self.activeFieldLists) do
+    list:updateRL(dt)
   end
   
   
-  --清理field。updateAnim里清理更保险，但这里会少清理几次。
-  --绝大多数情况都是由Feild时间到了被清理。
-  local leaveFields = {}
-  for field,_ in pairs(self.activeFields) do
-    if field:is_end() or field.map~=self  then 
-      table.insert(leaveFields,field)
-    end
-  end
-  for _,field in ipairs(leaveFields) do
-    self.activeFields[field]=nil
-  end
+  --清理fieldlist。不一定需要频繁清理
+  self:clearFieldLists()
   
   
 end

@@ -2,15 +2,14 @@
 
 data.face ={}
 
+data.addLoadingCvs("class","data/unit/class.csv",nil)
+data.addLoadingCvs("race","data/unit/race.csv",nil)
+data.addLoadingCvs("unit","data/unit/unit.csv",nil)
 
-local function checkSkillType(skills)
-  for k,v in pairs(skills) do
-    if g.skills[k]==nil then error("wrong skillname:"..k) end
-  end
-end
 
 
 local function loadUnitFace()
+  if SubThread then return end--子线程不执行
   local lovefs = require("file/lovefs")
   --debugmsg("source:"..love.filesystem.getSource())
   local fs = lovefs(love.filesystem.getSource().."/data/pic/face")
@@ -24,10 +23,9 @@ local function loadUnitFace()
 end
 
 return function ()
-  data.LoadCVS("class","data/unit/class.csv",nil)
-  data.LoadCVS("race","data/unit/race.csv",nil)
-  local linkF,indexList = data.LoadCVS("unit","data/unit/unit.csv",nil)
-  linkF()
+  
+  local indexList = data.GetCVSIndexList("data/unit/unit.csv")
+  
   for i=1,#indexList do
     local dataT = indexList[i]
     --animMale 取得
@@ -51,7 +49,6 @@ return function ()
     for k,v in pairs( dataT.race.profession_skills) do skill[k]=v  end
     for k,v in pairs( dataT.class.weapon_skills) do skill[k]=v  end
     for k,v in pairs( dataT.class.profession_skills) do skill[k]=v  end
-    checkSkillType(skill)
     dataT.skill = skill
     --checktrait,待以后
   end

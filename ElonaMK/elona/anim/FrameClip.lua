@@ -24,10 +24,7 @@ FrameClip = {
 }
  saveMetaType("FrameClip",FrameClip)--注册保存类型
 --frameClip可以保存。
-function FrameClip:loadfinish()
-  rawset(self,"type",assert(data.frames[self.id]))
-  
-end
+
 
 
 

@@ -20,11 +20,7 @@ Field = {
 Field.__newindex = function(o,k,v)
   if Field[k]==nil and k~="parent" and k~= "map" then error("使用了Field的意料之外的值。") else rawset(o,k,v) end
 end
---读取完成后自动调用。id是字符串，永不变化。
-function Field:loadfinish()
-  rawset(self,"type",assert(data.field[self.id]))
-  --如果新版增加字段，则需要补充。
-end
+
 
 
 function Field.new(typeid)
@@ -60,9 +56,5 @@ function Field:updateRL(dt)
   self.life = self.life +dt
   self.remain = self.remain-dt
   
-  --自清除。
-  if self.remain<=0 then
-    self.parent:remove(self)
-    --其他触发。
-  end
+  
 end

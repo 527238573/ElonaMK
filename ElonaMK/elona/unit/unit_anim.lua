@@ -1,12 +1,6 @@
 
 
 
---使相机聚焦单位
-function Unit:camera_Focus()
-  local x = self.x*64+32+self.status.camera_dx
-  local y = self.y*64+24+self.status.camera_dy
-  g.camera:setCenter(x,y)
-end
 
 --算上dxdy后估计的XY值。用于确定大概位置等
 function Unit:getLineXY()

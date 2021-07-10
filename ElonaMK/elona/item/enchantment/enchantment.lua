@@ -13,11 +13,7 @@ Enchantment.__newindex = function(o,k,v)
   if Enchantment[k]==nil then error("使用了Enchantment的意料之外的值:"..tostring(k)) else rawset(o,k,v) end
 end
 
---读取完成后自动调用。不再使用index。id是字符串，永不变化。
-function Enchantment:loadfinish()
-  rawset(self,"type",assert(data.enchantment[self.id]))
-  --如果新版增加字段，则需要补充。
-end
+
 
 
 function Enchantment.new(typeid)

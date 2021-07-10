@@ -379,7 +379,6 @@ end
 
 function pickDropWin:win_close()
   ui.clearTurboKey()
-  cmap:releaseItemList(target_X,target_Y)
 end
 
 

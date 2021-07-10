@@ -9,8 +9,8 @@ local path =c.source_dir.."data/map/"
 
 --从地图文件模板创建地图。
 function MapFactory.createFromTemplateId(id)
-  local file  =  path..id..".lua"
-  local template,err = table.loadAdv(file)
+  local file  =  path..id..".bsr"
+  local template,err = c.LoadFile(file)
   print("load map Template:",template,err)
   io.flush()
   if template==nil then error("load map template failed:"..id)end
@@ -47,8 +47,8 @@ end
 
 local overmapPath =c.source_dir.."data/overmap/"
 function  MapFactory.createOverMapFromTemplateId(id)
-  local file  =  overmapPath..id..".lua"
-  local template,err = table.loadAdv(file)
+  local file  =  overmapPath..id..".bsr"
+  local template,err = c.LoadFile(file)
   print("load overmap Template:",template,err)
   io.flush()
   if template==nil then error("load overmap template failed:"..id)end

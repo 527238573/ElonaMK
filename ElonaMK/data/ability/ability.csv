@@ -1,6 +1,6 @@
 id,name,icon,isMagic,main_attr,baseLevel,difficulty,costMana,cooldown,description,target_type,range,hit_skill,diceNum,diceFace,baseAtk
 str,str,str,bool,str,number,number,number,number,str,str,str,str,number,number,number
-D=ND,UTF8|D=ND,D=ND,D=ND,D=ND,D=0,D=1,D=0,D=1,UTF8,,,D=magic_chant,,,
+D=ND,UTF8|D=ND,D=ND,D=ND,D=ND|ATTR,D=0,D=1,D=0,D=1,UTF8,,,D=magic_chant|SKILL,,,
 fire_ball,»ðÇò,fire_ball,TRUE,mag,0,1,3,0.7,,single_enemy,sight,magic_chant,,,
 jump_slash,ÌøÕ¶,jump_slash,FALSE,str,0,1,5,2.5,,single_enemy,close,cutting,,,
 round_slash,»ØÐýÕ¶,round_slash,FALSE,str,5,1,7,5,,single_enemy,close,cutting,,,

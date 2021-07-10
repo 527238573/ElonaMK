@@ -1,6 +1,6 @@
 id,name,flags,equipType,range_skill,ammo_type,bullet,shootSound,reloadSound,bulletSound,R_key,reloadCost,maxAmmo,fixShotCost,shotCost,diceNum_r,diceFace_r,baseAtk_r,maxRange,dispersion,pellet,m_dps,sLevel,hit,crit,DEF,MGR,evade,block
 str,notLoad,flagstable,str,flagstable,str,str,str,str,str,str,number,number,bool,number,number,number,number,number,number,number,notLoad,number,number,number,number,number,number,number
-D=ND,,ADD,D=ND,D=ND|GEN_A,D=nil,D=bullet1,D=nil,D=nil,D=nil,D=nil,D=0.4,D=ND,D=TRUE,D=ND,D=ND,D=ND,D=ND,D=7.9,D=100,D=1,,D=ND,,,,,,
+D=ND,,ADD,D=ND,D=ND|GEN_A|SKILL,D=nil,D=bullet1,D=nil,D=nil,D=nil,D=nil,D=0.4,D=ND,D=TRUE,D=ND,D=ND,D=ND,D=ND,D=7.9,D=100,D=1,,D=ND,,,,,,
 wand,Ä§ÕÈ,STICK,hand,magic_chant,,,,,,,,0,FALSE,0.58,1,10,1,7.9,125,,10.34482759,10,,,,,,
 short_bow,¶Ì¹­,BOW,twohand,bow,arrow,arrow_wood,fire_arrow,,ranged_hit_flesh,select_ammo,,1,FALSE,0.48,2,13,2,7.9,200,,17.70833333,7,0,,,,,
 long_bow,³¤¹­,BOW,twohand,bow,arrow,arrow_wood,fire_arrow,,ranged_hit_flesh,select_ammo,,1,FALSE,0.58,2,18,3,10.2,110,,20.68965517,12,3,,,,,

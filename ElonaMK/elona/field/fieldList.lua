@@ -24,8 +24,6 @@ function FieldList:add(field)
   field.y = self.y
   for i=1,#self do
     if field.type.priority <= self[i].type.priority then
-      debugmsg(string.format("insert %d, old %d",field.type.priority,self[i].type.priority))
-      
       table.insert(self,i,field)
       return
     end
@@ -52,5 +50,17 @@ function FieldList:removeAll()
     table.remove(self,i)
     field.map =nil
     field.parent = nil
+  end
+end
+
+function FieldList:updateRL(dt)
+  for i = #self,1,-1 do
+    local field = self[i]
+    field:updateRL(dt)
+    if field:is_end() then
+      table.remove(self,i)
+      field.map =nil
+      field.parent = nil
+    end
   end
 end

@@ -2,10 +2,10 @@
 local abi_type
 
 
---通用local function
+--通用function
 
 --发射飞弹普通的延迟调用函数。
-local function fire_proj(source_unit,target,proj)
+function CB.fire_proj(source_unit,target,proj)
   local map =source_unit.map
   if map ==nil then return end --如果map不存在,就不发射（单位异常神隐了）
   if target.unit and target.unit.dead then
@@ -22,7 +22,6 @@ local function fire_proj(source_unit,target,proj)
   local clip  = Animation.Impact(0.21,0.3333,dx,dy,0)--运动时间：0.07,0.14
   source_unit:addClip(clip)
 end
-saveFunction(fire_proj) --使这个函数可以保存，吟唱火球到一半退出并保存游戏，读取后还能重建延迟调用。
 
 local function stepback_anim(source_unit,target,ftime)
   local tx,ty 
@@ -91,7 +90,7 @@ function abi_type.func(abi,source_unit,showmsg,target)
   dam_ins.subtype = "fire" --类型火焰
   proj.dam_ins = dam_ins
   
-  chant_eff:setEndCall(fire_proj,source_unit,target,proj)
+  chant_eff:setEndCall(CB.fire_proj,source_unit,target,proj)
   chant_eff:addClip(stepback_anim(source_unit,target,chant_eff.remain)) --添加后撤动作
   return true,chant_time,target:getTargetLv()
 end
