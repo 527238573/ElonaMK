@@ -1,5 +1,5 @@
 local suit = require"ui/suit"
-ui.right_w = 300
+ui.right_w = c.RightPanel_W
 ui.bottom_h = 64
 require"ui/window/Window"
 require"ui/window/child/numberAskWin"

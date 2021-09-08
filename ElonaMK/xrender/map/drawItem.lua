@@ -29,11 +29,11 @@ local function drawOneItem(camera,item,x,y,dy)
     if info.hanging then 
       ay= y*64+64 
     end
-    local scale = camera.workZoom*info.scaleFactor
+    local scale = info.scaleFactor
     local ox = info.w/2 --锚点
     local oy = info.h
     local quad = getItemQuad(info)
-    local screenx,screeny = camera:modelToScreen(ax,ay)
+    local screenx,screeny = camera:modelToCanvas(ax,ay)
     love.graphics.setColor(item:getDrawColor())
     love.graphics.draw(info.img,quad,screenx,screeny,0,scale,scale,ox,oy)--绘制，根据位置（锚点默认正中底边）和缩放
   
@@ -55,12 +55,6 @@ local function drawOneSquareItem(camera,x,y,map)
   local altitude = map:getAltitude(x,y)
 
 
-  local info
-  local ax,ay
-  local scale = camera.workZoom
-  local ox,oy
-  local quad
-  local screenx,screeny
 
   if item1~= Item.manyItems then
     drawOneItem(camera,item1,x,y,altitude)

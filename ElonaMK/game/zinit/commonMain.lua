@@ -7,6 +7,7 @@ c.win_W = love.graphics.getWidth()
 c.win_H = love.graphics.getHeight()
 c.WIN_W = love.graphics.getWidth()
 c.WIN_H = love.graphics.getHeight()
+c.RightPanel_W = 300--右侧面板宽度
 
 c.SQUARE_L= 64  --以下常数，基本不修改，位运算
 

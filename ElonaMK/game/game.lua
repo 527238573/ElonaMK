@@ -13,9 +13,8 @@ local CameraClass = require"game/camera/camera"
 function g.initCamera()
   
   --editor.topbar_H = 30
-  g.rightPanel_W = 300--只有右侧主面板
-  g.camera = CameraClass.new(0,0,c.win_W-g.rightPanel_W,c.win_H)--工作区域在屏幕上的起始坐标
-  g.wcamera = CameraClass.new(0,0,c.win_W-g.rightPanel_W,c.win_H)--大地图下的camera
+  g.camera = CameraClass.new(0,0,c.win_W-c.RightPanel_W,c.win_H)--工作区域在屏幕上的起始坐标
+  g.wcamera = CameraClass.new(0,0,c.win_W-c.RightPanel_W,c.win_H)--大地图下的camera
 end
 
 g.curFrame = 1

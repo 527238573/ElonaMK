@@ -31,6 +31,7 @@ function MapFactory.createFromTemplateId(id)
     end
   end
   --field不创建。
+  newmap:buildSquareInfoCache()--刷新cache
   
   newmap.gen_id = id --必须与模板的id一致。
   local gen_t = data.mapgen[newmap.gen_id]
@@ -41,7 +42,8 @@ function MapFactory.createFromTemplateId(id)
   else
     debugmsg("warning:no gen_t map："..id)
   end
-  
+  newmap.squareInfo_dirty = true
+  newmap:buildSquareInfoCache()--刷新cache
   return newmap
 end
 
@@ -60,6 +62,7 @@ end
 function MapFactory.createWmapField(x,y,id)
   assert(x>=0 and x<=wmap.w-1 and y>=0 and y<=wmap.h-1)
   local newmap = Map.new(42,28,3) --野外固定大小。
+  newmap:buildSquareInfoCache()--刷新cache
   newmap.id = id
   newmap.lastTurn = p.calendar:getTurnpast()--记录创建时间为最后更新时间
   local gtype = wmap:getGroundFlag(x,y)
@@ -75,9 +78,12 @@ function MapFactory.createWmapField(x,y,id)
   else
     newmap.gen_id = "dirt"
   end
+  
   local gen_t = data.mapgen[newmap.gen_id]
   if gen_t.generate then
     gen_t.generate(newmap,wmap,x,y)
   end
+  newmap.squareInfo_dirty = true
+  newmap:buildSquareInfoCache()--刷新cache
   return newmap
 end

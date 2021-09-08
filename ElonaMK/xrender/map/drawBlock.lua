@@ -31,11 +31,11 @@ local function drawOneGroundBlock(camera,x,y,map)
   local info = data.block[bid]
   if info.ground == false then return end 
   
-  local scale = camera.workZoom
+  local scale = 1
   local ox = info.anchorX --锚点
   local oy = info.h - info.anchorY
   local quad = getBlockQuad(info)
-  local screenx,screeny = camera:modelToScreen(x*64+32,y*64)
+  local screenx,screeny = camera:modelToCanvas(x*64+32,y*64)
   love.graphics.draw(info.img,quad,screenx,screeny,0,scale,scale,ox,oy)--绘制，根据位置（锚点默认正中底边）和缩放
 end
 
@@ -65,22 +65,22 @@ local function drawOneSolidBlock(camera,x,y,map)
     if right~=bid then state_code = state_code+2 end
     if down~=bid then state_code = state_code+4 end
     local quad = info[wallIndex[state_code]]
-    local scale = camera.workZoom
+    local scale = 1
     local ox = 32 --锚点
     local oy = 64- info.anchorY
-    local screenx,screeny = camera:modelToScreen(x*64+32,y*64+32)
+    local screenx,screeny = camera:modelToCanvas(x*64+32,y*64+32)
     love.graphics.draw(info.img,quad,screenx,screeny,0,scale,scale,ox,oy)
     if up~=bid then 
-      screenx,screeny = camera:modelToScreen(x*64,y*64+96- info.anchorY)
+      screenx,screeny = camera:modelToCanvas(x*64,y*64+96- info.anchorY)
       love.graphics.draw(info.img,info[5],screenx,screeny,0,scale,scale)
     end
     
   else--普通物件
-    local scale = camera.workZoom
+    local scale = 1
     local ox = info.anchorX --锚点
     local oy = info.h - info.anchorY
     local quad = getBlockQuad(info)
-    local screenx,screeny = camera:modelToScreen(x*64+32,y*64+32-10)
+    local screenx,screeny = camera:modelToCanvas(x*64+32,y*64+32-10)
     love.graphics.draw(info.img,quad,screenx,screeny,0,scale,scale,ox,oy)
   end
 end

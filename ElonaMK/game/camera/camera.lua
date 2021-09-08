@@ -72,6 +72,12 @@ function Camera:updateSeenRect()
   self.seen_maxX = self.centerX +self.half_seen_W
   self.seen_minY = self.centerY -self.half_seen_H
   self.seen_maxY = self.centerY +self.half_seen_H
+  
+  self.canvas_minX = math.floor(self.seen_minX)
+  self.canvas_Xoffset = -(self.seen_minX - self.canvas_minX) * self.workZoom
+  self.canvas_maxY = math.ceil(self.seen_maxY)
+  self.canvas_Yoffset = -(self.canvas_maxY - self.seen_maxY) * self.workZoom
+  
 end
 
 --传入model的坐标。
@@ -81,6 +87,10 @@ function Camera:canSee(cx,cy,radius)
 end
 
 
+
+function Camera:modelToCanvas(x,y)
+  return (x-self.canvas_minX)+self.workx,(self.canvas_maxY-y)+self.worky
+end
 
 function Camera:modelToScreen(x,y)
   return (x-self.seen_minX)*self.workZoom+self.workx,(self.seen_maxY-y)*self.workZoom+self.worky--注意maxY，模型坐标轴与屏幕坐标Y轴相反

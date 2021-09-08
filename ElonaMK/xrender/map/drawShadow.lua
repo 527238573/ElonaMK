@@ -155,10 +155,9 @@ end
 
 
 function render.drawShadow(camera,map)
-  map:buildSeenCache()
   setupLight()
 
-  local zoom  = camera.workZoom
+  local zoom  = 1
   local squareL = 64
   local startx = math.floor(camera.seen_minX/squareL)-2
   local starty = math.floor(camera.seen_minY/squareL)-2
@@ -197,7 +196,7 @@ function render.drawShadow(camera,map)
   --love.graphics.setBlendMode("subtract")
   if oldSeen~=nil and seen.time<changeTime  then
     local new_rate = seen.time/changeTime
-    local x,y= camera:modelToScreen(startx*squareL,starty*squareL)
+    local x,y= camera:modelToCanvas(startx*squareL,starty*squareL)
 
     local old_color = shadow_d*(1-new_rate)
     love.graphics.setColor(1,1,1,old_color)
@@ -211,13 +210,42 @@ function render.drawShadow(camera,map)
     love.graphics.draw(batch1,x,y,0,zoom,zoom)
   else
     love.graphics.setColor(1,1,1,shadow_d)
-    local x,y = camera:modelToScreen(startx*squareL,starty*squareL)
+    local x,y = camera:modelToCanvas(startx*squareL,starty*squareL)
     love.graphics.draw(batch1,x,y,0,zoom,zoom)
     love.graphics.draw(batchshow,x,y,0,zoom,zoom)
   end
   --love.graphics.setBlendMode("alpha")
-  render.drawEditorEdgeShadow(camera,map)
+  render.drawEdgeShadow(camera,map)
 end
+
+function render.drawEdgeShadow(camera,map)
+  if map.edge<=0 then return end
+  love.graphics.setColor(0,0,0,0.25) 
+  
+  local xleft = -map.edge *64
+  local xright = (map.w + map.edge )*64
+  local ileft = 0
+  local iright = map.w*64
+  
+  local xup = (map.h+map.edge)*64
+  local iup = (map.h)*64
+  local xdown = -map.edge *64
+  local idown = 0
+  --rect up
+  local sx,sy = camera:modelToCanvas(xleft,xup)
+  love.graphics.rectangle("fill",sx,sy,(xright-xleft),(xup-iup))
+  --rect left
+  sx,sy = camera:modelToCanvas(xleft,iup)
+  love.graphics.rectangle("fill",sx,sy,(ileft-xleft),(iup-idown))
+  --rect right
+  sx,sy = camera:modelToCanvas(iright,iup)
+  love.graphics.rectangle("fill",sx,sy,(xright-iright),(iup-idown))
+  --rect down
+  sx,sy = camera:modelToCanvas(xleft,idown)
+  love.graphics.rectangle("fill",sx,sy,(xright-xleft),(idown-xdown))
+  
+end
+
 
 
 function render.setTerrainColor()

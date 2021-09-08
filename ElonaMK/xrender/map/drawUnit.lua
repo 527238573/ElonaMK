@@ -23,17 +23,17 @@ local function drawUnitLifebar(unit,status,camera,x,y)
 
   local sx = x*64 +2 --格子中心点
   local sy = y*64 +30
-  local lw = camera.workZoom *unit:getHPRate()
-  local lh = camera.workZoom
+  local lw = 1 *unit:getHPRate()
+  local lh = 1
   local acx,acy = sx+status.dx,sy+status.dy+status.dz
-  local screenx,screeny = camera:modelToScreen(acx,acy)
+  local screenx,screeny = camera:modelToCanvas(acx,acy)
   love.graphics.setColor(1,1,1,1)
   love.graphics.draw(lifebar_q.img,lifebarquad,screenx,screeny,0,lw,lh,0,0)
 end
 
 local function drawDelayBar(unit,camera,screenx,screeny)
   if unit.delay_bar<=0 then return end
-  local zoom = camera.workZoom
+  local zoom = 1
   local precent  = c.clamp(unit.delay_bar/unit.delay_barmax,0,1)
   love.graphics.setColor(0.65,0.65,1)
   love.graphics.rectangle("fill",screenx-32*zoom,screeny+4*zoom,64*zoom,14*zoom)
@@ -57,7 +57,7 @@ local function drawOneSquareUnit(camera,todraw)
   local anim = unit:get_unitAnim() --anim数据
 
   --画影子
-  local shadow_x,shadow_y  = camera:modelToScreen(x*64 +32+status.dx,y*64+32+status.dy) --中心点
+  local shadow_x,shadow_y  = camera:modelToCanvas(x*64 +32+status.dx,y*64+32+status.dy) --中心点
   local shadow_scale = 2*anim.shadowSize
   render.setUnitShadowColor()
   love.graphics.draw(shadow_img,shadow_x,shadow_y,0,shadow_scale,shadow_scale,16,10)--绘制
@@ -69,12 +69,12 @@ local function drawOneSquareUnit(camera,todraw)
 
   local sx = x*64 +32 --格子中心点
   local sy = y*64 +32+(anim.h-oy)*sacleFactor --格子中心点+上移图片中心点
-  local scaleX = status.scaleX * sacleFactor *camera.workZoom
-  local scaleY = status.scaleY * sacleFactor *camera.workZoom
+  local scaleX = status.scaleX * sacleFactor 
+  local scaleY = status.scaleY * sacleFactor 
   local rotation = status.rot
   --屏幕坐标
   local acx,acy = sx+status.dx,sy+status.dy+status.dz
-  local screenx,screeny = camera:modelToScreen(acx,acy)
+  local screenx,screeny = camera:modelToCanvas(acx,acy)
 
   local img,quad,flip = unit:getImgQuad(status)
   if flip then scaleX =scaleX*-1 end--水平翻转 

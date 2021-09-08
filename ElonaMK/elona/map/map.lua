@@ -6,7 +6,6 @@ Map = {
     id = "null",
     name = tl("未知之地","Unknown place"),
     refreshMiniMap = false, --刷新小地图
-    seen ={w=10,sx=1,sy=1,allseen = true,time = 0},--cache
     squareInfo_dirty = true,
     seen_dirty = true,
     lastTurn = 0,--最后次更新的游戏内时间。载入新cmap时使用
@@ -14,9 +13,7 @@ Map = {
     can_exit = false,--能否在边缘退出。
   }
 local niltable = {
-  --terColor = true,--两个颜色color的
-  --blockColor = true,
-  --seen = true, --cache
+  seen = true, --cache
   transparent = true,--cache
   movecost = true,--cache
   
@@ -30,6 +27,7 @@ Map.__newindex = function(o,k,v)
 end
 
 function Map:preSave()
+  --self.tmp_pathNodes = nil --删除临时
   self.seen = nil
   self.transparent = nil
   self.movecost = nil
@@ -72,9 +70,6 @@ function Map.new(x,y,edge)
   Map.initTerAndBlock(o) --ter block
   
   
-  
-  o.transparent={}
-  
   o.activeUnit_num = 0--登记活跃单位的数量。
   o.activeUnits = {} --活跃中的单位列表。以key为值。无先后顺序。
   o.activeFieldLists = {} --所有地图上的fieldlist。以key为值。无先后顺序。
@@ -84,11 +79,7 @@ function Map.new(x,y,edge)
   o.frames = {}--地图上的活动特效。--不会保存
   o.projectiles={} --地图中的弹道投射物等。--不会保存
   
-  for i=1,x*y do
-    
-    o.transparent[i] = true --
-  end
-  o.squareInfo_dirty = false
+  o.squareInfo_dirty = true
   o.seen_dirty = true
   
   setmetatable(o,Map)
@@ -139,7 +130,6 @@ function Map:updateAnim(dt)
     self.activeUnits[unit]=nil
     self.activeUnit_num = self.activeUnit_num-1
   end
-  
   
 end
 

@@ -177,6 +177,22 @@ function Map:getBlockColor(x,y)
   return 1,1,1
 end
 
+function Map:getTerInfo(x,y)
+  assert(x>=-self.edge and x<=self.w+self.edge-1 and y>=-self.edge and y<=self.h+self.edge-1)
+  x = x+self.edge
+  y = y+self.edge
+  return data.ter[self.ter[y*self.realw+x]]
+end
+
+function Map:getBlockInfo(x,y)
+  assert(x>=-self.edge and x<=self.w+self.edge-1 and y>=-self.edge and y<=self.h+self.edge-1)
+  x = x+self.edge
+  y = y+self.edge
+  return data.block[self.block[y*self.realw+x]]
+end
+
+
+
 
 
 function Map:getAltitude(x,y)
@@ -185,34 +201,6 @@ function Map:getAltitude(x,y)
 end
 
 
-
-
-function Map:can_pass(x,y)
-  if not self:inbounds(x,y) then return false end
-  x = x+self.edge
-  y= y+self.edge
-  local tid = self.ter[y*self.realw+x]
-  local bid = self.block[y*self.realw+x]
-  local tinfo = data.ter[tid]
-  local binfo = data.block[bid]
-  return binfo.pass
-end
-
-
-function Map:move_cost(x,y)
-  if not self:inbounds(x,y) then return -1 end
-  x = x+self.edge
-  y= y+self.edge
-  local tid = self.ter[y*self.realw+x]
-  local bid = self.block[y*self.realw+x]
-  local tinfo = data.ter[tid]
-  local binfo = data.block[bid]
-  --if bid==nil then error("x,y:"..x.." "..y) end
-  
-  if not binfo.pass then return -1 end
-  local cost = tinfo.move_cost + binfo.move_cost
-  return cost
-end
 
 --CONTAINER
 --LOCKED --

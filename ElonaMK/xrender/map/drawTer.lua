@@ -155,7 +155,7 @@ function render.drawTer(camera,map)
 
   --love.graphics.setColor(1,1,1)
   
-  local zoom  = camera.workZoom
+  local zoom  = 1
   local squareL = 64
   local startx = math.floor(camera.seen_minX/squareL)
   local starty = math.floor(camera.seen_minY/squareL)
@@ -175,8 +175,8 @@ function render.drawTer(camera,map)
       end
     end
   end
-  local x,y = camera:modelToScreen(startx*squareL,starty*squareL)
-  love.graphics.draw(batch,x,y,0,zoom,zoom)
+  local x,y = camera:modelToCanvas(startx*squareL,starty*squareL)
+  love.graphics.draw(batch,x,y,0,1,1)
 end
 
 

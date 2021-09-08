@@ -7,7 +7,7 @@ local function drawOneField(field,camera,x,y,map)
 
   local color = field.color
   love.graphics.setColor(color[1],color[2],color[3],color[4])
-  local scale = camera.workZoom *info.scalefactor
+  local scale = 1 *info.scalefactor
   local ox = info.anchorX --锚点
   local oy = info.h - info.anchorY
   local sx = x*64+32
@@ -17,7 +17,7 @@ local function drawOneField(field,camera,x,y,map)
   elseif info.drawType =="air" then
     sy = y*64+22
   end
-  local screenx,screeny = camera:modelToScreen(sx,sy)
+  local screenx,screeny = camera:modelToCanvas(sx,sy)
   local quad 
   if info.type=="anim" then
     local totalTime = info.frameInterval*info.frameNum
@@ -49,7 +49,7 @@ local function drawOneField(field,camera,x,y,map)
       else
         if left then quad = info[3] else quad = info[2] end
       end
-      screenx,screeny = camera:modelToScreen( x*64,y*64+64)
+      screenx,screeny = camera:modelToCanvas( x*64,y*64+64)
       love.graphics.draw(img,quad,screenx,screeny,0,scale,scale,0,0)
       --右上角
       if up then
@@ -61,7 +61,7 @@ local function drawOneField(field,camera,x,y,map)
       else
         if right then quad = info[3] else quad = info[4] end
       end
-      screenx,screeny = camera:modelToScreen( x*64+32,y*64+64)
+      screenx,screeny = camera:modelToCanvas( x*64+32,y*64+64)
       love.graphics.draw(img,quad,screenx,screeny,0,scale,scale,0,0)
       --左下角
       if down then
@@ -73,7 +73,7 @@ local function drawOneField(field,camera,x,y,map)
       else
         if left then quad = info[9] else quad = info[8] end
       end
-      screenx,screeny = camera:modelToScreen( x*64,y*64+32)
+      screenx,screeny = camera:modelToCanvas( x*64,y*64+32)
       love.graphics.draw(img,quad,screenx,screeny,0,scale,scale,0,0)
       --右下角
       if down then
@@ -85,7 +85,7 @@ local function drawOneField(field,camera,x,y,map)
       else
         if right then quad = info[9] else quad = info[10] end
       end
-      screenx,screeny = camera:modelToScreen( x*64+32,y*64+32)
+      screenx,screeny = camera:modelToCanvas( x*64+32,y*64+32)
       love.graphics.draw(img,quad,screenx,screeny,0,scale,scale,0,0)
     end
   end

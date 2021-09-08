@@ -1,17 +1,23 @@
 
-
+local ffi = require("ffi")
 function Map:buildSquareInfoCache()
   if not self.squareInfo_dirty then return end
-  if self.transparent==nil then self.transparent = {} end
-  local transparent = self.transparent
   local w = self.w
   local h=  self.h
+  if self.transparent==nil then self.transparent = ffi.new("bool[?]",w*h) end
+  if self.movecost==nil then self.movecost = ffi.new("uint8_t[?]",w*h) end
+  
+  local transparent = self.transparent
+  local movecost = self.movecost
+  local clamp = c.clamp
   for y=0,h-1 do
     for x=0,w-1 do
+      local tinfo = data.ter[self:getTer(x,y)]
       local binfo = data.block[self:getBlock(x,y)]
-      transparent[y*w+x+1] = binfo.transparent
-      --添加field的效果
-      --if not binfo.transparent then   debugmsg("id:"..tostring(binfo.id).."trans:"..tostring(binfo.transparent)) end
+      transparent[y*w+x] = binfo.transparent
+      local cost = clamp(tinfo.move_cost + binfo.move_cost,50,255+49)-49--范围在50~304之间
+      if not binfo.pass then cost= 0 end --0表示不能通过
+      movecost[y*w+x] = cost
     end
   end
   self.squareInfo_dirty = false
@@ -19,9 +25,27 @@ function Map:buildSquareInfoCache()
 end
 
 function Map:isTranspant(x,y)
+  --需要检测field
   if not self:inbounds(x,y) then return false end
-  return self.transparent[y*self.w+x+1]
+  return self.transparent[y*self.w+x]
 end
+
+function Map:can_pass(x,y)
+  if not self:inbounds(x,y) then return false end
+  --debugmsg("canpass x:"..x.." y:"..y.." movecost:"..self.movecost[y*self.w+x])
+  
+  return self.movecost[y*self.w+x] ~=0
+end
+
+
+function Map:move_cost(x,y)
+  --需要检测field等
+  if not self:inbounds(x,y) then return -1 end
+  local cost = self.movecost[y*self.w+x]
+  if cost ==0 then return -1 end
+  return cost +49
+end
+
 
 function Map:buildSeenCache()
   self:buildSquareInfoCache()
@@ -119,7 +143,7 @@ end
 function Map:isMCSeen(x,y,lastseen)
   if not self:inbounds(x,y) then return false end
   local seen = lastseen or self.seen
-  if seen.allseen then return true end
+  if seen==nil then return true end
   x= x-seen.sx
   y= y-seen.sy
   if x>=0 and x<=seen.w-1 and y>=0 and y<=seen.w-1 then --必须在矩阵的范围内

@@ -17,13 +17,13 @@ local shader_rotUV = love.graphics.newShader[[
 
 function render.drawOneFrame(frame,acx,acy,camera)
   local img,quad = frame:getImgQuad()
-  local screenx,screeny = camera:modelToScreen(acx+frame.dx,acy+frame.dy)
+  local screenx,screeny = camera:modelToCanvas(acx+frame.dx,acy+frame.dy)
   
   local ftype = frame.type
   local ox = ftype.ox
   local oy = ftype.oy --以中心为点
-  local scaleX = ftype.scaleFactor *camera.workZoom*frame.scaleX
-  local scaleY = ftype.scaleFactor *camera.workZoom*frame.scaleY
+  local scaleX = ftype.scaleFactor *frame.scaleX
+  local scaleY = ftype.scaleFactor *frame.scaleY
   if frame.flipX then scaleX = scaleX*-1 end
   if frame.flipY then scaleY = scaleY*-1 end
   local rot = frame.rotation
@@ -56,13 +56,13 @@ end
 
 local function drawOneProjectile(proj,map,camera)
   local img,quad = proj:getImgQuad()
-  local screenx,screeny = camera:modelToScreen(proj.x,proj.y)
+  local screenx,screeny = camera:modelToCanvas(proj.x,proj.y)
   
   local ftype = proj.type
   local ox = ftype.ox
   local oy = ftype.oy --以中心为点
-  local scaleX = ftype.scaleFactor *camera.workZoom
-  local scaleY = ftype.scaleFactor *camera.workZoom
+  local scaleX = ftype.scaleFactor 
+  local scaleY = ftype.scaleFactor 
   local rot = proj.rotation
   love.graphics.draw(img,quad,screenx,screeny,rot,scaleX,scaleY,ox,oy)--绘制
 end
