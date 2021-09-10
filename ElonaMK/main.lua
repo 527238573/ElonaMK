@@ -14,7 +14,7 @@ local suit = require"ui/suit"
 
 function love.load()
   --debug模式才有效
-  c.initDebug()
+  c.initDebug() --在commonMain里有debugON OFF，对开启的代码段Debug
   --后续的载入，调用初始化函数
   data.init()
   

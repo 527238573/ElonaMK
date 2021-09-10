@@ -61,8 +61,8 @@ end
 
 function render.drawMainGame()
   local camera = g.camera
-  local x,y = camera.centerX,camera.centerY
-  camera:clampXY()
+  --local x,y = camera.centerX,camera.centerY
+  --camera:clampXY()
   local map = cmap
   love.graphics.setColor(1,1,1)
   love.graphics.setCanvas(canvas)
