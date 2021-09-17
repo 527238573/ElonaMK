@@ -70,6 +70,10 @@ function Map:inbounds_real(x,y)
   return x>=0 and x<=self.realw-1 and y>=0 and y<=self.realh-1
 end
 
+function Map:clampBounds(x,y)
+  return c.clamp(math.floor(x),0,self.w-1),c.clamp(math.floor(y),0,self.h-1)
+end
+
 
 
 function Map:copyFrom(omap,offsetX,offsetY)

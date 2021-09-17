@@ -6,8 +6,6 @@ Unit = {
     name = "noname",
     x=0, --位置。--只能在map_unit 修改，其他情况只读
     y=0, --位置。--只能在map_unit 修改，其他情况只读
-    _x =0,--私有，只能被map_unit修改
-    _y =0,
     level = 1,--等级
     exp = 0,--经验。
     hp = 0,--生命
@@ -64,14 +62,10 @@ local niltable = { --默认值为nil的成员变量
   brain = true, --brain状态机table，ai相关
 }
 saveMetaType("Unit",Unit,niltable) --注册保存类型
-Unit.__index = function(o,k) --对XY 的访问做限制，防止误改。后期可以删除限制加快速度
-  if k=="x" then return o._x end
-  if k=="y" then return o._y end
-  return Unit[k]
-end
+Unit.__index = Unit
 
 Unit.__newindex = function(o,k,v)
-  if k =="x" or k=="y" then error("不能直接写入unit.x,unit.y") end
+  if k =="x" or k=="y" then error("不能直接写入unit.x,unit.y") end --写入控制。后期可以删除这行
   if Unit[k]==nil and niltable[k]==nil then error("使用了Unit的意料之外的值。") else rawset(o,k,v) end
 end
 

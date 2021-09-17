@@ -29,7 +29,7 @@ return function()
   
   if suit:isHovered(touch) and suit:wasHovered(touch) then
     local dy  = suit:getWheelNumber()
-    g.camera:setWorkZoom(g.camera.workZoom +dy*0.1)
+    g.camera:setTargetWorkZoom(g.camera.targetZoom +dy*0.05)
   end
   
 end

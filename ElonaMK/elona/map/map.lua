@@ -20,6 +20,8 @@ local niltable = {
   unit = true,--临时table
   field = true,--临时table
   items = true,--临时table
+  tmp_pathNodes = true,--临时table
+  
 }
 saveMetaType("Map",Map,niltable)--注册保存类型
 Map.__newindex = function(o,k,v)
@@ -27,7 +29,7 @@ Map.__newindex = function(o,k,v)
 end
 
 function Map:preSave()
-  --self.tmp_pathNodes = nil --删除临时
+  self.tmp_pathNodes = nil --删除临时
   self.seen = nil
   self.transparent = nil
   self.movecost = nil

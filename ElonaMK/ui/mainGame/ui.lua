@@ -30,7 +30,7 @@ local touch = require"ui/mainGame/touch"
 function ui.uiLayer(dt)
   ui.updateTurboKey(dt) --UI界面按键连发
   g.camera:focusUnit(p.mc)--先定位镜头到主角位置
-  
+  g.camera:update(dt)
   ui.cameraMove(dt) --移动镜头渐变 
   
   touch()--鼠标控制。--受镜头影响，放在镜头移动后

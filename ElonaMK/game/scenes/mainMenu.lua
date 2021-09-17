@@ -32,7 +32,7 @@ function mainMenu.enter()
 	--particle:setLinearAcceleration(-5, 30, 5, 30) -- Random movement in all directions.
 	--particle:setColors(255, 255, 255, 255, 255, 255, 255, 0) -- Fade to transparency.
   particle:setSpeed( 80, 150 )
-  particle:setEmissionArea( "uniform", c.WIN_W, 0, 0, false )
+  particle:setEmissionArea( "uniform", c.win_W, 0, 0, false )
   particle:setDirection( 2.1 )
   particle:setRotation( 0, math.pi*2 )
   particle:setSpin( 0.8, 3 )
@@ -77,11 +77,11 @@ end
 
 function mainMenu.draw()
   local w,h = loadmain:getDimensions()
-  local scaleX,scaleY = c.WIN_W/w,c.WIN_H/h
+  local scaleX,scaleY = c.win_W/w,c.win_H/h
   local scaleMax = math.max(scaleX,scaleY)
   love.graphics.setColor(1,1,1)
   love.graphics.draw(loadmain,0,0,0,scaleMax,scaleMax)
-  love.graphics.draw(particle, c.WIN_W * 0.5+100, 0)
+  love.graphics.draw(particle, c.win_W * 0.5+100, 0)
   
   
   suit.theme.drawScale9Quad(parchment,win_menu.x,win_menu.y,360,500)

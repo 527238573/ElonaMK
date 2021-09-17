@@ -120,7 +120,10 @@ function Test.testSubThread()
   debugmsg(type(v))
   debugmsg(string.format("%04X",1))
 end
-
+function Test.testFindpath()
+  cmap:pathFind(2,2,8,8,20,3)
+  
+end
 
 function g.test2()
   --g.playSound("charge2",p.mc.x,p.mc.y)
@@ -140,6 +143,7 @@ function g.test2()
   Test.refuel_mana()
   --debugOff()
 end
+
 
 
 function g.test1()

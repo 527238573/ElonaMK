@@ -5,8 +5,6 @@
 
 c.win_W = love.graphics.getWidth()
 c.win_H = love.graphics.getHeight()
-c.WIN_W = love.graphics.getWidth()
-c.WIN_H = love.graphics.getHeight()
 c.RightPanel_W = 300--右侧面板宽度
 
 c.SQUARE_L= 64  --以下常数，基本不修改，位运算
@@ -107,8 +105,8 @@ c.shader_cooldown = love.graphics.newShader[[
 
 c.DES_WHITE = {0.9,0.9,0.9}
 c.DES_GREY = {0.7,0.7,0.7}
-c.DES_MAG = {0.5,0.5,0.9} --魔法技能数值（伤害）
-c.DES_SKI = {0.9,0.6,0.3} --物理技能数值（伤害）
+c.DES_MAG = {0.5,0.5,0.9} --魔法技能数值（伤害） 字体颜色
+c.DES_SKI = {0.9,0.6,0.3} --物理技能数值（伤害）字体颜色
 
 function c.addDesLine(t,str,color)
   table.insert(t,color)

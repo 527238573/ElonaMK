@@ -16,7 +16,14 @@ function Map:enterMap(x,y)
   self:unitSpawn(p.mc,x,y) --进入地图，mc第一个进入
   for i=1,p.teamNum do 
     local unit = p.team[i]
-    if unit  and unit ~= p.mc then self:unitSpawn(unit,x,y) end --进入地图
+    if unit  and unit ~= p.mc then 
+      self:unitSpawn(unit,x,y) 
+      unit.brain.follow_target = p.mc
+      
+    end --进入地图
+    
+    
+    
   end
   addmsg(string.format(tl("你进入了%s。","You entered %s."),self.name))
   

@@ -6,7 +6,10 @@ Brain= {
   
   isFighting = false,-- 是否在战斗状态  这个状态只作为自身AI的状态，不要用来其他查询
   
+  curState = "idle",--当前状态（总状态）
   
+  
+  path_step=0,
 }
 local niltable = { --默认值为nil的成员变量
   owner = true,--brain的所有者，unit
@@ -15,6 +18,11 @@ local niltable = { --默认值为nil的成员变量
   --非战斗状态变量
   follow_target = true,--需要跟随的目标，为nil不跟随
   wander_region = true,--乱逛限制的区域
+  
+  path = true,
+  
+  
+  
 }
 saveMetaType("Brain",Brain,niltable)--注册保存类型
 

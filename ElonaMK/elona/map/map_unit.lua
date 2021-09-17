@@ -47,9 +47,8 @@ function Map:unitEnter(unit,x,y)
     while(tarU.next_unit) do tarU = tarU.next_unit end --移动到尾部
     tarU.next_unit = unit--插入链表尾部
   end
-  
-  unit._x = x
-  unit._y = y
+  rawset(unit,"x",x)
+  rawset(unit,"y",y)
   unit.map = self
   if self.activeUnits[unit]==nil then self.activeUnit_num = self.activeUnit_num+1 end --增加数目
   self.activeUnits[unit] = true
@@ -124,8 +123,8 @@ function Map:unitMove(unit,x,y)
   unit.next_unit = nil --不能忘记清除，无论是否有值
   
   --进入新位置
-  unit._x = x
-  unit._y = y
+  rawset(unit,"x",x)
+  rawset(unit,"y",y)
   
   index = y*self.w+x+1
   tarU = self.unit[index]

@@ -20,6 +20,7 @@ function Camera.new(x,y,w,h)
   o.workx = x
   o.worky = y--工作区域在屏幕上的起始坐标
   o.workZoom = 1; -- 可见部分缩放比例
+  o.targetZoom =1;--指定的缩放比例
   
   --可见区域在模型坐标的半长
   o.half_seen_W = o.work_W/o.workZoom/2
@@ -41,24 +42,31 @@ function Camera:updateRect(map)
   self.center_maxX = map.w *c.SQUARE_L
   self.center_minY = 0
   self.center_maxY = map.h *c.SQUARE_L
+end
+
+
+function Camera:update(dt)
+  if self.workZoom == self.targetZoom then return end
+  local zoomSpeed = 1
+  local dz = self.targetZoom - self.workZoom
+  local sign = dz>0 and 1 or -1
+  self:setWorkZoom(self.workZoom  + sign* math.min (dt*zoomSpeed,math.abs(dz)))
   
+end
+
+function Camera:setTargetWorkZoom(z)
+  self.targetZoom = c.clamp(z,0.5,1)
 end
 
 function Camera:setWorkZoom(z)
   self.workZoom = c.clamp(z,0.5,1)
   self.half_seen_W = self.work_W/self.workZoom/2
   self.half_seen_H = self.work_H/self.workZoom/2
-  --
-  if self.workZoom ==0.5 then 
-    --self.centerX = self.centerX -self.centerX%2
-    --self.centerY = self.centerY -self.centerY%2
-  elseif self.workZoom ==0.75 then 
-    --self.centerX = self.centerX -self.centerX%(4/3)
-    --self.centerY = self.centerY -self.centerY%(4/3)
-  end
-  
   self:updateSeenRect()
 end
+
+
+
 
 function Camera:setCenter(x,y)
   self.centerX = c.clamp(x,self.center_minX,self.center_maxX)
