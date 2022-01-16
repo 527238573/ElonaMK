@@ -13,14 +13,21 @@ function g.fastStart()
   --大地图位置
   p:setPosition(26,31)
   
-  local mc = UnitFactory.createMC("Nilo","wizard")
+  local mc = UnitFactory.createMC("Nilo","warmage",30)
   p.mc = mc
   p.team[1] = mc
   cmap:unitSpawn(mc,38,20,true)
   
   
-  local girl = UnitFactory.createMC("teenage_girl","warrior")
+  local girl = UnitFactory.createMC("Lexi","priest",30)
   p.team[2] = girl
+  cmap:unitSpawn(girl,35,20,true)
+  girl = UnitFactory.createMC("Kavina","martial_artist",30)
+  p.team[3] = girl
+  cmap:unitSpawn(girl,35,20,true)
+  girl = UnitFactory.createMC("Heston","warrior",30)
+  p.team[4] = girl
+  
   cmap:unitSpawn(girl,35,20,true)
   p.inv:addItem(ItemFactory.create("katana"))
   p.inv:addItem(ItemFactory.create("shield_light"))

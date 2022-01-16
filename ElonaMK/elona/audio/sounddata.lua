@@ -69,7 +69,7 @@ local function addSoundGroup(gid,gtable)
 end
 
 return function()
-  if SubThread then return end--子线程不执行
+  --if SubThread then return end--子线程不执行
   loadSound()
   data.sound["ding1"].volume = 1
   data.sound["ding2"].volume = 1

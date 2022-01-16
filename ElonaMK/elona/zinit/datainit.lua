@@ -27,7 +27,7 @@ end
 
 --插入quad。
 function data.insertQuad(dataT,x,y,w,h,sw,sh)
-  if SubThread then return end
+--  if SubThread then return end
   local quad = love.graphics.newQuad(x,y,w,h,sw,sh)
   
   if UseMetaDataStrict then
@@ -44,7 +44,7 @@ local emptyImg = {
   }
 
 function data.newImage(...)
-  if SubThread then return emptyImg end
+--  if SubThread then return emptyImg end
   return love.graphics.newImage(...)
 end
 

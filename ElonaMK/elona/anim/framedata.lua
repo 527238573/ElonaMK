@@ -35,7 +35,7 @@ end
 
 data.addLoadingCvs("frames","data/frames/frames.csv",nil)
 return function ()
-  if SubThread then return end--子线程不执行
+  --if SubThread then return end--子线程不执行
   searchFiles()
   local indexList = data.GetCVSIndexList("data/frames/frames.csv")
   for i=1,#indexList do

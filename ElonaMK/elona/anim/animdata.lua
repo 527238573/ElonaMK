@@ -5,7 +5,7 @@ data.addLoadingCvs("unitAnim","data/unit/anim_unit.csv",nil)
 
 
 return function ()
-  if SubThread then return end--子线程不执行
+  --if SubThread then return end--子线程不执行
   
   local indexList = data.GetCVSIndexList("data/unit/anim_unit.csv")
   

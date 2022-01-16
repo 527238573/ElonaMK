@@ -1,12 +1,16 @@
 
 
 
-local terImg = data.newImage("data/terrain/terrain.png")
+local terImg = data.newImage("data/terrain/terrain_wall.png")
 data.terImg = terImg
-data.terScale = 1 --默认放大倍数
+local terImgScale = 1 --默认放大倍数
+data.terScale = terImgScale
+
 
 local twidth = terImg:getWidth()
 local theight = terImg:getHeight()
+
+
 
 data.blockImgs = {}
 
@@ -19,15 +23,22 @@ data.overmapImg = data.newImage("data/terrain/overmap.png")
 
 
 data.addLoadingCvs("terID","data/terrain/ter.csv",nil)
+data.addLoadingCvs("cliffID","data/terrain/cliff.csv",nil)
+data.addLoadingCvs("slopeID","data/terrain/slope.csv",nil)
 data.addLoadingCvs("blockID","data/terrain/block.csv",nil)
 data.addLoadingCvs("oterID","data/terrain/overmap.csv",nil)
+
+
+
 return function()
   --获得读取完成后的临时index表
   local ter_indexList = data.GetCVSIndexList("data/terrain/ter.csv")
+  local cliff_indexList = data.GetCVSIndexList("data/terrain/cliff.csv")
+  local slope_indexList = data.GetCVSIndexList("data/terrain/slope.csv")
   local block_indexList = data.GetCVSIndexList("data/terrain/block.csv")
   local oter_indexList = data.GetCVSIndexList("data/terrain/overmap.csv")
-  
-  
+
+
   --整理ter
   local ter = {}
   local terIndex = {}
@@ -41,32 +52,102 @@ return function()
     terIndex[dataT.id]=dataT.index
     --读取quad
     local function loadQuad(x,y,size,tt)
-      local scale = data.terScale/2
-      data.insertQuad(tt,x*64*scale,y*64*scale,size*scale,size*scale,twidth,theight)
+      data.insertQuad(tt,x*32*terImgScale,y*32*terImgScale,size*terImgScale,size*terImgScale,twidth,theight)
     end
     if dataT.type =="edged" then
-      loadQuad(dataT.quadX,     dataT.quadY,    32,dataT)
-      loadQuad(dataT.quadX+0.5, dataT.quadY,    32,dataT)
-      loadQuad(dataT.quadX+1,   dataT.quadY,    32,dataT)
-      loadQuad(dataT.quadX,     dataT.quadY+0.5,32,dataT)
-      loadQuad(dataT.quadX+0.5, dataT.quadY+0.5,32,dataT)
-      loadQuad(dataT.quadX+1,   dataT.quadY+0.5,32,dataT)
-      loadQuad(dataT.quadX,     dataT.quadY+1,  32,dataT)
-      loadQuad(dataT.quadX+0.5, dataT.quadY+1,  32,dataT)
-      loadQuad(dataT.quadX+1,   dataT.quadY+1,  32,dataT)
+      loadQuad(dataT.quadX,     dataT.quadY,    16,dataT)
+      loadQuad(dataT.quadX+0.5, dataT.quadY,    16,dataT)
+      loadQuad(dataT.quadX+1,   dataT.quadY,    16,dataT)
+      loadQuad(dataT.quadX,     dataT.quadY+0.5,16,dataT)
+      loadQuad(dataT.quadX+0.5, dataT.quadY+0.5,16,dataT)
+      loadQuad(dataT.quadX+1,   dataT.quadY+0.5,16,dataT)
+      loadQuad(dataT.quadX,     dataT.quadY+1,  16,dataT)
+      loadQuad(dataT.quadX+0.5, dataT.quadY+1,  16,dataT)
+      loadQuad(dataT.quadX+1,   dataT.quadY+1,  16,dataT)
     elseif dataT.type =="hierarchy" then
-      loadQuad(dataT.quadX,dataT.quadY,64,dataT)
-      loadQuad(dataT.quadX+1,dataT.quadY,64,dataT)
-      loadQuad(dataT.quadX+2,dataT.quadY,64,dataT)
-      loadQuad(dataT.quadX+3,dataT.quadY,64,dataT)
-      loadQuad(dataT.quadX+4,dataT.quadY,64,dataT)
-      loadQuad(dataT.quadX+5,dataT.quadY,64,dataT)
+      loadQuad(dataT.quadX,dataT.quadY,32,dataT)
+      loadQuad(dataT.quadX+1,dataT.quadY,32,dataT)
+      loadQuad(dataT.quadX+2,dataT.quadY,32,dataT)
+      loadQuad(dataT.quadX+3,dataT.quadY,32,dataT)
+      loadQuad(dataT.quadX+4,dataT.quadY,32,dataT)
+      loadQuad(dataT.quadX+5,dataT.quadY,32,dataT)
     else--single
-      loadQuad(dataT.quadX,dataT.quadY,64,dataT)
+      loadQuad(dataT.quadX,dataT.quadY,32,dataT)
     end
   end
+
+  --整理cliff
+  local cliff = {}
+  local cliffIndex = {}
+  data.cliff = cliff
+  data.cliffIndex = cliffIndex
+  for i=1,#cliff_indexList do
+    local dataT = cliff_indexList[i]
+    --插入新表
+    assert(cliff[dataT.index]==nil)
+    cliff[dataT.index] = dataT
+    cliffIndex[dataT.id]=dataT.index
+    --anchorX
+    if dataT.anchorX<0 then
+      dataT.anchorX = 16 *terImgScale  --w固定为32
+    end
+    local qx,qy = dataT.quadX,dataT.quadY
+    --读取quad
+    local function loadQuad(x,y,w,h,tt)
+      data.insertQuad(tt,x*32*terImgScale,y*32*terImgScale,w*terImgScale,h*terImgScale,twidth,theight)
+    end
+    loadQuad(qx,      qy+0.5, 32,32,dataT)
+    loadQuad(qx+1,    qy+0.5, 32,32,dataT)
+    loadQuad(qx+2,    qy+0.5, 32,32,dataT)
+    loadQuad(qx+3,    qy+0.5, 32,32,dataT)
+    loadQuad(qx,      qy+1.5, 32,32,dataT)
+    loadQuad(qx+1,    qy+1.5, 32,32,dataT)
+    loadQuad(qx+2,    qy+1.5, 32,32,dataT)
+    loadQuad(qx+3,    qy+1.5, 32,32,dataT)
+    loadQuad(qx,      qy,     32,16,dataT)
+    loadQuad(qx+1,    qy,     32,16,dataT)
+    loadQuad(qx+2,    qy,     32,16,dataT)
+    loadQuad(qx+3,    qy,     32,16,dataT)
+    loadQuad(qx,      qy+0.5,     32,16,dataT)
+    loadQuad(qx+2,    qy+0.5,     32,16,dataT)
+    loadQuad(qx+3,    qy+0.5,     32,16,dataT)
+  end
   
+  --整理slope
+  local slope = {}
+  local slopeIndex = {}
+  data.slope = slope
+  data.slopeIndex = slopeIndex
+  for i=1,#slope_indexList do
+    local dataT = slope_indexList[i]
+    --插入新表
+    assert(slope[dataT.index]==nil)
+    slope[dataT.index] = dataT
+    slopeIndex[dataT.id]=dataT.index
+    
+    local q1x,q1y = dataT.quad1X,dataT.quad1Y
+    local q2x,q2y = dataT.quad2X,dataT.quad2Y
+    --读取quad
+    local function loadQuad(x,y,w,h,tt)
+      data.insertQuad(tt,x*32*terImgScale,y*32*terImgScale,w*terImgScale,h*terImgScale,twidth,theight)
+    end
+    loadQuad(q1x,      q1y,   32,32,dataT)--1
+    loadQuad(q1x+1,    q1y,   32,32,dataT)--2
+    loadQuad(q1x+2,    q1y,   32,32,dataT)--3
+    loadQuad(q1x+3,    q1y,   32,32,dataT)--4
+    loadQuad(q1x,      q1y+1, 32,32,dataT)--5
+    loadQuad(q1x+1,    q1y+1, 32,32,dataT)--6
+    loadQuad(q1x+2,    q1y+1, 32,32,dataT)--7
+    loadQuad(q1x+3,    q1y+1, 32,32,dataT)--8
+    loadQuad(q2x,      q2y,     32,16,dataT)--9
+    loadQuad(q2x,      q2y+0.5, 32,32,dataT)--10
+    loadQuad(q2x,      q2y+1.5, 32,32,dataT)--11
+    loadQuad(q2x+1,    q2y,     32,16,dataT)--12
+    loadQuad(q2x+1,    q2y+0.5, 32,32,dataT)--13
+    loadQuad(q2x+1,    q2y+1.5, 32,32,dataT)--14
+  end
   
+
   --整理block
   local block = {}
   local blockIndex = {}
@@ -111,11 +192,11 @@ return function()
       loadQuad(dataT.quadX,dataT.quadY,dataT.w,dataT.h,dataT)
     end
   end
-  
+
   --整理oter
   local imgw = data.overmapImg:getWidth()
   local imgh = data.overmapImg:getHeight()
-  
+
   local oter = {}
   local oterIndex = {}
   data.oter = oter
@@ -137,7 +218,7 @@ return function()
         dataT.move_cost = 0
       end
     end
-    
+
     --读取quad
     local function loadQuad(x,y,w,h,tt)
       data.insertQuad(tt,x*32,y*32,w,h,imgw,imgh)
@@ -161,5 +242,5 @@ return function()
     end
 
   end
-  
+
 end

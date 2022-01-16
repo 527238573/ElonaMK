@@ -10,3 +10,7 @@ magicDevice 魔导器
 scroll 卷轴
 book 书
 ammo 子弹， 投掷，爆炸等
+
+
+
+

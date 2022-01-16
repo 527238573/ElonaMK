@@ -9,7 +9,7 @@ data.addLoadingCvs("unit","data/unit/unit.csv",nil)
 
 
 local function loadUnitFace()
-  if SubThread then return end--子线程不执行
+--  if SubThread then return end--子线程不执行
   local lovefs = require("file/lovefs")
   --debugmsg("source:"..love.filesystem.getSource())
   local fs = lovefs(love.filesystem.getSource().."/data/pic/face")

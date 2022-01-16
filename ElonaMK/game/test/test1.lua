@@ -103,23 +103,6 @@ function Test.saveMcTest()
   --io.flush()
 end
 
-local thread
-local ffi = require("ffi")
---local channel = love.thread.getChannel ( "a" );
-function Test.testSubThread()
---  if thread ==nil then
---  thread = love.thread.newThread( "elona/gameSub.lua" )
---  thread:start()
---  end
---  channel:push("asd")
---  local tables,err = loadfile( love.filesystem.getSourceBaseDirectory().."/Save/testMc.lua" )
---  local rt =tables()
---  channel:push(rt)
-  local v = ffi.new("uint16_t[?]",10,{1})--地型
-  debugmsg(string.format("test ffi :%d ,%d",v[8],v[9]))
-  debugmsg(type(v))
-  debugmsg(string.format("%04X",1))
-end
 function Test.testFindpath()
   cmap:pathFind(2,2,8,8,20,3)
   

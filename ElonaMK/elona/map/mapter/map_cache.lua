@@ -22,6 +22,7 @@ function Map:buildSquareInfoCache()
   end
   self.squareInfo_dirty = false
   self.seen_dirty = true
+  
 end
 
 function Map:isTranspant(x,y)

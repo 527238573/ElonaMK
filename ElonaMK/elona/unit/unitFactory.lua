@@ -40,16 +40,16 @@ function UnitFactory.create(id,level,faction)
 end
 
 
-function UnitFactory.createMC(id,classid)
-  
+function UnitFactory.createMC(id,classid,level)
+  level = level or 1
   local unit = Unit.new(id)
   local unitType = unit.type
   local classType = assert(data.class[classid])
-  
+  unit.level = level
   unit.class_id = classid
   rawset(unit,"class",classType) --转职改变职业，
   local raceType = unitType.race
-  unit:initAttr(raceType,classType,1,1) --初始化1级属性。
+  unit:initAttr(raceType,classType,level,1) --初始化1级属性。
   local skills = {}
   for k,v in pairs( unitType.weapon_skills) do skills[k]=v  end
   for k,v in pairs( unitType.profession_skills) do skills[k]=v  end
@@ -57,7 +57,7 @@ function UnitFactory.createMC(id,classid)
   for k,v in pairs( raceType.profession_skills) do skills[k]=v  end
   for k,v in pairs( classType.weapon_skills) do skills[k]=v  end
   for k,v in pairs( classType.profession_skills) do skills[k]=v  end
-  unit:initSkills(skills,1) --初始化1级属性。
+  unit:initSkills(skills,level) --初始化1级属性。
   unit:initTraits(raceType,classType)
   unit:setFaction("player")
   unit:on_equip_change()--刷新装备数据

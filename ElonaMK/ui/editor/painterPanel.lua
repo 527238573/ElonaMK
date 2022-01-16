@@ -3,9 +3,10 @@ local suit = require "ui/suit"
 local win_width = love.graphics.getWidth()
 local win_height = love.graphics.getHeight()
 local panel_opt = {id=newid()}
-local squre_layer = {data={"terrain","block","item","field"},select= 1,opt= {id={}}}
+local squre_layer = {data={"terrain","cliff","block","item","field"},select= 1,opt= {id={}}}
 
 local terrain_list = require "ui/editor/painter/terList"
+local cliff_list = require "ui/editor/painter/cliffList"
 local block_list = require "ui/editor/painter/blockList"
 local oter_list = require "ui/editor/painter/oterList"
 local item_list = require "ui/editor/painter/itemList"
@@ -52,12 +53,15 @@ return function()
       terrain_list(x+10,y+60,266,500)
       printId(editor.selctTileInfo)
     elseif squre_layer.select == 2 then
+      cliff_list(x+10,y+60,266,500)
+      printId(editor.selctCliffInfo)
+    elseif squre_layer.select == 3 then
       block_list(x+10,y+60,266,500)
       printId(editor.selctBlockInfo)
-    elseif squre_layer.select == 3 then
+    elseif squre_layer.select == 4 then
       item_list(x+10,y+60,266,500)
       printId(editor.selctItemInfo)
-    elseif squre_layer.select == 4 then
+    elseif squre_layer.select == 5 then
       field_list(x+10,y+60,266,500)
       printId(editor.selctFieldInfo)
     end

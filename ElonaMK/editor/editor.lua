@@ -18,36 +18,82 @@ function editor.init()
   editor.showEdgeShadow = true
 end
 
-
-local function setTerRange(terid,x,y)
+local function shiftBrush(func,x,y)
   if love.keyboard.isDown("lshift") then
     for sx = -2,2 do
       for sy = -2,2 do
-        if editor.map:inbounds_edge(x+sx,y+sy) then
-          editor.map:setTer(terid,x+sx,y+sy)
-        end
+        func(x+sx,y+sy)
       end
     end
   else
-    editor.map:setTer(terid,x,y)
+    func(x,y)
   end
 end
+
+
 
 
 
 local function brushTerrain(x,y)
   if editor.erase then
     if(editor.map:inbounds_edge(x,y) and editor.default_ter) then
-      setTerRange(editor.default_ter.index,x,y)
+      editor.map:setTer(editor.default_ter.index,x,y)
       render.terDirty()
     end
     return
   end
   if editor.selctTileInfo ==nil then return end
   if( editor.map:inbounds_edge(x,y)) then
-    setTerRange(editor.selctTileInfo.index,x,y)
+    editor.map:setTer(editor.selctTileInfo.index,x,y)
     render.terDirty()
   end
+end
+
+local function brushCliff(x,y)
+  local alt = editor.erase  and 2 or (editor.selctCliffAlt or 2)
+  local selctIndex = 1
+  if editor.selctCliffInfo  then selctIndex = editor.selctCliffInfo.index end
+  local map = editor.map
+  if (not map:inbounds_edge(x,y)) then return end
+  if alt >=1 then
+    map:setCliff(selctIndex,alt,x,y)
+    render.terDirty()
+    return
+  end
+  --整平背后的悬崖
+  if alt ==1 then
+    local cid,h = map:getCliffInfo(x,y)
+    local did,downh = cid,h
+    if map:inbounds_edge(x,y-1) then
+      did,downh = map:getCliffInfo(x,y-1)
+    end
+    if downh-1>h then
+      map:setCliff(cid,downh-1,x,y)
+      render.terDirty()
+    end
+  else
+    local cid,h = map:getCliffInfo(x,y)
+    local function checkLow(dx,dy)
+      if map:inbounds_edge(x+dx,y+dy) then
+        local did,downh = map:getCliffInfo(x+dx,y+dy)
+        if (downh-1>h) then 
+          cid = did
+          h = downh-1 
+        end
+      end
+    end
+    checkLow(1,1)
+    checkLow(0,1)
+    checkLow(-1,1)
+    checkLow(1,0)
+    checkLow(-1,0)
+    checkLow(1,-1)
+    checkLow(0,-1)
+    checkLow(-1,-1)
+    map:setCliff(cid,h,x,y)
+    render.terDirty()
+  end
+
 end
 
 local function brushBlock(x,y)
@@ -65,12 +111,12 @@ end
 
 
 local function brushRiverEdge(x,y)
-  
+
   local function isRiver(x,y)
     if (not editor.map:inbounds(x,y)) then return false end
     return data.oter[editor.map:getLayer1(x,y)].flags["RIVER"]
   end
-  
+
   local function riverEdge(x,y)
     if (not editor.map:inbounds(x,y)) then return end
     if isRiver(x,y) then return end
@@ -135,7 +181,7 @@ local function brushOter(x,y)
           end
         end
       else
-        
+
         editor.map:setLayer1(editor.selctOterInfo.index,x,y)
         if editor.selctOterInfo.flags["RIVER"] then
           brushRiverEdge(x,y)
@@ -184,12 +230,14 @@ function editor.brushSquare(x,y)
     brushOter(x,y)
   else
     if editor.curPainterSelct ==1 then
-      brushTerrain(x,y)
+      shiftBrush(brushTerrain,x,y)
     elseif editor.curPainterSelct ==2 then
-      brushBlock(x,y)
+      shiftBrush(brushCliff,x,y)
     elseif editor.curPainterSelct ==3 then
-      brushItem(x,y)
+      brushBlock(x,y)
     elseif editor.curPainterSelct ==4 then
+      brushItem(x,y)
+    elseif editor.curPainterSelct ==5 then
       brushField(x,y)
     end
   end
@@ -198,7 +246,7 @@ end
 
 function editor.changeMapSize(w,h,edge,id,offsetX,offsetY)
   local hasOffset = offsetX~=0 or offsetY ~=0
-  
+
   if editor.overmapMode == false then 
     if w~=editor.map.w or h~=editor.map.h or edge~=editor.map.edge or hasOffset then
       local omap = MapClass.new(w,h,edge)
@@ -291,7 +339,7 @@ function editor.openFile(name,path)
   if result and type(result)=="table" and result.w then
     print("load map Template meta:",getmetatable(result))
     io.flush()
-    
+
     if editor.copyOv then 
       editor.copyOvermap(result)
     else
@@ -317,8 +365,8 @@ function editor.internalSave(name,fullpath)
   local result,err  = c.SaveFile(  editor.map,curFilePath )
   print("save",result,err)
   io.flush()
-  
-  
+
+
   if result ==1 then
     curFileName = name
     love.window.setTitle("MapEditor-"..name)

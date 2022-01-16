@@ -23,7 +23,6 @@ function Unit:swap_to(dest_x,dest_y,destunit)
   --霸体状态不能换位。霸体可能正在播动画，
   if not destunit:canPush() then return false end
   
-  
   if not map:can_pass(dest_x,dest_y) then return false end --不能移动的地形。就算有单位占据不能移动的地形，也不能交换位置。
   
   

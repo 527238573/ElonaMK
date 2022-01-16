@@ -37,6 +37,14 @@ end
 function c.dist_3d(x1,y1,z1,x2,y2,z2)
   return math.sqrt((x1-x2)*(x1-x2)+ (y1-y2)*(y1-y2)+(z1-z2)*(z1-z2))
 end
+function c.remap_to(value,oldmin,oldmax,newmin,newmax)
+  value = (value - oldmin)/(oldmax-oldmin)
+  value = math.max(0,math.min(1,value))
+  return newmin + (newmax - newmin) * value
+  
+end
+
+
 
 local out = io.stdout
 function debugmsg(msg)

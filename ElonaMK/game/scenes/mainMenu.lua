@@ -2,7 +2,8 @@ local mainMenu  = Scene.new()
 local loadmain = love.graphics.newImage("data/pic/mainScreen.png")
 local leaf = love.graphics.newImage("assets/ui/dp3.png")
 
-local music = love.audio.newSource("assets/music/orc01.mp3","stream")
+--local music = love.audio.newSource("assets/music/orc01.mp3","stream")
+local music = love.audio.newSource("assets/music/1.mp3","stream")
 local suit = require"ui/suit"
 local parchment = c.pic.parchment
 local kuang = c.pic.titleKuang

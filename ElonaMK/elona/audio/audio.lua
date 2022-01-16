@@ -29,7 +29,7 @@ end
 
 
 function g.playSound(id,x,y,volume)
-  if SubThread then return end--子线程不执行
+--  if SubThread then return end--子线程不执行
   volume =volume or 1
   local sound = getSound(id)
   if sound == nil then return end
@@ -46,7 +46,7 @@ local delayList = {}
 
 
 function g.playSound_delay(id,x,y,delay,volume)
-  if SubThread then return end--子线程不执行
+  --if SubThread then return end--子线程不执行
   volume =volume or 1
   if delay<=0 then
     g.playSound(id,x,y,volume)
@@ -61,7 +61,7 @@ local loopingList ={}--持续播放的声音
 
 --以origin做唯一标识符，创建声音。必须每帧持续调用此函数来创建声音。有一帧未调用，下一帧就会清除。
 function g.loopSound(origin_id,id,x,y)
-  if SubThread then return end--子线程不执行
+  --if SubThread then return end--子线程不执行
   local lsound = loopingList[origin_id]
   if lsound ==nil then
     local sound = getSound(id) --

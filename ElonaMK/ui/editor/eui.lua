@@ -7,6 +7,7 @@ require"ui/editor/fileDlg"
 function editor.uiInit()
   editor.popwindow = nil--弹出窗口
   editor.terrainList_init()
+  editor.cliffList_init()
   editor.blockList_init()
   editor.oterList_init()
   editor.itemList_init()

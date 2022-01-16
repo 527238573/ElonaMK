@@ -3,6 +3,7 @@ render = {}
 require"xrender/map/drawAll"
 require"xrender/map/drawTer"
 require"xrender/map/grid"
+require"xrender/map/drawCliff"
 require"xrender/map/drawBlock"
 require"xrender/map/drawShadow"
 require"xrender/map/drawItem"
@@ -35,7 +36,7 @@ function render.drawEditor()
     
     
     love.graphics.setColor(1,1,1)
-    love.graphics.setCanvas(canvas)
+    love.graphics.setCanvas({canvas, depth=true})
     love.graphics.clear()
     
     render.drawTer(camera,map)
@@ -55,7 +56,7 @@ function render.drawEditor()
   
   if editor.showGrid then render.drawMapDebugMesh(camera,map) end
 
-  render.drawEditorRightMouse(camera)
+  render.drawEditorRightMouse(camera,map)
 end
 
 
@@ -65,7 +66,7 @@ function render.drawMainGame()
   --camera:clampXY()
   local map = cmap
   love.graphics.setColor(1,1,1)
-  love.graphics.setCanvas(canvas)
+  love.graphics.setCanvas({canvas, depth=true})
   love.graphics.clear()
   
   map:buildSeenCache()--重建seencache 除了刚进入地图或只在这里

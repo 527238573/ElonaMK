@@ -57,10 +57,13 @@ local function getNeighbours(curNode,map)
     local costs = {}
     local nx,ny = curNode.x,curNode.y
     
-    local function addoffset(ox,oy)
+    local function addoffset(dx,dy)
+      local ox,oy = dx+nx,dy+ny
       local cost = map:move_cost(ox,oy)
       if cost<=0 then return end
       neighbours[#neighbours+1] = nodemap[ox][oy]
+      if dx~=0 and dy~=0 then cost = cost*1.5 end
+      cost  = cost/100
       if curNode.g< 10 then --考虑单位绕行
         local m_unit = map:unit_at(ox,oy)
         if m_unit then
@@ -68,20 +71,20 @@ local function getNeighbours(curNode,map)
           cost = cost +13-curNode.g
         end
       end
-      costs[#costs+1] = cost/100
+      costs[#costs+1] = cost
       
       
       
       
     end
-    addoffset(nx-1,ny)
-    addoffset(nx+1,ny)
-    addoffset(nx,ny-1)
-    addoffset(nx,ny+1)
-    addoffset(nx-1,ny+1)
-    addoffset(nx-1,ny-1)
-    addoffset(nx+1,ny+1)
-    addoffset(nx+1,ny-1)
+    addoffset(-1,0)
+    addoffset(1,0)
+    addoffset(0,-1)
+    addoffset(0,1)
+    addoffset(-1,1)
+    addoffset(-1,-1)
+    addoffset(1,1)
+    addoffset(1,-1)
     
     return neighbours,costs
   end

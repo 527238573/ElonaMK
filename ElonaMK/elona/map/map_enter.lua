@@ -50,7 +50,7 @@ function Map:leaveMap()
   --单位离开
   for i=1,p.teamNum do 
     local unit = p.team[i]
-    if unit then self:unitDespawn(unit) end --从地图上解除。
+    if unit and unit:is_alive() then self:unitDespawn(unit) end --从地图上解除。
   end
   addmsg(string.format(tl("你离开了%s。","You left %s."),self.name))
 end

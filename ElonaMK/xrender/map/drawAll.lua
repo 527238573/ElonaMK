@@ -30,6 +30,7 @@ function render.drawSolid(camera,map)
   local queue =render.generateUnitQueue(camera,map)
   
   for y = endy,starty,-1 do
+    --render.drawLineCliff(startx,endx,y,camera,map)
     render.drawLineSolidBlock(startx,endx,y,camera,map)
     render.drawLineItem(startx,endx,y,camera,map)
     render.drawLineFieldWithType(startx,endx,y,camera,map,"solid")

@@ -8,10 +8,26 @@ local NumToColor,ColorToNum,Color_111--提前声明，local function ，常量
 function Map.initTerAndBlock(o)
   o.ter = ffi.new("uint16_t[?]",o.realw*o.realh) --地型
   o.block = ffi.new("uint16_t[?]",o.realw*o.realh)--地面上的物体 树，块等等。 trap合并入这一层。
+  o.cliff = ffi.new("uint8_t[?]",o.realw*o.realh) --悬崖类型
+  o.height = ffi.new("uint8_t[?]",o.realw*o.realh) --高度类型 前五位bit 记录 高度，后三位bit记录 （=0平地，>0 斜坡)
   
   for i=0,o.realw*o.realh-1 do --无效区域内只有ter 和block，做装饰用。
     o.ter[i] = 1 --默认为index为1 的类型 ，是泥土实地，最基本的ter类型
     o.block[i] = 1 --block为1代表空气，无东西，但block类型里存在这一类型。也就是说block也必须有值
+    o.cliff[i] = 1--悬崖
+    o.height[i] = 2*8 --平地默认2级高度
+  end
+  
+  for x=2,5 do
+    for y =2,5 do
+      o.height[y*o.realw+x] = 3 *8
+    end
+  end
+  
+  for x=3,4 do
+    for y =2,5 do
+      o.height[y*o.realw+x] = 4 *8
+    end
   end
   
 end
@@ -150,6 +166,62 @@ function Map:getBlock_real(x,y) --生成时候的读取
   assert(x>=0 and x<=self.realw-1 and y>=0 and y<=self.realh-1)
   return self.block[y*self.realw+x]
 end
+
+--返回clipid和高度 和样式
+function Map:getCliffInfo(x,y)
+  assert(x>=-self.edge and x<=self.w+self.edge-1 and y>=-self.edge and y<=self.h+self.edge-1)
+  x = x+self.edge
+  y= y+self.edge
+  local sq_index = y*self.realw+x
+  local cliff = self.cliff[sq_index]
+  local o_height =  self.height[sq_index]
+  
+  return cliff,bit.rshift(o_height,3),o_height%8
+end
+
+
+function Map:setCliff(index,height,x,y)
+  assert(x>=-self.edge and x<=self.w+self.edge-1 and y>=-self.edge and y<=self.h+self.edge-1 and height>=0 and height<16)
+  x = x+self.edge
+  y= y+self.edge
+  self.cliff[y*self.realw+x] = index
+  self.height[y*self.realw+x] = height *8
+  self.squareInfo_dirty = true
+end
+--只返回高度偏移（模型空间）
+local _cliffHight = c.cliffHeight
+function Map:getCliffDiffHigh(x,y)
+  assert(x>=0 and x<=self.realw-1 and y>=0 and y<=self.realh-1)
+  return (bit.rshift(self.height[y*self.realw+x],3) -2)*_cliffHight
+end
+
+
+local checkAltList = {
+  x={-1,-1,-1,0,0,1,1,1},
+  y={-1,0,1,-1,1,-1,0,1},
+}
+--返回是否是悬崖边缘。只有周围有比其低的地面，或者不同的cliff，算是cliffedge
+function Map:isCliffEdge(x,y,h)
+  local height = self.height
+  local cliff = self.cliff
+  local this_cid = cliff[y*self.realw+x]
+  
+  local function getA(x,y)
+    if x>=0 and x<=self.realw-1 and y>=0 and y<=self.realh-1 then
+      return bit.rshift(height[y*self.realw+x],3),cliff[y*self.realw+x]
+    end
+    return h,this_cid
+  end
+  for i=1,8 do 
+    local dx,dy = checkAltList.x[i],checkAltList.y[i]
+    local alt,cid = getA(x+dx,y+dy)
+    if alt<h or cid~= this_cid then
+      return true
+    end
+  end
+  return false
+end
+
 
 --Color部分
 function NumToColor(num)

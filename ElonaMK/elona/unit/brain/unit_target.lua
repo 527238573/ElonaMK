@@ -40,7 +40,7 @@ function Unit:findNearestEnemy(findrange)
 
   local closestUnit,range = nil,maxrange+0.001--范围内目标
   local map = self.map
-  if map.activeUnit_num<=170 then --数量不多，搜索单位表。
+  if map.activeUnit_num<=100 then --数量不多，搜索单位表。
     local unitList = self.map.activeUnits
     for unit,_ in pairs(unitList) do
       if self:isHostile(unit) then

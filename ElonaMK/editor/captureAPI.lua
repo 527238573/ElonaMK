@@ -23,7 +23,11 @@ local function findFunction(baseName,fName,memberDes)
   if func.description then
     memberDes.description = func.description
   end
-  
+  if func.isFunc then --根据文本是否是:.来区分
+    memberDes.type = "function"
+  else
+    memberDes.type = "method"
+  end
 end
 
 
@@ -33,27 +37,30 @@ local function addFunction(funcName,getargs,description)
     funcName = string.sub(funcName,string.find(funcName,"%a"),-1)
   end
   
-  
+  local isFunc = true
   local namet = string.split(funcName,".")
   if #namet ==1 then
     namet = string.split(funcName,":")
+    isFunc = false --method
   end
-  if #namet ==1 then return end
+  if #namet ==1 then return end --local function， or Global function
   
   if #namet>2 then
     debugmsg("3 Split Name function:"..funcName.." args: "..getargs)
     return
   end
   
-  local base = funcTable[namet[1]]
+  local base = funcTable[namet[1]] --get or create BaseTable(lib)
   if base ==nil then
     base = {}
     funcTable[namet[1]] = base
   end
   if base[namet[2]] then
-    --debugmsg("repeat function:"..funcName.." args: "..getargs)
+    if namet[1]~= "abi_type" then 
+      debugmsg("repeat function:"..funcName.." args: "..getargs)
+    end
   else
-    base[namet[2]] = {args = getargs,description = description}
+    base[namet[2]] = {args = getargs,description = description,isFunc = isFunc}
     --debugmsg("new function:"..funcName.." args: "..getargs)
   end
   
@@ -165,20 +172,13 @@ function editor.captureAPI()
     
     local function loadMember(kname,val)
       if kname =="__index" or kname =="__newindex" or kname =="saveType" then return end
-      local typestr = "value"
-      if type(val) =="function" then
-        if kname =="new" then
-          typestr ="function"
-        else
-          typestr ="method"
-        end
-      end
       
       local memberDes = {
-          type = typestr,
+          type = "value",
           description = name.."."..kname,
       }
       if type(val) =="function" then findFunction(name,kname,memberDes) end
+      if(memberDes.type ~="function") then return end
       
       classDes.childs[kname] = memberDes
     end
@@ -208,15 +208,14 @@ function editor.captureAPI()
     local function loadMember(kname,val)
       if kname =="__index" or kname =="__newindex" or kname =="saveType" or kname =="new" then return end
       local typestr = "value"
-      if type(val) =="function" then
-        typestr ="method"
-      end
       
       local memberDes = {
           type = typestr,
           description = cname..":"..kname,
       }
       if type(val) =="function" then findFunction(cname,kname,memberDes) end
+      if(memberDes.type == "function") then return end-- ClassVar 只包含成员函数，不包含静态函数
+      
       varDes.childs[kname] = memberDes
     end
     
@@ -270,11 +269,16 @@ function editor.captureAPI()
   loadLib("ItemFactory",ItemFactory)
   loadLib("Animation",Animation)
   
-  loadClassVar("Unit","unit")
-  loadClassVar("Unit","source_unit")
+  for name,class in pairs(saveClass) do
+    loadClassVar(name,string.lower(name))
+  end
+  
+  
+  --loadClassVar("Unit","unit")
+  --loadClassVar("Unit","source_unit")
   loadClassVar("Unit","_unit",true)--postfix, 例如t_unit,target_unit这种局域变量都可以自动提示
-  loadClassVar("Item","item")
-  loadClassVar("Map","map")
+  --loadClassVar("Item","item")
+  --loadClassVar("Map","map")
   loadClassVar("Ability","abi")
   
   local res,err = table.save(tosave, filePath)

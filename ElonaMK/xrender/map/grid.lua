@@ -12,9 +12,6 @@ local function drawLine(sx,sy,ex,ey,camera)
 end
 
 
-
-
-
 function render.drawMapDebugMesh(camera,map)--绘制网格
   
   local edge = map.edge or 0
@@ -38,42 +35,25 @@ function render.drawMapDebugMesh(camera,map)--绘制网格
 end
 
 
-function render.drawEditorRightMouse(camera)
+function render.drawEditorRightMouse(camera,map)
   if editor.brushPos then
-    local x,y = 64*editor.brushPos[1], 64*(editor.brushPos[2]+1)
-    x,y = camera:modelToScreen(x,y)
+    local bx,by = editor.brushPos[1],editor.brushPos[2]
+    local x,y = 64*bx, 64*(by+1)
+    local diff = 0
+    if map:inbounds_edge(bx,by) then
+      diff = map:getCliffDiffHigh(bx,by)
+    end
+    
+    local sx,sy = camera:modelToScreen(x,y)
     love.graphics.setColor(200/255,200/255,120/255,120/255) 
-    love.graphics.rectangle("fill",x,y,64*camera.workZoom,64*camera.workZoom)
+    love.graphics.rectangle("fill",sx,sy,64*camera.workZoom,64*camera.workZoom)
+    if diff~=0 then
+      sx,sy = camera:modelToScreen(x,y+diff)
+      love.graphics.setColor(120/255,120/255,200/255,120/255) 
+      love.graphics.rectangle("fill",sx,sy,64*camera.workZoom,64*camera.workZoom)
+    end
+    
   end
   
 end
 
-
-
-function render.drawEditorEdgeShadow(camera,map)
-  if map.edge<=0 then return end
-  love.graphics.setColor(0,0,0,0.25) 
-  
-  local xleft = -map.edge *64
-  local xright = (map.w + map.edge )*64
-  local ileft = 0
-  local iright = map.w*64
-  
-  local xup = (map.h+map.edge)*64
-  local iup = (map.h)*64
-  local xdown = -map.edge *64
-  local idown = 0
-  --rect up
-  local sx,sy = camera:modelToScreen(xleft,xup)
-  love.graphics.rectangle("fill",sx,sy,(xright-xleft)*camera.workZoom,(xup-iup)*camera.workZoom)
-  --rect left
-  sx,sy = camera:modelToScreen(xleft,iup)
-  love.graphics.rectangle("fill",sx,sy,(ileft-xleft)*camera.workZoom,(iup-idown)*camera.workZoom)
-  --rect right
-  sx,sy = camera:modelToScreen(iright,iup)
-  love.graphics.rectangle("fill",sx,sy,(xright-iright)*camera.workZoom,(iup-idown)*camera.workZoom)
-  --rect down
-  sx,sy = camera:modelToScreen(xleft,idown)
-  love.graphics.rectangle("fill",sx,sy,(xright-xleft)*camera.workZoom,(idown-xdown)*camera.workZoom)
-  
-end
