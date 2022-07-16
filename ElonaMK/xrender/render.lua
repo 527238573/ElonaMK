@@ -3,7 +3,6 @@ render = {}
 require"xrender/map/drawAll"
 require"xrender/map/drawTer"
 require"xrender/map/grid"
-require"xrender/map/drawCliff"
 require"xrender/map/drawBlock"
 require"xrender/map/drawShadow"
 require"xrender/map/drawItem"

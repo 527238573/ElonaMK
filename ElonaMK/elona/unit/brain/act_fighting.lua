@@ -18,7 +18,7 @@ end
 local function moveToTarget(unit,brain,target)
   
   local function followPath()
-    local res,path = unit.map:pathFind(unit.x,unit.y,target.x,target.y,22,1.8)
+    local res,path = unit.map:pathFind(unit.x,unit.y,target.x,target.y,21,1.8)
     path.destX,path.destY = target.x,target.y
     brain.path = path
     brain.path_step = 0

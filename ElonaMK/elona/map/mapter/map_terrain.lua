@@ -10,6 +10,7 @@ function Map.initTerAndBlock(o)
   o.block = ffi.new("uint16_t[?]",o.realw*o.realh)--地面上的物体 树，块等等。 trap合并入这一层。
   o.cliff = ffi.new("uint8_t[?]",o.realw*o.realh) --悬崖类型
   o.height = ffi.new("uint8_t[?]",o.realw*o.realh) --高度类型 前五位bit 记录 高度，后三位bit记录 （=0平地，>0 斜坡)
+  --pattern 1 = 左高右低的斜坡 2 = 右高左低
   
   for i=0,o.realw*o.realh-1 do --无效区域内只有ter 和block，做装饰用。
     o.ter[i] = 1 --默认为index为1 的类型 ，是泥土实地，最基本的ter类型
@@ -29,6 +30,9 @@ function Map.initTerAndBlock(o)
       o.height[y*o.realw+x] = 4 *8
     end
   end
+  
+  o.height[2*o.realw+5] = 3 *8 +1
+  o.height[3*o.realw+5] = 3 *8 +1
   
 end
 
@@ -180,17 +184,21 @@ function Map:getCliffInfo(x,y)
 end
 
 
-function Map:setCliff(index,height,x,y)
+function Map:setCliff(index,height,x,y,pattern)
   assert(x>=-self.edge and x<=self.w+self.edge-1 and y>=-self.edge and y<=self.h+self.edge-1 and height>=0 and height<16)
+  pattern = pattern or 0
   x = x+self.edge
   y= y+self.edge
   self.cliff[y*self.realw+x] = index
-  self.height[y*self.realw+x] = height *8
+  self.height[y*self.realw+x] = height *8 + pattern
   self.squareInfo_dirty = true
 end
+
 --只返回高度偏移（模型空间）
 local _cliffHight = c.cliffHeight
 function Map:getCliffDiffHigh(x,y)
+  x = x+self.edge
+  y= y+self.edge
   assert(x>=0 and x<=self.realw-1 and y>=0 and y<=self.realh-1)
   return (bit.rshift(self.height[y*self.realw+x],3) -2)*_cliffHight
 end
@@ -200,22 +208,27 @@ local checkAltList = {
   x={-1,-1,-1,0,0,1,1,1},
   y={-1,0,1,-1,1,-1,0,1},
 }
---返回是否是悬崖边缘。只有周围有比其低的地面，或者不同的cliff，算是cliffedge
+--返回是否是悬崖边缘。只有周围有比其低的地面，算是cliffedge
 function Map:isCliffEdge(x,y,h)
   local height = self.height
-  local cliff = self.cliff
-  local this_cid = cliff[y*self.realw+x]
-  
+  --local cliff = self.cliff
+  --local this_cid = cliff[y*self.realw+x]
+  x = x+self.edge
+  y= y+self.edge
   local function getA(x,y)
     if x>=0 and x<=self.realw-1 and y>=0 and y<=self.realh-1 then
-      return bit.rshift(height[y*self.realw+x],3),cliff[y*self.realw+x]
+      return bit.rshift(height[y*self.realw+x],3)--,cliff[y*self.realw+x]
     end
-    return h,this_cid
+    --if y<0 then return 2,this_cid end--底边高度默认为2
+    
+    return h--,this_cid
   end
+  
+  
   for i=1,8 do 
     local dx,dy = checkAltList.x[i],checkAltList.y[i]
-    local alt,cid = getA(x+dx,y+dy)
-    if alt<h or cid~= this_cid then
+    local alt = getA(x+dx,y+dy)
+    if alt<h then
       return true
     end
   end

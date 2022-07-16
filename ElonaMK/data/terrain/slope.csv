@@ -1,6 +1,6 @@
-index,id,name,color,quad1X,quad1Y,quad2X,quad2Y,flags
-number,str,str,str,number,number,number,number,flagstable
-D=ND,D=ND,UTF8,D=brown,D=ND,D=ND,D=ND,D=ND,
-1,slope_rock,土坡,,28,0,28,2,
-2,slope_black_rock,深色土坡,,28,4.5,30,2,
-3,slope_brick1,楼梯,,28,6.5,28,8.5,
+index,id,name,color,quadX,quadY,flags
+number,str,str,str,number,number,flagstable
+D=ND,D=ND,UTF8,D=brown,D=ND,D=ND,
+1,slope_rock,土坡,,12,28,
+2,slope_black_rock,深色土坡,,15,28,
+3,slope_brick1,楼梯,,18,28,

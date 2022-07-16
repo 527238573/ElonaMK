@@ -27,7 +27,7 @@ local function getVolume(x,y)
   return rate*rate
 end
 
-
+--一帧同时播放过多相同声音，会卡
 function g.playSound(id,x,y,volume)
 --  if SubThread then return end--子线程不执行
   volume =volume or 1

@@ -49,36 +49,78 @@ local function brushTerrain(x,y)
   end
 end
 
-local function brushCliff(x,y)
-  local alt = editor.erase  and 2 or (editor.selctCliffAlt or 2)
-  local selctIndex = 1
-  if editor.selctCliffInfo  then selctIndex = editor.selctCliffInfo.index end
+local stairsDx = {-1,1,0,0}
+local stairsDy = {0,0,1,-1}
+
+local function brushStairs(x,y,si)
   local map = editor.map
-  if (not map:inbounds_edge(x,y)) then return end
-  if alt >=1 then
-    map:setCliff(selctIndex,alt,x,y)
+  local dx = stairsDx[si]
+  local dy = stairsDy[si]
+  if (not map:inbounds_edge(x+dx,y+dy)) then return end
+  
+  local cid,h = map:getCliffInfo(x,y)
+  local cid2,h2 = map:getCliffInfo(x+dx,y+dy)
+  if h<=0 then return end
+  
+  if (h2 -h)==1 then
+    map:setCliff(cid,h,x,y,si)
     render.terDirty()
-    return
   end
-  --整平背后的悬崖
-  if alt ==1 then
-    local cid,h = map:getCliffInfo(x,y)
-    local did,downh = cid,h
-    if map:inbounds_edge(x,y-1) then
-      did,downh = map:getCliffInfo(x,y-1)
+end
+
+local function brushRandomStairs(map,x,y)
+  local targetCalls = {}
+  for si=1,4 do
+    local dx = stairsDx[si]
+    local dy = stairsDy[si]
+    if (map:inbounds_edge(x+dx,y+dy)) then
+      local cid,h = map:getCliffInfo(x,y)
+      local cid2,h2 = map:getCliffInfo(x+dx,y+dy)
+      if (h>0) and ((h2 -h)==1) then
+        local function tcall()
+          map:setCliff(cid,h,x,y,si)
+          render.terDirty()
+        end
+        targetCalls[#targetCalls+1] = tcall--加入队列
+      end
     end
-    if downh-1>h then
-      map:setCliff(cid,downh-1,x,y)
-      render.terDirty()
+  end
+  
+  if #targetCalls>1 then
+    targetCalls[rnd(1,#targetCalls)]()
+  elseif #targetCalls>0 then
+    targetCalls[1]()
+  end
+end
+
+
+
+
+
+local function smoothCliff(map,x,y)
+  local cid,h,pat = map:getCliffInfo(x,y)
+    --if h<1 then return end
+    --先检测pattern是否合法
+    if pat >0 then
+      local dx = stairsDx[pat]
+      local dy = stairsDy[pat]
+      if (not map:inbounds_edge(x+dx,y+dy)) then 
+        pat = 0--不允许靠外侧的斜坡
+      else
+        local cid2,h2 = map:getCliffInfo(x+dx,y+dy)
+        if (h2 -h)~=1 then pat = 0 end --消除斜坡
+      end
     end
-  else
-    local cid,h = map:getCliffInfo(x,y)
+    
+    --再检测高度是否平滑
     local function checkLow(dx,dy)
       if map:inbounds_edge(x+dx,y+dy) then
-        local did,downh = map:getCliffInfo(x+dx,y+dy)
+        local did,downh,dpattern = map:getCliffInfo(x+dx,y+dy)
+        downh = downh+ (dpattern>0 and 1 or 0)--计算高度时有斜坡的地方算高处
         if (downh-1>h) then 
           cid = did
           h = downh-1 
+          pat = 0 --被迫抬升后消除斜坡
         end
       end
     end
@@ -90,11 +132,69 @@ local function brushCliff(x,y)
     checkLow(1,-1)
     checkLow(0,-1)
     checkLow(-1,-1)
-    map:setCliff(cid,h,x,y)
+    map:setCliff(cid,h,x,y,pat)
     render.terDirty()
-  end
-
+  
 end
+
+
+local function brushCliff(x,y)
+  local pattern = editor.erase  and 3 or (editor.selctCliffPattern or 3)
+  
+  local alt = pattern -1
+  local selctIndex = 1
+  if editor.selctCliffInfo  then selctIndex = editor.selctCliffInfo.index end
+  local map = editor.map
+  if (not map:inbounds_edge(x,y)) then return end
+  
+  if pattern <=7 then --普通悬崖
+    if alt >=0 then
+      map:setCliff(selctIndex,alt,x,y)
+      map:setTer(17,x,y) --empty——ter
+      
+      render.terDirty()
+      return
+    end
+  elseif pattern ==8 then --清除悬崖
+    local cid,h,pat = map:getCliffInfo(x,y)
+    if pat >0 then
+      map:setCliff(cid,h,x,y,0)
+      render.terDirty()
+    end
+  elseif pattern == 9 then --平滑悬崖
+    smoothCliff(map,x,y)
+  elseif pattern ==10 then --更换悬崖类型
+    local cid,h,pat = map:getCliffInfo(x,y)
+    if selctIndex~= cid then
+      map:setCliff(selctIndex,h,x,y,pat)
+      render.terDirty()
+    end
+  elseif pattern >=11 and pattern<=14 then
+    brushStairs(x,y,pattern-10)
+  elseif pattern == 15 then --平滑造坡
+    brushRandomStairs(map,x,y)
+    smoothCliff(map,x,y)
+  elseif pattern == 16 then --平滑背后悬崖
+    local cid,h = map:getCliffInfo(x,y)
+    local did,downh = cid,h
+    if map:inbounds_edge(x,y-1) then
+      did,downh = map:getCliffInfo(x,y-1)
+    end
+    if downh-1>h then
+      map:setCliff(cid,downh-1,x,y)
+      render.terDirty()
+    end
+  end
+  
+end
+
+
+
+
+
+
+
+
 
 local function brushBlock(x,y)
   if editor.erase then

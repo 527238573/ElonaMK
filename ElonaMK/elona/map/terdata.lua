@@ -3,13 +3,15 @@
 
 local terImg = data.newImage("data/terrain/terrain_wall.png")
 data.terImg = terImg
+
+
 local terImgScale = 1 --默认放大倍数
 data.terScale = terImgScale
 
 
 local twidth = terImg:getWidth()
 local theight = terImg:getHeight()
-
+data.terWhiteQuad = love.graphics.newQuad(11*32*terImgScale,16*32*terImgScale,32*terImgScale,32*terImgScale,twidth,theight)
 
 
 data.blockImgs = {}
@@ -96,10 +98,10 @@ return function()
     local function loadQuad(x,y,w,h,tt)
       data.insertQuad(tt,x*32*terImgScale,y*32*terImgScale,w*terImgScale,h*terImgScale,twidth,theight)
     end
-    loadQuad(qx,      qy+0.5, 32,32,dataT)
-    loadQuad(qx+1,    qy+0.5, 32,32,dataT)
-    loadQuad(qx+2,    qy+0.5, 32,32,dataT)
-    loadQuad(qx+3,    qy+0.5, 32,32,dataT)
+    loadQuad(qx,      qy+0.5, 32,16,dataT)
+    loadQuad(qx+1,    qy+0.5, 32,16,dataT)
+    loadQuad(qx+2,    qy+0.5, 32,16,dataT)
+    loadQuad(qx+3,    qy+0.5, 32,16,dataT)
     loadQuad(qx,      qy+1.5, 32,32,dataT)
     loadQuad(qx+1,    qy+1.5, 32,32,dataT)
     loadQuad(qx+2,    qy+1.5, 32,32,dataT)
@@ -108,9 +110,10 @@ return function()
     loadQuad(qx+1,    qy,     32,16,dataT)
     loadQuad(qx+2,    qy,     32,16,dataT)
     loadQuad(qx+3,    qy,     32,16,dataT)
-    loadQuad(qx,      qy+0.5,     32,16,dataT)
-    loadQuad(qx+2,    qy+0.5,     32,16,dataT)
-    loadQuad(qx+3,    qy+0.5,     32,16,dataT)
+    loadQuad(qx,      qy+1, 32,16,dataT)
+    loadQuad(qx+1,    qy+1, 32,16,dataT)
+    loadQuad(qx+2,    qy+1, 32,16,dataT)
+    loadQuad(qx+3,    qy+1, 32,16,dataT)
   end
   
   --整理slope
@@ -125,26 +128,27 @@ return function()
     slope[dataT.index] = dataT
     slopeIndex[dataT.id]=dataT.index
     
-    local q1x,q1y = dataT.quad1X,dataT.quad1Y
-    local q2x,q2y = dataT.quad2X,dataT.quad2Y
+    local qx,qy = dataT.quadX,dataT.quadY
     --读取quad
     local function loadQuad(x,y,w,h,tt)
       data.insertQuad(tt,x*32*terImgScale,y*32*terImgScale,w*terImgScale,h*terImgScale,twidth,theight)
     end
-    loadQuad(q1x,      q1y,   32,32,dataT)--1
-    loadQuad(q1x+1,    q1y,   32,32,dataT)--2
-    loadQuad(q1x+2,    q1y,   32,32,dataT)--3
-    loadQuad(q1x+3,    q1y,   32,32,dataT)--4
-    loadQuad(q1x,      q1y+1, 32,32,dataT)--5
-    loadQuad(q1x+1,    q1y+1, 32,32,dataT)--6
-    loadQuad(q1x+2,    q1y+1, 32,32,dataT)--7
-    loadQuad(q1x+3,    q1y+1, 32,32,dataT)--8
-    loadQuad(q2x,      q2y,     32,16,dataT)--9
-    loadQuad(q2x,      q2y+0.5, 32,32,dataT)--10
-    loadQuad(q2x,      q2y+1.5, 32,32,dataT)--11
-    loadQuad(q2x+1,    q2y,     32,16,dataT)--12
-    loadQuad(q2x+1,    q2y+0.5, 32,32,dataT)--13
-    loadQuad(q2x+1,    q2y+1.5, 32,32,dataT)--14
+    loadQuad(qx,      qy,       32,16,dataT)--1
+    loadQuad(qx+1,    qy,       32,16,dataT)--2
+    loadQuad(qx+2,    qy,       32,16,dataT)--3
+    loadQuad(qx+2,    qy+1.5,   32,16,dataT)--4
+    loadQuad(qx,      qy+0.5,   32,32,dataT)--5
+    loadQuad(qx+1,    qy+0.5,   32,32,dataT)--6
+    loadQuad(qx+2,    qy+0.5,   32,32,dataT)--7
+    loadQuad(qx+2,    qy+2,     32,32,dataT)--8
+    loadQuad(qx,      qy+1.5,   32,16,dataT)--9
+    loadQuad(qx,      qy+2,     32,16,dataT)--10
+    loadQuad(qx,      qy+2.5,   32,16,dataT)--11
+    loadQuad(qx,      qy+3,     32,32,dataT)--12
+    loadQuad(qx+1,    qy+1.5,   32,16,dataT)--13
+    loadQuad(qx+1,    qy+2,     32,16,dataT)--14
+    loadQuad(qx+1,    qy+2.5,   32,16,dataT)--15
+    loadQuad(qx+1,    qy+3,     32,32,dataT)--16
   end
   
 
